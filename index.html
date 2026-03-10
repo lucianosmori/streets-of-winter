@@ -123,6 +123,36 @@
     #btn-punch   { background: rgba(255,200,0,0.25);  left: 0;    bottom: 0; }
     #btn-kick    { background: rgba(255,100,30,0.25); right: 0;   bottom: 0; }
     #btn-special { background: rgba(80,160,255,0.25); left: 54px; top: 0;    width: 52px; height: 52px; }
+
+    /* Menu buttons — top-center */
+    #menu-btns {
+      position: absolute;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 12px;
+      pointer-events: none;
+    }
+    .menu-btn {
+      width: 72px;
+      height: 36px;
+      border-radius: 8px;
+      border: 2px solid rgba(255,255,255,0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: monospace;
+      font-size: 11px;
+      font-weight: bold;
+      color: #fff;
+      pointer-events: all;
+      touch-action: none;
+      cursor: pointer;
+    }
+    .menu-btn:active { filter: brightness(1.5); }
+    #btn-start { background: rgba(80,255,120,0.25); }
+    #btn-back  { background: rgba(200,80,80,0.25);  }
   </style>
 </head>
 <body>
@@ -146,6 +176,10 @@
       <div class="action-btn" id="btn-kick"    data-key="x">KICK</div>
       <div class="action-btn" id="btn-special" data-key="q">★ SPEC</div>
     </div>
+    <div id="menu-btns">
+      <div class="menu-btn" id="btn-start" data-key="Enter">▶ START</div>
+      <div class="menu-btn" id="btn-back"  data-key="Tab">↩ BACK</div>
+    </div>
   </div>
 
   <!-- Kaplay.js — pin to a specific version once you like the behaviour
@@ -167,8 +201,10 @@
     // Fires keydown on touchstart/mousedown and keyup on touchend/mouseup.
     // Kaplay's onKeyDown / onKeyPress / onKeyUp all respond to these.
     function fireKey(key, type) {
+      const singleChar = key.length === 1;
       window.dispatchEvent(new KeyboardEvent(type, {
-        key, code: "Key" + key.toUpperCase(),
+        key,
+        code: singleChar ? "Key" + key.toUpperCase() : key,
         bubbles: true, cancelable: true,
       }));
     }
