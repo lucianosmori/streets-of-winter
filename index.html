@@ -215,18 +215,18 @@
       btn.addEventListener("touchstart", e => {
         e.preventDefault();
         fireKey(key, "keydown");
+        // Fire keypress immediately after keydown (native order: keydown → keypress → keyup)
+        fireKey(key, "keypress");
       }, { passive: false });
 
       btn.addEventListener("touchend", e => {
         e.preventDefault();
         fireKey(key, "keyup");
-        // Also fire keypress so onKeyPress() handlers trigger
-        fireKey(key, "keypress");
       }, { passive: false });
 
       // Mouse fallback for desktop testing
-      btn.addEventListener("mousedown", () => fireKey(key, "keydown"));
-      btn.addEventListener("mouseup",   () => { fireKey(key, "keyup"); fireKey(key, "keypress"); });
+      btn.addEventListener("mousedown", () => { fireKey(key, "keydown"); fireKey(key, "keypress"); });
+      btn.addEventListener("mouseup",   () => fireKey(key, "keyup"));
     });
   </script>
 </body>
