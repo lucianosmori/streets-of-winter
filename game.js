@@ -12,7 +12,7 @@ kaplay({
   height:     SCREEN_H,
   letterbox:  true,        // maintain aspect ratio with black bars on resize
   background: [18, 18, 28],
-  // TODO: set pixelDensity: 2 for retina sharpness once final assets are in
+  pixelDensity: window.devicePixelRatio,
 });
 
 
