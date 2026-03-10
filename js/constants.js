@@ -1,0 +1,305 @@
+// =============================================================================
+// Ottawa Rage — js/constants.js
+// All tuning values, level definitions, and entity stat tables.
+// Edit numbers here; never scatter magic values through game logic.
+// =============================================================================
+
+// ── Canvas / layout ───────────────────────────────────────────────────────────
+const SCREEN_W = 800;
+const SCREEN_H = 400;
+
+// Belt-scroll ground band.  Characters are confined to this vertical strip.
+// Smaller y = further back in perspective; larger y = closer to camera.
+const GROUND_TOP    = 195;
+const GROUND_BOTTOM = 355;
+
+// ── Player tuning ─────────────────────────────────────────────────────────────
+const PLAYER_SPEED    = 185;   // px / sec
+const PLAYER_MAX_HP   = 100;
+const ATTACK_DURATION = 0.22;  // sec — movement locked while attacking
+const HURT_IFRAMES    = 0.45;  // sec — invincibility after being hit
+const KNOCKBACK       = 22;    // px — applied to enemy on hit
+const SPECIAL_HP_COST = 20;    // HP spent on special move
+const SPECIAL_RADIUS  = 115;   // px — area-of-effect radius
+const SPECIAL_DAMAGE  = 35;
+const SPECIAL_COOLDOWN = 5;    // sec
+
+// Attack configs: range (depth reach), width (lateral tolerance), damage, flash colour
+const ATTACKS = {
+  punch:   { range: 68,  width: 32, damage: 12, fxColor: [255, 230, 80]  },
+  kick:    { range: 90,  width: 42, damage: 22, fxColor: [255, 130, 40]  },
+};
+
+// ── Player character roster ───────────────────────────────────────────────────
+// TODO: Add a character-select screen and expand this array with more heroes.
+const PLAYER_CONFIGS = [
+  {
+    name:    "LUCIANO",
+    col:     [80,  160, 255],   // placeholder rect colour
+    hurtCol: [255, 80,  80 ],
+    // TODO: sprite: "hero_luciano"
+    keys: { up:"w", down:"s", left:"a", right:"d", punch:"z", kick:"x", special:"q" },
+    startX: 120,
+  },
+  {
+    name:    "PRIYA",
+    col:     [80,  220, 120],
+    hurtCol: [255, 200, 60 ],
+    // TODO: sprite: "hero_priya"
+    keys: { up:"i", down:"k", left:"j", right:"l", punch:"u", kick:"o", special:"p" },
+    startX: 175,
+  },
+];
+
+// ── Level definitions ─────────────────────────────────────────────────────────
+// Each level has:
+//   stores     — placeholder storefronts rendered as coloured rects + sign text
+//   npcTypes   — pool of NPC archetypes to spawn in background
+//   waves      — array of wave definitions; each wave = array of {type, count}
+//   boss       — { type, name, count? }  (count defaults to 1)
+//   pickups    — types available in this level (health drops + weapon pickups)
+//   bossIntro  — banner text when the boss spawns
+//   skyCol     — [r,g,b] sky/upper-half colour
+//   groundCol  — [r,g,b] sidewalk surface colour
+const LEVELS = [
+  // ── Level 1 ────────────────────────────────────────────────────────────────
+  {
+    id: 1, name: "Bank Street Shops", subtitle: "The Strip",
+    skyCol: [60, 65, 80], groundCol: [200, 195, 185],
+    // TODO: replace stores with loadSprite("bg_bankstreet", ...) parallax layer
+    stores: [
+      { label: "TIM HORTONS", x:   0, w: 156, h: 130, col: [180, 20,  20 ] },
+      { label: "DOLLARAMA",   x: 164, w: 140, h: 112, col: [20,  130, 20 ] },
+      { label: "CURRY PALACE",x: 312, w: 168, h: 122, col: [200, 150, 20 ] },
+      { label: "DEP",         x: 488, w: 132, h: 100, col: [80,  80,  160] },
+      { label: "SMOKE SHOP",  x: 628, w: 172, h: 126, col: [90,  60,  40 ] },
+    ],
+    npcTypes: ["turban", "quebecois", "african"],
+    waves: [
+      [{ type:"grunt",  count:3 }],
+      [{ type:"grunt",  count:2 }, { type:"heavy",  count:1 }],
+      [{ type:"grunt",  count:3 }, { type:"heavy",  count:1 }],
+    ],
+    boss:      { type:"heavy_boss",    name:"Big Earl" },
+    pickups:   ["donut", "cart", "coffee"],
+    bossIntro: "BIG EARL blocks the Tim Hortons exit!",
+  },
+
+  // ── Level 2 ────────────────────────────────────────────────────────────────
+  {
+    id: 2, name: "ByWard Market", subtitle: "The Market",
+    skyCol: [55, 60, 75], groundCol: [190, 185, 175],
+    stores: [
+      { label: "BYWARD MUFFIN", x:   0, w: 152, h: 120, col: [160, 100, 40 ] },
+      { label: "BAREFAX",       x: 160, w: 162, h: 140, col: [120, 20,  120] }, // neon purple
+      { label: "FLOWERS",       x: 330, w: 132, h: 100, col: [40,  130, 80 ] },
+      { label: "MARKET STALL",  x: 470, w: 162, h: 90,  col: [160, 120, 30 ] },
+      { label: "CHEESE PLACE",  x: 640, w: 160, h: 112, col: [200, 180, 60 ] },
+    ],
+    npcTypes: ["lgbtq", "ukrainian", "turban"],
+    waves: [
+      [{ type:"grunt",    count:2 }, { type:"stripper", count:1 }],
+      [{ type:"agile",    count:2 }, { type:"stripper", count:2 }],
+      [{ type:"stripper", count:2 }, { type:"heavy",    count:1 }, { type:"agile", count:2 }],
+    ],
+    boss:      { type:"stripper_boss", name:"The Duo", count:2 },
+    pickups:   ["bottle", "fruit_cart", "donut"],
+    bossIntro: "THE DUO guard the Barefax door!",
+  },
+
+  // ── Level 3 ────────────────────────────────────────────────────────────────
+  {
+    id: 3, name: "Rideau Canal", subtitle: "The Canal",
+    skyCol: [70, 80, 100], groundCol: [210, 220, 230],  // snow / ice palette
+    stores: [
+      { label: "SKATE SHACK",   x:   0, w: 148, h: 100, col: [80,  80,  120] },
+      { label: "HOT CHOC",      x: 156, w: 142, h:  95, col: [120, 70,  30 ] },
+      { label: "PARLIAMENT ▶▶", x: 306, w: 198, h:  80, col: [50,  80,  50 ] }, // distant silhouette
+      { label: "CANAL TRAIL",   x: 512, w: 148, h:  88, col: [70,  90,  110] },
+      { label: "FISH HUT",      x: 668, w: 132, h:  95, col: [90,  60,  40 ] },
+    ],
+    npcTypes: ["hijab", "quebecois", "african"],
+    waves: [
+      [{ type:"agile",    count:3 }],
+      [{ type:"agile",    count:2 }, { type:"crackhead", count:2 }],
+      [{ type:"kicker",   count:2 }, { type:"crackhead", count:2 }, { type:"agile", count:1 }],
+    ],
+    boss:      { type:"heavy_chain", name:"Chain Daddy" },
+    pickups:   ["skate", "fish", "coffee"],
+    bossIntro: "CHAIN DADDY descends from the barge!",
+  },
+
+  // ── Level 4 ────────────────────────────────────────────────────────────────
+  {
+    id: 4, name: "Curry Street", subtitle: "The Strip",
+    skyCol: [50, 45, 60], groundCol: [185, 175, 160],
+    stores: [
+      { label: "DESI KITCHEN",  x:   0, w: 156, h: 130, col: [200, 150, 20 ] },
+      { label: "SPICE WORLD",   x: 164, w: 146, h: 120, col: [220, 80,  20 ] },
+      { label: "BIRYANI HOUSE", x: 318, w: 166, h: 135, col: [180, 140, 20 ] },
+      { label: "HALAL MEATS",   x: 492, w: 136, h: 110, col: [160, 40,  40 ] },
+      { label: "SWEET SHOP",    x: 636, w: 164, h: 120, col: [200, 160, 60 ] },
+    ],
+    npcTypes: ["turban", "ukrainian", "lgbtq"],
+    waves: [
+      [{ type:"crackhead", count:3 }, { type:"grunt",    count:1 }],
+      [{ type:"crackhead", count:3 }, { type:"kicker",   count:2 }],
+      [{ type:"crackhead", count:2 }, { type:"grunt",    count:2 }, { type:"kicker", count:2 }],
+    ],
+    boss:      { type:"drug_lord", name:"The Chef" },
+    pickups:   ["samosa", "spice_cart", "coffee"],
+    bossIntro: "THE CHEF steps off the food truck!",
+  },
+
+  // ── Level 5 ────────────────────────────────────────────────────────────────
+  {
+    id: 5, name: "Parliament Hill", subtitle: "The Finale",
+    skyCol: [40, 50, 70], groundCol: [215, 220, 215],
+    stores: [
+      { label: "EAST BLOCK",  x:   0, w: 148, h: 130, col: [55, 70, 55] },
+      { label: "PARLIAMENT",  x: 156, w: 488, h: 160, col: [50, 80, 50] }, // centrepiece green copper roof
+      { label: "WEST BLOCK",  x: 652, w: 148, h: 130, col: [55, 70, 55] },
+    ],
+    npcTypes: ["palestinian", "turban", "hijab", "quebecois"],
+    waves: [
+      [{ type:"heavy",    count:2 }, { type:"grunt",    count:2 }],
+      [{ type:"heavy",    count:2 }, { type:"stripper", count:2 }, { type:"grunt",  count:2 }],
+      [{ type:"heavy",    count:3 }, { type:"kicker",   count:2 }, { type:"stripper", count:2 }],
+    ],
+    boss:      { type:"syndicate_boss", name:"The Overlord" },
+    pickups:   ["flagpole", "statue", "samosa"],
+    bossIntro: "THE OVERLORD stands atop Parliament!",
+  },
+];
+
+// ── Enemy stat table ──────────────────────────────────────────────────────────
+// TODO: Add "sprite" key to each entry once spritesheet is in assets/.
+//       Remove the matching rect/color in spawnEnemy() and add sprite() component.
+const ENEMY_DEFS = {
+  grunt: {
+    label:"GRUNT",   col:[160, 80, 80],  w:26, h:46,
+    hp:50,  speed:58,  damage:8,  attackRange:38, attackCooldown:1.4,
+    taunts:["Get lost, eh!", "Stay from away!", "Puck off!"],
+    // TODO: sprite:"enemy_grunt"
+  },
+  agile: {
+    label:"SLIDER",  col:[120, 80, 140], w:24, h:44,
+    hp:35,  speed:90,  damage:6,  attackRange:45, attackCooldown:0.9,
+    taunts:["Too slow, bud!", "Catch this deke!", "Shinny's over!"],
+    // TODO: sprite:"enemy_agile"
+  },
+  heavy: {
+    label:"HEAVY",   col:[140, 60, 40],  w:34, h:50,
+    hp:90,  speed:40,  damage:14, attackRange:42, attackCooldown:1.8,
+    taunts:["Crush time, eh!", "Burly smash!", "Take the body!"],
+    // TODO: sprite:"enemy_heavy"
+  },
+  stripper: {
+    label:"WHIPLASH", col:[220, 100, 160], w:22, h:46,
+    hp:45,  speed:80,  damage:10, attackRange:62, attackCooldown:1.1,
+    taunts:["Back off!", "Dance with me!", "Whip it!"],
+    // TODO: sprite:"enemy_stripper"
+  },
+  crackhead: {
+    label:"ADDICT",  col:[110, 100, 75], w:22, h:42,
+    hp:30,  speed:72,  damage:7,  attackRange:40, attackCooldown:0.8,
+    taunts:["Gimme that!", "Heh heh, mine!", "Burn ya!"],
+    // TODO: sprite:"enemy_crackhead"
+  },
+  kicker: {
+    label:"KICKER",  col:[80, 120, 160], w:24, h:46,
+    hp:55,  speed:65,  damage:12, attackRange:52, attackCooldown:1.0,
+    taunts:["Kick your ass!", "Feel the burn!", "Block this!"],
+    // TODO: sprite:"enemy_kicker"
+  },
+  // ── Boss variants ──────────────────────────────────────────────────────────
+  heavy_boss: {
+    label:"BIG EARL",    col:[120, 40, 20],  w:40, h:56,
+    hp:200, speed:35, damage:16, attackRange:52, attackCooldown:2.0, isBoss:true,
+    taunts:["Bank Street's mine!", "You're done in Ottawa!"],
+    // TODO: sprite:"boss_earl"
+  },
+  stripper_boss: {
+    label:"THE DUO",     col:[200, 50, 140], w:30, h:52,
+    hp:180, speed:75, damage:14, attackRange:70, attackCooldown:1.2, isBoss:true,
+    taunts:["You can't handle us!", "Two's company!"],
+    // TODO: sprite:"boss_duo"
+  },
+  heavy_chain: {
+    label:"CHAIN DADDY", col:[80, 80, 40],   w:42, h:54,
+    hp:220, speed:38, damage:18, attackRange:68, attackCooldown:1.8, isBoss:true,
+    taunts:["Chain check, buddy!", "Nobody passes the barge!"],
+    // TODO: sprite:"boss_chain"
+  },
+  drug_lord: {
+    label:"THE CHEF",    col:[160, 120, 20], w:36, h:52,
+    hp:240, speed:45, damage:15, attackRange:56, attackCooldown:1.6, isBoss:true,
+    taunts:["This is my street!", "You mess with the chef?"],
+    // TODO: sprite:"boss_chef"
+  },
+  syndicate_boss: {
+    label:"OVERLORD",    col:[40, 40, 80],   w:44, h:60,
+    hp:300, speed:30, damage:20, attackRange:62, attackCooldown:2.2, isBoss:true,
+    taunts:["Ottawa belongs to me!", "The Hill is mine!"],
+    // TODO: sprite:"boss_overlord"
+  },
+};
+
+// ── NPC archetypes ────────────────────────────────────────────────────────────
+// NPCs are always passive.  They wander, react to fights, flee from enemies.
+// TODO: Add "sprite" key once NPC spritesheets exist in assets/.
+const NPC_DEFS = {
+  turban: {
+    col:[210, 170, 110], accentCol:[255, 120, 0],   w:22, h:44, speed:25,
+    phrases:["Arre yaar!", "Bas karo!", "Chai piyoge?"],
+    // TODO: sprite:"npc_turban"
+  },
+  lgbtq: {
+    col:[255, 140, 200], accentCol:[255, 80, 200],  w:22, h:44, speed:30,
+    phrases:["Love wins!", "Stay fabulous!", "You go girl!"],
+    // TODO: sprite:"npc_lgbtq"
+  },
+  hijab: {
+    col:[100, 120, 200], accentCol:[60, 80, 160],   w:22, h:44, speed:20,
+    phrases:["Astaghfirullah!", "SubhanAllah!", "Peace be upon you."],
+    // TODO: sprite:"npc_hijab"
+  },
+  african: {
+    col:[160, 100, 50],  accentCol:[220, 160, 40],  w:22, h:44, speed:28,
+    phrases:["Habari!", "Selam!", "Insha'Allah!"],
+    // TODO: sprite:"npc_african"
+  },
+  quebecois: {
+    col:[220, 180, 140], accentCol:[200, 60, 60],   w:24, h:44, speed:22,
+    phrases:["Tabarnak!", "Câlisse!", "Go Sens go!"],
+    // TODO: sprite:"npc_quebecois"
+  },
+  ukrainian: {
+    col:[255, 220, 180], accentCol:[30, 120, 220],  w:22, h:44, speed:25,
+    phrases:["Slava Ukraini!", "Davai!", "Nemozhlyvo!"],
+    // TODO: sprite:"npc_ukrainian"
+  },
+  palestinian: {
+    col:[210, 190, 160], accentCol:[20, 120, 40],   w:22, h:44, speed:30,
+    phrases:["Free Palestine!", "Intifada!", "Ya free!"],
+    // TODO: sprite:"npc_palestinian"
+  },
+};
+
+// ── Pickup table ──────────────────────────────────────────────────────────────
+// heal > 0  → restores HP on contact
+// isWeapon  → player holds it; attacks use weapon damage/uses until it breaks
+// TODO: Add sprite keys once pickup sprites exist in assets/.
+const PICKUP_DEFS = {
+  donut:      { col:[220,170,100], label:"DONUT",   heal:20, isWeapon:false,                   w:18, h:14 },
+  samosa:     { col:[200,150, 50], label:"SAMOSA",  heal:25, isWeapon:false,                   w:16, h:16 },
+  coffee:     { col:[100, 60, 30], label:"COFFEE",  heal:15, isWeapon:false,                   w:14, h:20 },
+  fish:       { col:[150,200,220], label:"FISH",    heal:10, isWeapon:false,                   w:28, h:14 },
+  bottle:     { col:[100,160, 80], label:"BOTTLE",  heal: 0, isWeapon:true,  damage:18, uses:3, w:10, h:24 },
+  cart:       { col:[160,160,160], label:"CART",    heal: 0, isWeapon:true,  damage:30, uses:2, w:40, h:28 },
+  spice_cart: { col:[200,100, 20], label:"SPICE",   heal: 0, isWeapon:true,  damage:22, uses:3, w:36, h:28 },
+  fruit_cart: { col:[220,140, 60], label:"FRUITS",  heal: 0, isWeapon:true,  damage:25, uses:2, w:40, h:28 },
+  flagpole:   { col:[200, 50, 50], label:"FLAG",    heal: 0, isWeapon:true,  damage:28, uses:4, w: 8, h:55 },
+  skate:      { col:[180,200,220], label:"SKATE",   heal: 0, isWeapon:true,  damage:20, uses:2, w:30, h:12 },
+  statue:     { col:[160,140,100], label:"STATUE",  heal: 0, isWeapon:true,  damage:40, uses:1, w:20, h:50 },
+};
