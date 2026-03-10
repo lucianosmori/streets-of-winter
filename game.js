@@ -389,6 +389,7 @@ scene("game", ({ numPlayers = 1, levelIdx = 0 }) => {
     if (p.hurtTimer > 0 || p.hp <= 0) return;   // invincibility or already dead
 
     p.hp        = Math.max(0, p.hp - damage);
+    p.state     = "hurt";
     p.hurtTimer = HURT_IFRAMES;
 
     spawnFloatText(`-${damage}`, p.pos.x, p.pos.y - 58, [255, 80, 80]);

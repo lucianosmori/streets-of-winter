@@ -229,6 +229,13 @@ function updatePlayerMovement(p) {
   // Flip sprite to face movement direction
   if (cfg.sprite) p.flipX = (p.facing < 0);
 
+  // Trigger animation on state change — must run before locked-return so that
+  // states set externally (punch/kick/special/hurt) play immediately.
+  if (cfg.sprite && p.state !== p._lastState) {
+    p.play(p.state);
+    p._lastState = p.state;
+  }
+
   const locked = p.attackTimer > 0 || p.hurtTimer > 0;
   if (locked) { p.z = p.pos.y; return; }
 
@@ -245,12 +252,6 @@ function updatePlayerMovement(p) {
     p.state = "walk";
   } else {
     p.state = "idle";
-  }
-
-  // Trigger animation only on state change
-  if (cfg.sprite && p.state !== p._lastState) {
-    p.play(p.state);
-    p._lastState = p.state;
   }
 
   // Hard clamp to playfield
