@@ -19,9 +19,135 @@
       image-rendering: crisp-edges;
       display: block;
     }
+
+    /* ── Rotate overlay ──────────────────────────────────────────────────────── */
+    #rotate-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: #05050a;
+      z-index: 9999;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-family: monospace;
+      font-size: 1.1rem;
+      text-align: center;
+      gap: 20px;
+    }
+    #rotate-overlay .icon {
+      font-size: 3rem;
+      animation: spin 1.5s ease-in-out infinite alternate;
+    }
+    @keyframes spin {
+      from { transform: rotate(-20deg); }
+      to   { transform: rotate(20deg);  }
+    }
+    @media (orientation: portrait) {
+      #rotate-overlay { display: flex; }
+    }
+
+    /* ── Virtual gamepad ─────────────────────────────────────────────────────── */
+    #gamepad {
+      display: none;          /* shown only on touch devices via JS */
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 160px;
+      pointer-events: none;   /* children re-enable as needed */
+      z-index: 1000;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    /* D-pad cluster — bottom-left */
+    #dpad {
+      position: absolute;
+      left: 18px;
+      bottom: 18px;
+      width: 132px;
+      height: 132px;
+      pointer-events: none;
+    }
+    .dpad-btn {
+      position: absolute;
+      width: 42px;
+      height: 42px;
+      background: rgba(255,255,255,0.12);
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: rgba(255,255,255,0.7);
+      pointer-events: all;
+      touch-action: none;
+      cursor: pointer;
+    }
+    .dpad-btn:active { background: rgba(255,255,255,0.28); }
+    #btn-up    { left: 45px; top: 0;    }
+    #btn-down  { left: 45px; bottom: 0; }
+    #btn-left  { left: 0;    top: 45px; }
+    #btn-right { right: 0;   top: 45px; }
+
+    /* Action buttons — bottom-right */
+    #actions {
+      position: absolute;
+      right: 18px;
+      bottom: 18px;
+      width: 160px;
+      height: 100px;
+      pointer-events: none;
+    }
+    .action-btn {
+      position: absolute;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: monospace;
+      font-size: 11px;
+      font-weight: bold;
+      color: #fff;
+      pointer-events: all;
+      touch-action: none;
+      cursor: pointer;
+    }
+    .action-btn:active { filter: brightness(1.5); }
+    #btn-punch   { background: rgba(255,200,0,0.25);  left: 0;    bottom: 0; }
+    #btn-kick    { background: rgba(255,100,30,0.25); right: 0;   bottom: 0; }
+    #btn-special { background: rgba(80,160,255,0.25); left: 54px; top: 0;    width: 52px; height: 52px; }
   </style>
 </head>
 <body>
+
+  <!-- Portrait-mode blocker -->
+  <div id="rotate-overlay">
+    <div class="icon">📱</div>
+    <div>Rotate your device<br>to landscape to play</div>
+  </div>
+
+  <!-- Virtual gamepad (visible on touch devices only) -->
+  <div id="gamepad">
+    <div id="dpad">
+      <div class="dpad-btn" id="btn-up"    data-key="w">▲</div>
+      <div class="dpad-btn" id="btn-down"  data-key="s">▼</div>
+      <div class="dpad-btn" id="btn-left"  data-key="a">◀</div>
+      <div class="dpad-btn" id="btn-right" data-key="d">▶</div>
+    </div>
+    <div id="actions">
+      <div class="action-btn" id="btn-punch"   data-key="z">PUNCH</div>
+      <div class="action-btn" id="btn-kick"    data-key="x">KICK</div>
+      <div class="action-btn" id="btn-special" data-key="q">★ SPEC</div>
+    </div>
+  </div>
+
   <!-- Kaplay.js — pin to a specific version once you like the behaviour
        e.g. kaplay@3001.0.17.  https://kaplayjs.com -->
   <script src="https://unpkg.com/kaplay@3001/dist/kaplay.js"></script>
@@ -30,5 +156,42 @@
   <script src="js/constants.js"></script>
   <script src="js/entities.js"></script>
   <script src="game.js"></script>
+
+  <script>
+    // ── Show gamepad only on real touch devices ───────────────────────────────
+    if (window.matchMedia("(pointer: coarse)").matches) {
+      document.getElementById("gamepad").style.display = "block";
+    }
+
+    // ── Virtual button → synthetic KeyboardEvent ─────────────────────────────
+    // Fires keydown on touchstart/mousedown and keyup on touchend/mouseup.
+    // Kaplay's onKeyDown / onKeyPress / onKeyUp all respond to these.
+    function fireKey(key, type) {
+      window.dispatchEvent(new KeyboardEvent(type, {
+        key, code: "Key" + key.toUpperCase(),
+        bubbles: true, cancelable: true,
+      }));
+    }
+
+    document.querySelectorAll("[data-key]").forEach(btn => {
+      const key = btn.dataset.key;
+
+      btn.addEventListener("touchstart", e => {
+        e.preventDefault();
+        fireKey(key, "keydown");
+      }, { passive: false });
+
+      btn.addEventListener("touchend", e => {
+        e.preventDefault();
+        fireKey(key, "keyup");
+        // Also fire keypress so onKeyPress() handlers trigger
+        fireKey(key, "keypress");
+      }, { passive: false });
+
+      // Mouse fallback for desktop testing
+      btn.addEventListener("mousedown", () => fireKey(key, "keydown"));
+      btn.addEventListener("mouseup",   () => { fireKey(key, "keyup"); fireKey(key, "keypress"); });
+    });
+  </script>
 </body>
 </html>
