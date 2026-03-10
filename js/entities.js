@@ -140,15 +140,15 @@ function showSpeechBubble(msg, srcX, srcY, duration = 2.2) {
 
   // Bubble background
   add([rect(W, 19), pos(bx, by),
-       color(250, 248, 230), z(800), lifespan(duration, { fade: 0.45 })]);
+       color(250, 248, 230), opacity(1), z(800), lifespan(duration, { fade: 0.45 })]);
 
   // Bubble text
   add([text(msg, { size: 8 }), pos(bx + 4, by + 4),
-       color(30, 30, 30), z(801), lifespan(duration, { fade: 0.45 })]);
+       color(30, 30, 30), opacity(1), z(801), lifespan(duration, { fade: 0.45 })]);
 
   // Pointer nub below the bubble
   add([rect(7, 7), pos(clamp(srcX - 3, bx + 4, bx + W - 10), by + 17),
-       color(250, 248, 230), z(800), lifespan(duration, { fade: 0.45 })]);
+       color(250, 248, 230), opacity(1), z(800), lifespan(duration, { fade: 0.45 })]);
 }
 
 /** Spawn a floating damage / score number that rises and fades. */
@@ -156,6 +156,7 @@ function spawnFloatText(msg, x, y, col) {
   add([text(msg, { size: 11 }),
        pos(x + rand(-10, 10), y),
        color(...col),
+       opacity(1),
        z(820),
        lifespan(0.75, { fade: 0.3 }),
        // Drift upward each frame via a tiny onUpdate scoped to this object
@@ -326,7 +327,7 @@ function updateEnemy(e, target, onAttack) {
       onAttack(e.def.damage);
       // Tiny red flash on attack
       add([rect(14, 14), pos(e.pos.x + e.facing * 14, e.pos.y - 28),
-           anchor("center"), color(255, 60, 60), z(e.pos.y + 5), lifespan(0.1)]);
+           anchor("center"), color(255, 60, 60), opacity(1), z(e.pos.y + 5), lifespan(0.1)]);
       // TODO: e.play("attack") on sprite
     }
   } else {
@@ -458,6 +459,7 @@ function spawnPickup(type, x, y) {
     text(def.label, { size: 7 }),
     pos(x - def.w / 2, y - def.h - 14),
     color(255, 240, 180),
+    opacity(1),
     z(286),
     lifespan(4, { fade: 0.5 }),   // fades away after 4s; pickup stays until collected
   ]);

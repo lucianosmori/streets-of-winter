@@ -12,7 +12,7 @@ kaplay({
   height:     SCREEN_H,
   letterbox:  true,        // maintain aspect ratio with black bars on resize
   background: [18, 18, 28],
-  // TODO: set pixelDensity: 2 for retina sharpness once final assets are in
+  pixelDensity: window.devicePixelRatio,
 });
 
 
@@ -297,7 +297,7 @@ scene("game", ({ numPlayers = 1, levelIdx = 0 }) => {
     // TODO: Replace with attack-arc sprite / particle effect
     const fxX = p.pos.x + p.facing * (14 + range * 0.5);
     add([rect(22, 22), pos(fxX, p.pos.y - 30),
-         anchor("center"), color(...atk.fxColor),
+         anchor("center"), color(...atk.fxColor), opacity(1),
          z(p.pos.y + 10), lifespan(0.12)]);
 
     // TODO: play("sfx_punch") / play("sfx_kick")
@@ -485,7 +485,7 @@ scene("game", ({ numPlayers = 1, levelIdx = 0 }) => {
   function showBanner(msg, duration) {
     add([text(msg, { size: 28, align: "center" }),
          pos(SCREEN_W / 2, SCREEN_H / 2 - 20), anchor("center"),
-         color(255, 215, 60), fixed(), z(500),
+         color(255, 215, 60), opacity(1), fixed(), z(500),
          lifespan(duration, { fade: 0.4 })]);
   }
 
