@@ -34,10 +34,10 @@ const ATTACKS = {
 // TODO: Add a character-select screen and expand this array with more heroes.
 const PLAYER_CONFIGS = [
   {
-    name:    "LUCIANO",
-    col:     [80,  160, 255],   // placeholder rect colour
+    name:    "TAXPAYER",
+    col:     [255, 255, 255],   // white = neutral sprite tint
     hurtCol: [255, 80,  80 ],
-    // TODO: sprite: "hero_luciano"
+    sprite:  "hero_taxpayer",
     keys: { up:"w", down:"s", left:"a", right:"d", punch:"z", kick:"x", special:"q" },
     startX: 120,
   },

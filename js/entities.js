@@ -179,10 +179,10 @@ function spawnPlayer(idx) {
   const cfg = PLAYER_CONFIGS[idx];
   const startY = lerp(GROUND_TOP + 24, GROUND_BOTTOM, 0.5 + idx * 0.12);
 
-  // TODO: Swap rect/color for sprite(cfg.sprite), then call p.play("idle") on state change.
-  //       Flip the sprite horizontally when p.facing changes: p.flipX = (p.facing < 0)
+  const useSprite = !!cfg.sprite;
   const p = add([
-    rect(28, 48),
+    useSprite ? sprite(cfg.sprite) : rect(28, 48),
+    useSprite ? scale(0.35) : scale(1),
     pos(cfg.startX, startY),
     anchor("bot"),           // pos = feet centre; correct for depth sorting
     color(...cfg.col),
@@ -193,6 +193,7 @@ function spawnPlayer(idx) {
       hp:             PLAYER_MAX_HP,
       maxHp:          PLAYER_MAX_HP,
       state:          "idle",   // idle | walk | punch | kick | special | hurt
+      _lastState:     null,     // used to detect state changes for play()
       attackTimer:    0,        // > 0 while in attack state
       hurtTimer:      0,        // > 0 during invincibility frames
       specialCooldown:0,
@@ -200,6 +201,7 @@ function spawnPlayer(idx) {
       heldWeapon:     null,     // { type, uses, damage } or null
     },
   ]);
+  if (useSprite) p.play("idle");
   return p;
 }
 
@@ -214,13 +216,24 @@ function updatePlayerMovement(p) {
   p.hurtTimer       = Math.max(0, p.hurtTimer       - dt());
   p.specialCooldown = Math.max(0, p.specialCooldown - dt());
 
-  // Visual state colour; TODO: replace with p.play(p.state) on a sprite
-  p.color = p.hurtTimer > 0 ? rgb(...cfg.hurtCol) : rgb(...cfg.col);
-
-  // Weapon tint overlay (held weapon = slightly orange tint on placeholder)
-  if (p.heldWeapon) {
+  // Colour tint: hurt = red flash, weapon held = weapon colour, normal = neutral
+  if (p.hurtTimer > 0) {
+    p.color = rgb(...cfg.hurtCol);
+  } else if (p.heldWeapon) {
     const d = PICKUP_DEFS[p.heldWeapon.type];
     p.color = rgb(...d.col);   // TODO: show held item as a separate sprite layer
+  } else {
+    p.color = rgb(...cfg.col);
+  }
+
+  // Flip sprite to face movement direction
+  if (cfg.sprite) p.flipX = (p.facing < 0);
+
+  // Trigger animation on state change — must run before locked-return so that
+  // states set externally (punch/kick/special/hurt) play immediately.
+  if (cfg.sprite && p.state !== p._lastState) {
+    p.play(p.state);
+    p._lastState = p.state;
   }
 
   const locked = p.attackTimer > 0 || p.hurtTimer > 0;
