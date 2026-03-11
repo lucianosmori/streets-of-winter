@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c \"from PIL import Image; img = Image.open\\(''assets/grunt_art.png''\\); w,h = img.size; print\\(f''Size: {w}x{h}''\\); print\\(f''8 cols: {w}/8 = {w/8}''\\); print\\(f''4 rows: {h}/4 = {h/4}''\\); print\\(f''Clean? w%8={w%8}, h%4={h%4}''\\)\")"
+    ]
+  }
+}

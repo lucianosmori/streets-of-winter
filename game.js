@@ -36,8 +36,16 @@ loadSprite("hero_taxpayer", "assets/hero_taxpayer.png", {
 // loadSprite("hero_priya", "assets/hero_priya.png", { /* same layout */ });
 
 // ── Enemy spritesheets ────────────────────────────────────────────────────────
-// loadSprite("enemy_grunt",    "assets/enemy_grunt.png",    { sliceX:6, sliceY:4,
-//   anims:{ walk:{from:0,to:5,loop:true}, attack:{from:6,to:9}, hurt:{from:10,to:11} } });
+loadSprite("enemy_grunt", "assets/grunt_art.png", {
+  sliceX: 8, sliceY: 4,
+  anims: {
+    walk:   { from: 0,  to: 7,  loop: true,  speed: 10 },  // row 0: walk cycle
+    idle:   { from: 8,  to: 15, loop: true,  speed: 8  },  // row 1: patrol/idle
+    attack: { from: 16, to: 23, loop: false, speed: 12 },  // row 2: attack
+    hurt:   { from: 24, to: 27, loop: false, speed: 8  },  // row 3, cols 0-3: flinch
+    death:  { from: 28, to: 31, loop: false, speed: 6  },  // row 3, cols 4-7: collapse
+  },
+});
 // loadSprite("enemy_agile",    "assets/enemy_agile.png",    { /* same layout */ });
 // loadSprite("enemy_heavy",    "assets/enemy_heavy.png",    { /* same layout */ });
 // loadSprite("enemy_stripper", "assets/enemy_stripper.png", { /* same layout */ });
@@ -366,7 +374,6 @@ scene("game", ({ numPlayers = 1, levelIdx = 0 }) => {
   function killEnemy(e) {
     if (e.state === "dead") return;  // guard against double-kill in same frame
     e.state = "dead";
-    e.color = rgb(255, 255, 255);   // death flash
 
     // Score popup
     const pts = e.def.isBoss ? 500 : 100;
@@ -378,11 +385,21 @@ scene("game", ({ numPlayers = 1, levelIdx = 0 }) => {
       pickups.push(spawnPickup(drop, e.pos.x, e.pos.y));
     }
 
-    wait(0.14, () => {
-      destroy(e);
-      enemies = enemies.filter(x => x !== e);
-      checkWaveCleared();
-    });
+    if (e.def.sprite) {
+      e.play("death");
+      wait(0.5, () => {
+        destroy(e);
+        enemies = enemies.filter(x => x !== e);
+        checkWaveCleared();
+      });
+    } else {
+      e.color = rgb(255, 255, 255);   // death flash
+      wait(0.14, () => {
+        destroy(e);
+        enemies = enemies.filter(x => x !== e);
+        checkWaveCleared();
+      });
+    }
   }
 
   function hitPlayer(p, damage) {

@@ -180,7 +180,7 @@ const ENEMY_DEFS = {
     label:"GRUNT",   col:[160, 80, 80],  w:26, h:46,
     hp:50,  speed:58,  damage:8,  attackRange:38, attackCooldown:1.4,
     taunts:["Get lost, eh!", "Stay from away!", "Puck off!"],
-    // TODO: sprite:"enemy_grunt"
+    sprite:"enemy_grunt",
   },
   agile: {
     label:"SLIDER",  col:[120, 80, 140], w:24, h:44,

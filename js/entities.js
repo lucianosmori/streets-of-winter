@@ -276,12 +276,13 @@ function updatePlayerMovement(p) {
 function spawnEnemy(type, x, y) {
   const def = ENEMY_DEFS[type];
 
-  // TODO: Swap rect/color for sprite(def.sprite) and call e.play("walk") etc.
+  const useSprite = !!def.sprite;
   const e = add([
-    rect(def.w, def.h),
+    useSprite ? sprite(def.sprite) : rect(def.w, def.h),
+    useSprite ? scale(def.h / 192) : scale(1),
     pos(x, y),
     anchor("bot"),
-    color(...def.col),
+    useSprite ? color(255, 255, 255) : color(...def.col),
     z(300),
     {
       def,
@@ -289,12 +290,14 @@ function spawnEnemy(type, x, y) {
       hp:            def.hp,
       maxHp:         def.hp,
       state:         "walk",   // walk | hurt | dead
+      _lastState:    null,
       hurtTimer:     0,
       attackCooldown: rand(0.3, def.attackCooldown),  // stagger initial strikes
       tauntCooldown:  rand(4, 10),
       facing:        -1,
     },
   ]);
+  if (useSprite) e.play("walk");
   return e;
 }
 
@@ -311,9 +314,11 @@ function updateEnemy(e, target, onAttack) {
 
   // Colour flash when hurt — brighter version of base colour
   const dc = e.def.col;
-  e.color = e.hurtTimer > 0
-    ? rgb(Math.min(255, dc[0]+90), Math.min(255, dc[1]+90), Math.min(255, dc[2]+90))
-    : rgb(...dc);
+  if (!e.def.sprite) {
+    e.color = e.hurtTimer > 0
+      ? rgb(Math.min(255, dc[0]+90), Math.min(255, dc[1]+90), Math.min(255, dc[2]+90))
+      : rgb(...dc);
+  }
 
   // Recover from hurt stun
   if (e.state === "hurt" && e.hurtTimer <= 0) e.state = "walk";
@@ -341,7 +346,7 @@ function updateEnemy(e, target, onAttack) {
       // Tiny red flash on attack
       add([rect(14, 14), pos(e.pos.x + e.facing * 14, e.pos.y - 28),
            anchor("center"), color(255, 60, 60), opacity(1), z(e.pos.y + 5), lifespan(0.1)]);
-      // TODO: e.play("attack") on sprite
+      if (e.def.sprite) e.play("attack");
     }
   } else {
     // Walk toward target
@@ -349,6 +354,16 @@ function updateEnemy(e, target, onAttack) {
     e.pos.y += (dy / dist) * e.def.speed * dt();
     e.pos.x  = clamp(e.pos.x, 20, SCREEN_W - 20);
     e.pos.y  = clamp(e.pos.y, GROUND_TOP + 24, GROUND_BOTTOM);
+  }
+
+  // Sprite animation state & facing
+  if (e.def.sprite) {
+    if (e.state !== e._lastState) {
+      if (e.state === "walk") e.play("walk");
+      else if (e.state === "hurt") e.play("hurt");
+      e._lastState = e.state;
+    }
+    e.flipX = e.facing < 0;  // sprite faces right by default, flip when facing left
   }
 
   e.z = e.pos.y;  // depth sort
