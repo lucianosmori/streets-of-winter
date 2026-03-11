@@ -23,14 +23,14 @@ kaplay({
 
 // ── Hero spritesheets ─────────────────────────────────────────────────────────
 loadSprite("hero_taxpayer", "assets/hero_taxpayer.png", {
-  sliceX: 8, sliceY: 6,
+  sliceX: 12, sliceY: 6,
   anims: {
     idle:    { from: 0,  to: 0,  loop: true,  speed: 1  },   // row 0, single frame
-    walk:    { from: 8,  to: 15, loop: true,  speed: 10 },   // row 1
-    punch:   { from: 16, to: 19, loop: false, speed: 12 },   // row 2, cols 0-3
-    kick:    { from: 20, to: 23, loop: false, speed: 10 },   // row 2, cols 4-7
-    special: { from: 24, to: 31, loop: false, speed: 8  },   // row 3 (Audit Slam / ice burst)
-    hurt:    { from: 32, to: 35, loop: false, speed: 6  },   // row 4
+    walk:    { from: 12, to: 23, loop: true,  speed: 10 },   // row 1, 12 frames
+    punch:   { from: 24, to: 27, loop: false, speed: 12 },   // row 2, cols 0-3
+    kick:    { from: 28, to: 31, loop: false, speed: 10 },   // row 2, cols 4-7
+    special: { from: 36, to: 47, loop: false, speed: 8  },   // row 3 (Audit Slam / ice burst)
+    hurt:    { from: 54, to: 59, loop: false, speed: 6  },   // row 4, cols 6-11
   },
 });
 // loadSprite("hero_priya", "assets/hero_priya.png", { /* same layout */ });
