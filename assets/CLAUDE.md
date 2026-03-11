@@ -92,6 +92,11 @@ bg_bankstreet, bg_byward, bg_canal, bg_currystreet, bg_parliament
 ### Effects
 fx_punch.png, fx_kick.png (3-4 frame impact animations)
 
+## Generating New Sprites
+
+See [SPRITE_PROMPT.md](SPRITE_PROMPT.md) for ready-to-use prompts for Gemini/Imagen.
+Covers all entity types with exact dimensions, style guide, and post-generation checklist.
+
 ## Audio (all TODO)
 - sfx_punch.wav, sfx_kick.wav, sfx_hurt.wav, sfx_pickup.wav
 - sfx_enemy_hit.wav, sfx_enemy_die.wav
