@@ -72,8 +72,14 @@ function drawLevelBackground(lvl) {
       ic += 16 + Math.floor(Math.random() * 20);
     }
 
+    // ─ Layout: split building into upper floors (60%) and ground floor (40%) ─
+    const gfFrac = 0.35;  // ground floor gets 35% of building height
+    const signH = 26;
+    const awnH = 9;
+    const signY = wt + Math.floor(s.h * (1 - gfFrac)) - signH;
+
     // ─ Wall panel lines (subtle siding) ─
-    for (let ly = wt + 18; ly < GROUND_TOP - 56; ly += 20) {
+    for (let ly = wt + 18; ly < signY - 4; ly += 20) {
       add([rect(s.w - 6, 1), pos(s.x + 3, ly),
            color(...dk(s.col, 16)), fixed(), z(-285)]);
     }
@@ -81,7 +87,7 @@ function drawLevelBackground(lvl) {
     // ─ Windows (framed glass with highlight) ─
     const winW = 16, winH = 18, winGapX = 8, winGapY = 8;
     const winAreaTop = wt + 10;
-    const winAreaBot = GROUND_TOP - 56;
+    const winAreaBot = signY - 6;
     const numCols = Math.max(1, Math.floor((s.w - 22 + winGapX) / (winW + winGapX)));
     const totalWinW = numCols * winW + (numCols - 1) * winGapX;
     const winOffX = s.x + Math.floor((s.w - totalWinW) / 2);
@@ -105,8 +111,6 @@ function drawLevelBackground(lvl) {
     }
 
     // ─ Sign band (large, prominent) ─
-    const signH = 26;
-    const signY = GROUND_TOP - signH - 24;
     // Sign background
     add([rect(s.w - 4, signH), pos(s.x + 2, signY),
          color(...sc), fixed(), z(-270)]);
@@ -133,7 +137,6 @@ function drawLevelBackground(lvl) {
 
     // ─ Awning (striped) ─
     const awnY = signY + signH + 3;
-    const awnH = 9;
     add([rect(s.w - 6, awnH), pos(s.x + 3, awnY),
          color(...ac), fixed(), z(-260)]);
     // Stripes

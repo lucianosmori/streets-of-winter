@@ -39,6 +39,27 @@
   }
   ```
 
+### grunt_art.png (Enemy: Grunt)
+- **Dimensions:** 1408×768 (clean, no repack needed)
+- **Grid:** 8 columns × 4 rows = 32 frames, each 176×192px
+- **Row layout (verified via per-frame bounding box analysis):**
+  - Row 0 (frames 0-7): Walk cycle — all standing, ~87px wide content
+  - Row 1 (frames 8-15): Attack — standing, arms extend (frames widen 96→135px)
+  - Row 2 (frames 16-23): Hurt (cols 0-4, standing) + Death (cols 5-7, LYING ~156px wide)
+  - Row 3 (frames 24-31): Idle/patrol — all standing, ~80px wide
+- **Animation config in game.js:**
+  ```js
+  sliceX: 8, sliceY: 4,
+  anims: {
+    walk:   { from: 0,  to: 7  },  // row 0
+    attack: { from: 8,  to: 15 },  // row 1
+    hurt:   { from: 16, to: 20 },  // row 2, standing only
+    death:  { from: 21, to: 23 },  // row 2, collapse/lying
+    idle:   { from: 24, to: 31 },  // row 3
+  }
+  ```
+- **Important lesson:** Don't guess row contents from visual inspection. Use the Python bounding-box analysis script to classify frames as STANDING vs LYING (width > height × 1.3 = lying). Row order in AI-generated sheets often doesn't match intuitive expectations.
+
 ## Sprite Sheet Repack Procedure
 
 When sprite sheets have non-uniform frame spacing or non-divisible dimensions:
@@ -62,13 +83,35 @@ When sprite sheets have non-uniform frame spacing or non-divisible dimensions:
 
 4. **Verify** the output dimensions divide cleanly
 
-## Planned Sprites (all TODO)
+## Sprite Frame Analysis Script
+
+Use this to verify row contents of AI-generated sprite sheets before mapping animations:
+
+```python
+from PIL import Image
+img = Image.open('sheet.png').convert('RGBA')
+w, h = img.size
+cols, rows = 8, 4  # adjust per sheet
+fw, fh = w // cols, h // rows
+for r in range(rows):
+    for c in range(cols):
+        cell = img.crop((c*fw, r*fh, (c+1)*fw, (r+1)*fh))
+        pixels = list(cell.getdata())
+        vis = [(i%fw, i//fw) for i,p in enumerate(pixels) if p[3]>10]
+        if len(vis) < 50: print(f'Frame {r*cols+c} (r{r}c{c}): EMPTY'); continue
+        xs, ys = zip(*vis)
+        cw, ch = max(xs)-min(xs)+1, max(ys)-min(ys)+1
+        orient = 'LYING' if cw > ch*1.3 else 'STANDING'
+        print(f'Frame {r*cols+c} (r{r}c{c}): {cw}x{ch} [{orient}]')
+```
+
+## Planned Sprites (TODO)
 
 ### Enemies (suggested 8×4 grids)
-| Sprite | Type | Notes |
-|--------|------|-------|
-| enemy_grunt.png | grunt | Basic thug, 50 HP |
-| enemy_agile.png | agile/slider | Fast, low HP |
+| Sprite | Type | Status |
+|--------|------|--------|
+| grunt_art.png | grunt | DONE |
+| enemy_agile.png | agile/slider | TODO, fast low HP |
 | enemy_heavy.png | heavy | Slow, tanky |
 | enemy_stripper.png | stripper/whiplash | Long range |
 | enemy_crackhead.png | crackhead/addict | Erratic, fast cooldown |
@@ -86,8 +129,9 @@ When sprite sheets have non-uniform frame spacing or non-divisible dimensions:
 ### NPCs (suggested 4×1 — simple walk cycle)
 turban, lgbtq, hijab, african, quebecois, ukrainian, palestinian
 
-### Backgrounds (single images, 800×195px upper area)
+### Backgrounds (single images, 800×260px upper area)
 bg_bankstreet, bg_byward, bg_canal, bg_currystreet, bg_parliament
+(Note: GROUND_TOP is now 260, not 195)
 
 ### Effects
 fx_punch.png, fx_kick.png (3-4 frame impact animations)

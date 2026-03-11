@@ -71,16 +71,21 @@ Depth-sorted by Y position. NPCs at z~290, pickups at z~285, players/enemies at 
 - Mobile virtual gamepad with landscape lock
 - GitHub Pages CI/CD
 - Hero "Taxpayer" sprite sheet (12×6 grid, 1392×756px)
+- Enemy "Grunt" sprite sheet (8×4 grid, 1408×768px) — first sprited enemy
+- Sprite-aware enemy system: `spawnEnemy`/`updateEnemy`/`killEnemy` auto-detect `def.sprite` and use animated sprites with facing, state transitions, and death anims
+- Detailed pixel-art storefront rendering with windows, signs, awnings, doors
+- Proportional building layout (upper floors 65% / ground floor 35%)
+- `assets/SPRITE_PROMPT.md` — ready-to-use prompts for Gemini/Imagen sprite generation
 
 ## What's Missing / TODO
 
 ### Sprites (Critical)
 - **Player 2 (Priya)** sprite sheet — no sprite exists yet
-- **All enemy sprites** (6 types + 5 bosses) — using colored rectangles
+- **5 enemy sprites** (agile, heavy, stripper, crackhead, kicker) — using colored rectangles
+- **5 boss sprites** — using colored rectangles
 - **All NPC sprites** (7 types) — using colored rectangles
-- **Background layers** (5 levels) — using programmatic colored rects for storefronts
 - **Impact effects** (punch/kick VFX)
-- See `assets/CLAUDE.md` for sprite creation guidelines
+- See `assets/CLAUDE.md` for sprite guidelines, `assets/SPRITE_PROMPT.md` for generation prompts
 
 ### Audio
 - No sound effects loaded (punch, kick, hurt, pickup)
@@ -95,7 +100,6 @@ Depth-sorted by Y position. NPCs at z~290, pickups at z~285, players/enemies at 
 - Player 2 full integration testing
 
 ### Polish
-- Attack animations need visual feedback beyond flash rects
-- Death animations for enemies (currently just flash + destroy)
+- Death animations for enemies without sprites (currently just flash + destroy)
 - Level transition animations
 - Boss intro cinematics (currently just text banners)
