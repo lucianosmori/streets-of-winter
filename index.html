@@ -198,11 +198,13 @@
     }
 
     // ── Virtual button → synthetic KeyboardEvent ─────────────────────────────
-    // Fires keydown on touchstart/mousedown and keyup on touchend/mouseup.
-    // Kaplay's onKeyDown / onKeyPress / onKeyUp all respond to these.
+    // Kaplay listens for keyboard events on the <canvas>, not on window.
+    // We must dispatch on the canvas so onKeyPress / isKeyDown pick them up.
+    const _gameCanvas = document.querySelector("canvas");
+
     function fireKey(key, type) {
       const singleChar = key.length === 1;
-      window.dispatchEvent(new KeyboardEvent(type, {
+      _gameCanvas.dispatchEvent(new KeyboardEvent(type, {
         key,
         code: singleChar ? "Key" + key.toUpperCase() : key,
         bubbles: true, cancelable: true,
@@ -214,8 +216,8 @@
 
       btn.addEventListener("touchstart", e => {
         e.preventDefault();
+        _gameCanvas.focus();          // keep canvas focused so Kaplay tracks keys
         fireKey(key, "keydown");
-        // Fire keypress immediately after keydown (native order: keydown → keypress → keyup)
         fireKey(key, "keypress");
       }, { passive: false });
 
@@ -225,7 +227,7 @@
       }, { passive: false });
 
       // Mouse fallback for desktop testing
-      btn.addEventListener("mousedown", () => { fireKey(key, "keydown"); fireKey(key, "keypress"); });
+      btn.addEventListener("mousedown", () => { _gameCanvas.focus(); fireKey(key, "keydown"); fireKey(key, "keypress"); });
       btn.addEventListener("mouseup",   () => fireKey(key, "keyup"));
     });
   </script>
