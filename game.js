@@ -39,11 +39,11 @@ loadSprite("hero_taxpayer", "assets/hero_taxpayer.png", {
 loadSprite("enemy_grunt", "assets/grunt_art.png", {
   sliceX: 8, sliceY: 4,
   anims: {
-    walk:   { from: 0,  to: 7,  loop: true,  speed: 10 },  // row 0: walk cycle
-    idle:   { from: 8,  to: 15, loop: true,  speed: 8  },  // row 1: patrol/idle
-    attack: { from: 16, to: 23, loop: false, speed: 12 },  // row 2: attack
-    hurt:   { from: 24, to: 27, loop: false, speed: 8  },  // row 3, cols 0-3: flinch
-    death:  { from: 28, to: 31, loop: false, speed: 6  },  // row 3, cols 4-7: collapse
+    walk:   { from: 0,  to: 7,  loop: true,  speed: 10 },  // row 0: walk cycle (all standing)
+    attack: { from: 8,  to: 15, loop: false, speed: 12 },  // row 1: attack (standing, arms extend)
+    hurt:   { from: 16, to: 20, loop: false, speed: 8  },  // row 2 cols 0-4: hurt (standing)
+    death:  { from: 21, to: 23, loop: false, speed: 6  },  // row 2 cols 5-7: collapse (lying)
+    idle:   { from: 24, to: 31, loop: true,  speed: 6  },  // row 3: idle/patrol (all standing)
   },
 });
 // loadSprite("enemy_agile",    "assets/enemy_agile.png",    { /* same layout */ });

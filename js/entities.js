@@ -517,7 +517,10 @@ function updateEnemy(e, target, onAttack) {
       // Tiny red flash on attack
       add([rect(14, 14), pos(e.pos.x + e.facing * 14, e.pos.y - 28),
            anchor("center"), color(255, 60, 60), opacity(1), z(e.pos.y + 5), lifespan(0.1)]);
-      if (e.def.sprite) e.play("attack");
+      if (e.def.sprite) {
+        e.play("attack");
+        e._lastState = "attack";  // force walk to re-trigger after attack ends
+      }
     }
   } else {
     // Walk toward target
