@@ -20,57 +20,228 @@
  * @param {object} lvl — level data object from LEVELS[]
  */
 function drawLevelBackground(lvl) {
+  // -- Colour helpers --
+  const dk = (c, a) => [Math.max(0,c[0]-a), Math.max(0,c[1]-a), Math.max(0,c[2]-a)];
+  const lt = (c, a) => [Math.min(255,c[0]+a), Math.min(255,c[1]+a), Math.min(255,c[2]+a)];
 
-  // Sky / upper half
-  add([rect(SCREEN_W, GROUND_TOP), pos(0, 0),
-       color(...lvl.skyCol), fixed(), z(-200)]);
+  // ── Sky gradient (4 bands for depth) ──────────────────────────────────────
+  const skyBands = 4;
+  const bandH = Math.ceil(GROUND_TOP / skyBands);
+  for (let i = 0; i < skyBands; i++) {
+    const f = i / (skyBands - 1);
+    add([rect(SCREEN_W, bandH + 1), pos(0, i * bandH),
+         color(lvl.skyCol[0] + f * 12, lvl.skyCol[1] + f * 8, lvl.skyCol[2] + f * 15),
+         fixed(), z(-300)]);
+  }
 
-  // Storefront row
-  // TODO: Replace with per-store sprite images from assets/bg_*.png
+  // ── Distant skyline silhouettes ───────────────────────────────────────────
+  const sils = [{x:25,w:40,h:55},{x:140,w:30,h:40},{x:280,w:50,h:70},{x:450,w:35,h:48},
+                {x:580,w:45,h:62},{x:700,w:38,h:44},{x:760,w:42,h:58}];
+  for (const sl of sils) {
+    add([rect(sl.w, sl.h), pos(sl.x, GROUND_TOP - sl.h - 145),
+         color(...dk(lvl.skyCol, 6)), fixed(), z(-299)]);
+    // Tiny lit window on silhouette
+    add([rect(3, 3), pos(sl.x + sl.w / 2, GROUND_TOP - sl.h - 140),
+         color(180, 170, 100), opacity(0.4), fixed(), z(-298)]);
+  }
+
+  // ── Storefronts ───────────────────────────────────────────────────────────
   for (const s of lvl.stores) {
+    const wt = GROUND_TOP - s.h; // wall top y
+    const sc  = s.signCol     || [200, 40, 40];
+    const stc = s.signTextCol || [255, 255, 255];
+    const ac  = s.awningCol   || dk(s.col, 10);
 
-    // Building wall
-    add([rect(s.w - 4, s.h), pos(s.x + 2, GROUND_TOP - s.h),
-         color(...s.col), fixed(), z(-195)]);
+    // ─ Wall ─
+    add([rect(s.w - 2, s.h), pos(s.x + 1, wt),
+         color(...s.col), fixed(), z(-290)]);
 
-    // Window grid (simple decorative rects)
-    for (let wx = s.x + 10; wx < s.x + s.w - 20; wx += 28) {
-      for (let wy = GROUND_TOP - s.h + 10; wy < GROUND_TOP - 28; wy += 28) {
-        add([rect(14, 13), pos(wx, wy), color(175, 205, 225), fixed(), z(-194)]);
+    // ─ Roof ledge ─
+    add([rect(s.w + 2, 5), pos(s.x - 1, wt - 3),
+         color(...dk(s.col, 35)), fixed(), z(-289)]);
+
+    // ─ Snow on roof ─
+    add([rect(s.w - 4, 7), pos(s.x + 2, wt - 8),
+         color(228, 234, 248), fixed(), z(-288)]);
+    // Icicle drips
+    let ic = s.x + 14;
+    while (ic < s.x + s.w - 10) {
+      const icicleH = 3 + Math.floor(Math.random() * 6);
+      add([rect(2, icicleH), pos(ic, wt),
+           color(210, 220, 242), fixed(), z(-287)]);
+      ic += 16 + Math.floor(Math.random() * 20);
+    }
+
+    // ─ Wall panel lines (subtle siding) ─
+    for (let ly = wt + 18; ly < GROUND_TOP - 56; ly += 20) {
+      add([rect(s.w - 6, 1), pos(s.x + 3, ly),
+           color(...dk(s.col, 16)), fixed(), z(-285)]);
+    }
+
+    // ─ Windows (framed glass with highlight) ─
+    const winW = 16, winH = 18, winGapX = 8, winGapY = 8;
+    const winAreaTop = wt + 10;
+    const winAreaBot = GROUND_TOP - 56;
+    const numCols = Math.max(1, Math.floor((s.w - 22 + winGapX) / (winW + winGapX)));
+    const totalWinW = numCols * winW + (numCols - 1) * winGapX;
+    const winOffX = s.x + Math.floor((s.w - totalWinW) / 2);
+
+    for (let wy = winAreaTop; wy + winH <= winAreaBot; wy += winH + winGapY) {
+      for (let c = 0; c < numCols; c++) {
+        const wx = winOffX + c * (winW + winGapX);
+        // Frame
+        add([rect(winW + 4, winH + 4), pos(wx - 2, wy - 2),
+             color(...dk(s.col, 28)), fixed(), z(-280)]);
+        // Glass pane
+        add([rect(winW, winH), pos(wx, wy),
+             color(120, 155, 195), fixed(), z(-278)]);
+        // Reflection highlight
+        add([rect(3, winH - 4), pos(wx + 2, wy + 2),
+             color(165, 200, 232), fixed(), z(-276)]);
+        // Warm interior glow (bottom half)
+        add([rect(winW - 4, 6), pos(wx + 2, wy + winH - 8),
+             color(200, 180, 120), opacity(0.35), fixed(), z(-275)]);
       }
     }
 
-    // Store sign band
-    add([rect(s.w - 4, 17), pos(s.x + 2, GROUND_TOP - 21),
-         color(200, 40, 40), fixed(), z(-193)]);
+    // ─ Sign band (large, prominent) ─
+    const signH = 26;
+    const signY = GROUND_TOP - signH - 24;
+    // Sign background
+    add([rect(s.w - 4, signH), pos(s.x + 2, signY),
+         color(...sc), fixed(), z(-270)]);
+    // Sign border (top, bottom, sides)
+    add([rect(s.w - 4, 2), pos(s.x + 2, signY - 2),
+         color(...lt(sc, 65)), fixed(), z(-269)]);
+    add([rect(s.w - 4, 2), pos(s.x + 2, signY + signH),
+         color(...lt(sc, 45)), fixed(), z(-269)]);
+    add([rect(2, signH + 4), pos(s.x, signY - 2),
+         color(...lt(sc, 50)), fixed(), z(-269)]);
+    add([rect(2, signH + 4), pos(s.x + s.w - 2, signY - 2),
+         color(...lt(sc, 50)), fixed(), z(-269)]);
 
-    // Sign label text
-    // TODO: Render as a pixel-font sprite once assets are ready
-    add([text(s.label, { size: 7 }), pos(s.x + 5, GROUND_TOP - 20),
-         color(255, 240, 220), fixed(), z(-192)]);
+    // Sign text (large with drop shadow for readability)
+    const fontSize = Math.min(14, Math.floor((s.w - 16) / s.label.length * 1.6));
+    const textX = s.x + 8;
+    const textY = signY + Math.floor((signH - fontSize) / 2);
+    // Shadow
+    add([text(s.label, { size: fontSize }),
+         pos(textX + 1, textY + 1), color(0, 0, 0), fixed(), z(-266)]);
+    // Main text
+    add([text(s.label, { size: fontSize }),
+         pos(textX, textY), color(...stc), fixed(), z(-265)]);
+
+    // ─ Awning (striped) ─
+    const awnY = signY + signH + 3;
+    const awnH = 9;
+    add([rect(s.w - 6, awnH), pos(s.x + 3, awnY),
+         color(...ac), fixed(), z(-260)]);
+    // Stripes
+    for (let sx = s.x + 3; sx < s.x + s.w - 6; sx += 12) {
+      add([rect(6, awnH), pos(sx, awnY),
+           color(...lt(ac, 28)), fixed(), z(-259)]);
+    }
+    // Awning shadow below
+    add([rect(s.w - 6, 3), pos(s.x + 3, awnY + awnH),
+         color(0, 0, 0), opacity(0.12), fixed(), z(-258)]);
+
+    // ─ Ground floor (storefront windows + door) ─
+    const gfTop = awnY + awnH + 3;
+    const gfH = GROUND_TOP - gfTop;
+    if (gfH > 6) {
+      // Ground floor wall (slightly lighter)
+      add([rect(s.w - 4, gfH), pos(s.x + 2, gfTop),
+           color(...lt(s.col, 15)), fixed(), z(-255)]);
+
+      const doorW = 14;
+      const doorX = s.x + Math.floor(s.w / 2) - doorW / 2;
+      const sfWinW = Math.min(30, Math.floor((s.w - doorW - 28) / 2));
+
+      // Left storefront window
+      if (sfWinW > 8) {
+        add([rect(sfWinW + 2, gfH - 2), pos(s.x + 7, gfTop + 1),
+             color(...dk(s.col, 20)), fixed(), z(-254)]); // frame
+        add([rect(sfWinW, gfH - 4), pos(s.x + 8, gfTop + 2),
+             color(155, 185, 145), fixed(), z(-253)]); // glass
+        add([rect(sfWinW - 4, gfH - 8), pos(s.x + 10, gfTop + 4),
+             color(215, 205, 165), fixed(), z(-252)]); // warm glow
+      }
+
+      // Door
+      add([rect(doorW + 2, gfH - 2), pos(doorX - 1, gfTop + 1),
+           color(...dk(s.col, 30)), fixed(), z(-254)]); // frame
+      add([rect(doorW, gfH - 4), pos(doorX, gfTop + 2),
+           color(...dk(s.col, 18)), fixed(), z(-253)]); // door panel
+      add([rect(2, 3), pos(doorX + doorW - 4, gfTop + Math.floor(gfH / 2)),
+           color(210, 190, 110), fixed(), z(-252)]); // handle
+
+      // Right storefront window
+      if (sfWinW > 8) {
+        const rwx = s.x + s.w - sfWinW - 9;
+        add([rect(sfWinW + 2, gfH - 2), pos(rwx, gfTop + 1),
+             color(...dk(s.col, 20)), fixed(), z(-254)]);
+        add([rect(sfWinW, gfH - 4), pos(rwx + 1, gfTop + 2),
+             color(155, 185, 145), fixed(), z(-253)]);
+        add([rect(sfWinW - 4, gfH - 8), pos(rwx + 3, gfTop + 4),
+             color(215, 205, 165), fixed(), z(-252)]);
+      }
+    }
   }
 
-  // Sidewalk surface
+  // ── Sidewalk ──────────────────────────────────────────────────────────────
   add([rect(SCREEN_W, GROUND_BOTTOM - GROUND_TOP), pos(0, GROUND_TOP),
-       color(...lvl.groundCol), fixed(), z(-190)]);
+       color(...lvl.groundCol), fixed(), z(-250)]);
 
-  // Sidewalk slab seams
-  for (let cx = 80; cx < SCREEN_W; cx += 120) {
-    add([rect(1, GROUND_BOTTOM - GROUND_TOP - 20), pos(cx, GROUND_TOP + 10),
-         color(105, 95, 80), fixed(), z(-189)]);
+  // Slab pattern (alternating shades)
+  for (let sx = 0; sx < SCREEN_W; sx += 65) {
+    const shade = (Math.floor(sx / 65) % 2 === 0) ? 4 : -3;
+    const sc = shade > 0 ? lt(lvl.groundCol, shade) : dk(lvl.groundCol, -shade);
+    add([rect(63, GROUND_BOTTOM - GROUND_TOP - 8), pos(sx + 1, GROUND_TOP + 4),
+         color(...sc), fixed(), z(-249)]);
   }
 
-  // Road strip below playfield
+  // Slab seam lines (vertical)
+  for (let cx = 65; cx < SCREEN_W; cx += 65) {
+    add([rect(1, GROUND_BOTTOM - GROUND_TOP - 4), pos(cx, GROUND_TOP + 2),
+         color(...dk(lvl.groundCol, 28)), fixed(), z(-248)]);
+  }
+
+  // Horizontal seam
+  add([rect(SCREEN_W, 1),
+       pos(0, GROUND_TOP + Math.floor((GROUND_BOTTOM - GROUND_TOP) / 2)),
+       color(...dk(lvl.groundCol, 18)), fixed(), z(-248)]);
+
+  // Snow patches on sidewalk
+  for (let i = 0; i < 8; i++) {
+    add([rect(20 + Math.random() * 35, 3 + Math.random() * 5),
+         pos(Math.random() * (SCREEN_W - 50) + 5,
+             GROUND_TOP + 8 + Math.random() * (GROUND_BOTTOM - GROUND_TOP - 20)),
+         color(225, 230, 245), opacity(0.22), fixed(), z(-247)]);
+  }
+
+  // Curb
+  add([rect(SCREEN_W, 5), pos(0, GROUND_BOTTOM - 5),
+       color(...dk(lvl.groundCol, 35)), fixed(), z(-246)]);
+  add([rect(SCREEN_W, 2), pos(0, GROUND_BOTTOM - 1),
+       color(25, 20, 15), fixed(), z(-245)]);
+
+  // ── Road ──────────────────────────────────────────────────────────────────
   add([rect(SCREEN_W, SCREEN_H - GROUND_BOTTOM), pos(0, GROUND_BOTTOM),
-       color(55, 50, 40), fixed(), z(-190)]);
+       color(42, 38, 32), fixed(), z(-250)]);
 
-  // Kerb shadow
-  add([rect(SCREEN_W, 3), pos(0, GROUND_BOTTOM - 3),
-       color(15, 12, 8), fixed(), z(-188)]);
+  // Dashed centre line
+  const roadMidY = GROUND_BOTTOM + Math.floor((SCREEN_H - GROUND_BOTTOM) / 2);
+  for (let lx = 12; lx < SCREEN_W; lx += 44) {
+    add([rect(22, 2), pos(lx, roadMidY),
+         color(190, 170, 45), fixed(), z(-248)]);
+  }
 
-  // Level name plate (top-left strip)
-  add([text(`LVL ${lvl.id}  ${lvl.name.toUpperCase()}`, { size: 8 }),
-       pos(6, 4), color(180, 180, 180), fixed(), z(600)]);
+  // ── Level name plate (with drop shadow) ───────────────────────────────────
+  const lvlText = `LVL ${lvl.id}  ${lvl.name.toUpperCase()}`;
+  add([text(lvlText, { size: 10 }),
+       pos(7, 5), color(0, 0, 0), fixed(), z(599)]);
+  add([text(lvlText, { size: 10 }),
+       pos(6, 4), color(210, 210, 220), fixed(), z(600)]);
 }
 
 
