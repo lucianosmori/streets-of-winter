@@ -101,6 +101,12 @@ loadSprite("npc_quebecois", "assets/npc_quebecois.png", {
 // loadSprite("npc_ukrainian",  "assets/npc_ukrainian.png",  { sliceX:4 });
 // loadSprite("npc_palestinian","assets/npc_palestinian.png",{ sliceX:4 });
 
+// ── Pickup sprites ───────────────────────────────────────────────────────────
+loadSprite("pickup_donut",  "assets/pickup_donut.png");
+loadSprite("pickup_coffee", "assets/pickup_coffee.png");
+loadSprite("pickup_samosa", "assets/pickup_samosa.png");
+loadSprite("pickup_cart",   "assets/pickup_cart.png");
+
 // ── Backgrounds ───────────────────────────────────────────────────────────────
 // loadSprite("bg_bankstreet",  "assets/bg_bankstreet.png");
 // loadSprite("bg_byward",      "assets/bg_byward.png");
@@ -357,7 +363,7 @@ scene("game", ({ numPlayers = 1, levelIdx = 0 }) => {
     if (p.heldWeapon) {
       p.heldWeapon.uses--;
       if (p.heldWeapon.uses <= 0) {
-        showSpeechBubble("BROKE!", p.pos.x, p.pos.y);
+        showSpeechBubble("BROKE!", p);
         p.heldWeapon = null;
       }
     }
@@ -517,7 +523,7 @@ scene("game", ({ numPlayers = 1, levelIdx = 0 }) => {
       // TODO: play("sfx_pickup")
     } else if (def.isWeapon) {
       p.heldWeapon = { type: pk.pickupType, uses: def.uses, damage: def.damage };
-      showSpeechBubble(`${def.label} picked up!`, pk.pos.x, pk.pos.y);
+      showSpeechBubble(`${def.label} picked up!`, p, 1.5);
     }
   }
 

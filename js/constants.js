@@ -336,12 +336,12 @@ const NPC_DEFS = {
 // isWeapon  → player holds it; attacks use weapon damage/uses until it breaks
 // TODO: Add sprite keys once pickup sprites exist in assets/.
 const PICKUP_DEFS = {
-  donut:      { col:[220,170,100], label:"DONUT",   heal:20, isWeapon:false,                   w:18, h:14 },
-  samosa:     { col:[200,150, 50], label:"SAMOSA",  heal:25, isWeapon:false,                   w:16, h:16 },
-  coffee:     { col:[100, 60, 30], label:"COFFEE",  heal:15, isWeapon:false,                   w:14, h:20 },
+  donut:      { col:[220,170,100], label:"DONUT",   heal:20, isWeapon:false,                   w:18, h:14, sprite:"pickup_donut" },
+  samosa:     { col:[200,150, 50], label:"SAMOSA",  heal:25, isWeapon:false,                   w:16, h:16, sprite:"pickup_samosa" },
+  coffee:     { col:[100, 60, 30], label:"COFFEE",  heal:15, isWeapon:false,                   w:14, h:20, sprite:"pickup_coffee" },
   fish:       { col:[150,200,220], label:"FISH",    heal:10, isWeapon:false,                   w:28, h:14 },
   bottle:     { col:[100,160, 80], label:"BOTTLE",  heal: 0, isWeapon:true,  damage:18, uses:3, w:10, h:24 },
-  cart:       { col:[160,160,160], label:"CART",    heal: 0, isWeapon:true,  damage:30, uses:2, w:40, h:28 },
+  cart:       { col:[160,160,160], label:"CART",    heal: 0, isWeapon:true,  damage:30, uses:2, w:40, h:28, sprite:"pickup_cart" },
   spice_cart: { col:[200,100, 20], label:"SPICE",   heal: 0, isWeapon:true,  damage:22, uses:3, w:36, h:28 },
   fruit_cart: { col:[220,140, 60], label:"FRUITS",  heal: 0, isWeapon:true,  damage:25, uses:2, w:40, h:28 },
   flagpole:   { col:[200, 50, 50], label:"FLAG",    heal: 0, isWeapon:true,  damage:28, uses:4, w: 8, h:55 },

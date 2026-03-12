@@ -307,22 +307,43 @@ function drawSnow() {
  * @param {number} srcX/srcY — world position of the speaker's feet
  * @param {number} duration  — seconds before it fades (default 2.2)
  */
-function showSpeechBubble(msg, srcX, srcY, duration = 2.2) {
+function showSpeechBubble(msg, entityOrX, yOrDuration, maybeDuration) {
   const W  = Math.min(msg.length * 6 + 16, 140);
-  const bx = clamp(srcX - W / 2, 4, SCREEN_W - W - 4);
-  const by = srcY - 58;   // above character's head
+
+  // Detect: entity-tracking mode vs static (x, y) mode
+  const entity = (typeof entityOrX === "object" && entityOrX !== null) ? entityOrX : null;
+  let lastX = entity ? entity.pos.x : entityOrX;
+  let lastY = entity ? entity.pos.y : yOrDuration;
+  const duration = entity
+    ? (typeof yOrDuration === "number" ? yOrDuration : 2.2)
+    : (typeof maybeDuration === "number" ? maybeDuration : 2.2);
+
+  function getBubblePos() {
+    if (entity && entity.exists()) {
+      lastX = entity.pos.x;
+      lastY = entity.pos.y;
+    }
+    const bx = clamp(lastX - W / 2, 4, SCREEN_W - W - 4);
+    const by = lastY - 58;
+    return { bx, by, nubX: clamp(lastX - 3, bx + 4, bx + W - 10) };
+  }
+
+  const p = getBubblePos();
 
   // Bubble background
-  add([rect(W, 19), pos(bx, by),
-       color(250, 248, 230), opacity(1), z(800), lifespan(duration, { fade: 0.45 })]);
+  add([rect(W, 19), pos(p.bx, p.by),
+       color(250, 248, 230), opacity(1), z(800), lifespan(duration, { fade: 0.45 }),
+       { update() { const q = getBubblePos(); this.pos.x = q.bx; this.pos.y = q.by; } }]);
 
   // Bubble text
-  add([text(msg, { size: 8 }), pos(bx + 4, by + 4),
-       color(30, 30, 30), opacity(1), z(801), lifespan(duration, { fade: 0.45 })]);
+  add([text(msg, { size: 8 }), pos(p.bx + 4, p.by + 4),
+       color(30, 30, 30), opacity(1), z(801), lifespan(duration, { fade: 0.45 }),
+       { update() { const q = getBubblePos(); this.pos.x = q.bx + 4; this.pos.y = q.by + 4; } }]);
 
   // Pointer nub below the bubble
-  add([rect(7, 7), pos(clamp(srcX - 3, bx + 4, bx + W - 10), by + 17),
-       color(250, 248, 230), opacity(1), z(800), lifespan(duration, { fade: 0.45 })]);
+  add([rect(7, 7), pos(p.nubX, p.by + 17),
+       color(250, 248, 230), opacity(1), z(800), lifespan(duration, { fade: 0.45 }),
+       { update() { const q = getBubblePos(); this.pos.x = q.nubX; this.pos.y = q.by + 17; } }]);
 }
 
 /** Spawn a floating damage / score number that rises and fades. */
@@ -503,7 +524,7 @@ function updateEnemy(e, target, onAttack) {
   // Taunt player (speech bubble)
   if (e.tauntCooldown <= 0) {
     e.tauntCooldown = rand(6, 14);
-    showSpeechBubble(choose(e.def.taunts), e.pos.x, e.pos.y);
+    showSpeechBubble(choose(e.def.taunts), e);
   }
 
   // Vector toward target
@@ -612,7 +633,7 @@ function updateNPC(n, players, enemies) {
   // React to a nearby fight with a speech bubble
   if (fightNearby && n.reactCooldown <= 0 && Math.random() < 0.25) {
     n.reactCooldown = rand(3.5, 8);
-    showSpeechBubble(choose(n.def.phrases), n.pos.x, n.pos.y);
+    showSpeechBubble(choose(n.def.phrases), n);
     n.state = "react";
     wait(1.2, () => { if (n.state === "react") n.state = "walk"; });
   }
@@ -652,12 +673,13 @@ function updateNPC(n, players, enemies) {
 function spawnPickup(type, x, y) {
   const def = PICKUP_DEFS[type];
 
-  // TODO: Swap rect/color for sprite of the pickup item.
+  const useSprite = !!def.sprite;
   const pk = add([
-    rect(def.w, def.h),
+    useSprite ? sprite(def.sprite) : rect(def.w, def.h),
+    useSprite ? scale(def.h / 48) : scale(1),
     pos(x, y),
     anchor("bot"),
-    color(...def.col),
+    useSprite ? color(255, 255, 255) : color(...def.col),
     z(285),   // below characters
     {
       pickupType: type,
