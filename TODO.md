@@ -57,4 +57,4 @@ Pick items off the top. One per session. Check off when done.
 
 _Drop new ideas here. Move to a section above when ready to work on them._
 
--
+- [ ] **Mobile portrait camera** — Instead of forcing landscape, use Kaplay's `camPos()` to follow the player in portrait mode. Crop to vertical slice centered on P1, smooth lerp follow, edge clamping. Concept plan in `.claude/plans/silly-toasting-meerkat.md`. Key: keep 800x400 world coords, only change viewport via camera. HUD needs `fixed()`, gamepad buttons need portrait layout check.
