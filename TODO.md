@@ -24,10 +24,10 @@ Pick items off the top. One per session. Check off when done.
 - [ ] Boss: The Chef (drug_lord) sprite
 - [ ] Boss: The Overlord (syndicate_boss) sprite
 - [ ] Impact effects (punch/kick VFX)
-- [x] Pickup: donut sprite (prompt ready, needs generation)
-- [x] Pickup: coffee sprite (prompt ready, needs generation)
-- [x] Pickup: samosa sprite (prompt ready, needs generation)
-- [x] Pickup: cart sprite (prompt ready, needs generation)
+- [x] Pickup: donut sprite
+- [x] Pickup: coffee sprite
+- [x] Pickup: samosa sprite
+- [x] Pickup: cart sprite
 - [ ] Pickup: remaining items (bottle, fish, spice_cart, fruit_cart, flagpole, skate, statue)
 
 ## Audio
@@ -51,6 +51,7 @@ Pick items off the top. One per session. Check off when done.
 - [ ] Level transition animations
 - [ ] Boss intro cinematics (currently just text banners)
 - [x] Speech bubbles follow characters
+- [x] Speech bubble anti-overlap (stacking, proximity fade, suppression near player)
 
 ## Brainstorm / Ideas
 

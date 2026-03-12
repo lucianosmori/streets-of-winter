@@ -79,15 +79,21 @@ Depth-sorted by Y position. NPCs at z~290, pickups at z~285, players/enemies at 
 - Enemy "Heavy" sprite sheet (8×4 grid, 1408×768px)
 - Boss "Big Earl" sprite sheet (8×4 grid, 2560×880px) — COM-repacked from Gemini output, **still broken** (unaligned carousel effect, needs regen)
 - AI Sprite QA Pipeline in `assets/CLAUDE.md` — dimension check, content analysis, COM stability, repack procedures
+- `/sprite-qa` skill in `.claude/skills/sprite-qa/SKILL.md` — automated QA pipeline
 - `spriteH` per-entity override for non-standard frame heights in scaling formula
+- NPC sprites: turban, quebecois, african (4×1 grid, 464×126px, 116×126 per frame)
+- Pickup sprites: donut, coffee, samosa, cart (48×48 single frame PNGs)
+- Sprite-aware pickup system: `spawnPickup` auto-detects `def.sprite`, scales via `def.h / 48`
+- Speech bubble QoL: follow characters, auto-stack to avoid overlap, proximity fade near player, suppression within 60px of player
 
 ## What's Missing / TODO
 
 ### Sprites (Critical)
 - **Player 2 (Priya)** sprite sheet — no sprite exists yet
-- **3 enemy sprites** (agile, stripper, crackhead, kicker) — using colored rectangles
+- **4 enemy sprites** (agile, stripper, crackhead, kicker) — using colored rectangles
 - **4 boss sprites** (Duo, Chain Daddy, Chef, Overlord) — using colored rectangles
-- **All NPC sprites** (7 types) — using colored rectangles
+- **4 NPC sprites** (lgbtq, hijab, ukrainian, palestinian) — using colored rectangles
+- **7 pickup sprites** (bottle, fish, spice_cart, fruit_cart, flagpole, skate, statue)
 - **Impact effects** (punch/kick VFX)
 - See `assets/CLAUDE.md` for sprite guidelines, `assets/SPRITE_PROMPT.md` for generation prompts
 
@@ -107,3 +113,4 @@ Depth-sorted by Y position. NPCs at z~290, pickups at z~285, players/enemies at 
 - Death animations for enemies without sprites (currently just flash + destroy)
 - Level transition animations
 - Boss intro cinematics (currently just text banners)
+- ~~Speech bubble overlap / readability~~ — DONE (stacking, proximity fade, suppression)
