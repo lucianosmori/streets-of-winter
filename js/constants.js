@@ -237,7 +237,7 @@ const ENEMY_DEFS = {
     label:"HEAVY",   col:[140, 60, 40],  w:34, h:50,
     hp:90,  speed:40,  damage:14, attackRange:42, attackCooldown:1.8,
     taunts:["Crush time, eh!", "Burly smash!", "Take the body!"],
-    // TODO: sprite:"enemy_heavy"
+    sprite:"enemy_heavy",
   },
   stripper: {
     label:"WHIPLASH", col:[220, 100, 160], w:22, h:46,
@@ -262,7 +262,7 @@ const ENEMY_DEFS = {
     label:"BIG EARL",    col:[120, 40, 20],  w:40, h:56,
     hp:200, speed:35, damage:16, attackRange:52, attackCooldown:2.0, isBoss:true,
     taunts:["Bank Street's mine!", "You're done in Ottawa!"],
-    // TODO: sprite:"boss_earl"
+    sprite:"boss_earl",
   },
   stripper_boss: {
     label:"THE DUO",     col:[200, 50, 140], w:30, h:52,

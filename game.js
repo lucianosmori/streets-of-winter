@@ -47,13 +47,31 @@ loadSprite("enemy_grunt", "assets/grunt_art.png", {
   },
 });
 // loadSprite("enemy_agile",    "assets/enemy_agile.png",    { /* same layout */ });
-// loadSprite("enemy_heavy",    "assets/enemy_heavy.png",    { /* same layout */ });
+loadSprite("enemy_heavy", "assets/heavy_art.png", {
+  sliceX: 8, sliceY: 4,
+  anims: {
+    walk:   { from: 0,  to: 7,  loop: true,  speed: 8  },   // row 0: walk cycle
+    attack: { from: 8,  to: 15, loop: false, speed: 10 },   // row 1: attack (arms extend)
+    hurt:   { from: 16, to: 20, loop: false, speed: 8  },   // row 2 cols 0-4: hurt (standing)
+    death:  { from: 21, to: 23, loop: false, speed: 6  },   // row 2 cols 5-7: collapse (lying)
+    idle:   { from: 24, to: 31, loop: true,  speed: 6  },   // row 3: idle/patrol
+  },
+});
 // loadSprite("enemy_stripper", "assets/enemy_stripper.png", { /* same layout */ });
 // loadSprite("enemy_crackhead","assets/enemy_crackhead.png",{ /* same layout */ });
 // loadSprite("enemy_kicker",   "assets/enemy_kicker.png",   { /* same layout */ });
 
 // ── Boss spritesheets ─────────────────────────────────────────────────────────
-// loadSprite("boss_earl",      "assets/boss_earl.png",      { sliceX:8, sliceY:5 });
+loadSprite("boss_earl", "assets/heavy_boss_art.png", {
+  sliceX: 8, sliceY: 4,
+  anims: {
+    attack: { from: 0,  to: 7,  loop: false, speed: 10 },  // row 0: punch/slam
+    walk:   { from: 8,  to: 15, loop: true,  speed: 7  },  // row 1: heavy stride
+    idle:   { from: 8,  to: 15, loop: true,  speed: 5  },  // reuse walk as idle
+    hurt:   { from: 24, to: 27, loop: false, speed: 8  },  // row 3 cols 0-3: stagger
+    death:  { from: 28, to: 31, loop: false, speed: 5  },  // row 3 cols 4-7: defeat
+  },
+});
 // loadSprite("boss_duo",       "assets/boss_duo.png",       { sliceX:8, sliceY:5 });
 // loadSprite("boss_chain",     "assets/boss_chain.png",     { sliceX:8, sliceY:5 });
 // loadSprite("boss_chef",      "assets/boss_chef.png",      { sliceX:8, sliceY:5 });
@@ -414,6 +432,19 @@ scene("game", ({ numPlayers = 1, levelIdx = 0 }) => {
     // TODO: play("sfx_hurt")
   }
 
+
+  // ── Debug cheats (remove before release) ────────────────────────────────────
+  // Keyboard: ` = skip wave, - = skip level
+  // Mobile:   hold BACK + tap PUNCH = skip wave, hold BACK + tap KICK = skip level
+  function debugSkipWave() { [...enemies].forEach(e => killEnemy(e)); }
+  function debugSkipLevel() {
+    const next = levelIdx + 1;
+    if (next < LEVELS.length) go("game", { numPlayers, levelIdx: next });
+  }
+  onKeyPress("}", debugSkipWave);
+  onKeyPress("-", debugSkipLevel);
+  onKeyPress("z", () => { if (isKeyDown("tab")) debugSkipWave(); });   // BACK+PUNCH
+  onKeyPress("x", () => { if (isKeyDown("tab")) debugSkipLevel(); });  // BACK+KICK
 
   // ── Main update loops ───────────────────────────────────────────────────────
 
