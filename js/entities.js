@@ -307,8 +307,14 @@ function drawSnow() {
  * @param {number} srcX/srcY — world position of the speaker's feet
  * @param {number} duration  — seconds before it fades (default 2.2)
  */
+// Track active bubbles so new ones can avoid overlapping them
+const _activeBubbles = [];
+// Player refs for bubble proximity fade (populated by spawnPlayer)
+const _playerRefs = [];
+
 function showSpeechBubble(msg, entityOrX, yOrDuration, maybeDuration) {
   const W  = Math.min(msg.length * 6 + 16, 140);
+  const BUBBLE_H = 26; // background 19 + nub 7
 
   // Detect: entity-tracking mode vs static (x, y) mode
   const entity = (typeof entityOrX === "object" && entityOrX !== null) ? entityOrX : null;
@@ -318,32 +324,88 @@ function showSpeechBubble(msg, entityOrX, yOrDuration, maybeDuration) {
     ? (typeof yOrDuration === "number" ? yOrDuration : 2.2)
     : (typeof maybeDuration === "number" ? maybeDuration : 2.2);
 
+  // Is this a player's own bubble? (player bubbles never fade from proximity)
+  const isPlayerBubble = entity && entity.pidx !== undefined;
+
+  // Register this bubble for overlap tracking
+  const bubble = { x: lastX, y: lastY - 72, w: W, h: BUBBLE_H, offset: 0 };
+  _activeBubbles.push(bubble);
+  setTimeout(() => {
+    const idx = _activeBubbles.indexOf(bubble);
+    if (idx >= 0) _activeBubbles.splice(idx, 1);
+  }, duration * 1000);
+
   function getBubblePos() {
     if (entity && entity.exists()) {
       lastX = entity.pos.x;
       lastY = entity.pos.y;
     }
     const bx = clamp(lastX - W / 2, 4, SCREEN_W - W - 4);
-    const by = lastY - 58;
+    let by = lastY - 72;
+
+    // Push bubble up if it overlaps any other active bubble
+    let nudged = true;
+    let attempts = 0;
+    while (nudged && attempts < 4) {
+      nudged = false;
+      for (const other of _activeBubbles) {
+        if (other === bubble) continue;
+        const obx = clamp(other.x - other.w / 2, 4, SCREEN_W - other.w - 4);
+        const oby = other.y + other.offset;
+        // Check horizontal overlap
+        if (bx < obx + other.w && bx + W > obx) {
+          // Check vertical overlap
+          if (by < oby + BUBBLE_H && by + BUBBLE_H > oby) {
+            by = oby - BUBBLE_H - 2; // stack above
+            nudged = true;
+          }
+        }
+      }
+      attempts++;
+    }
+    by = Math.max(2, by); // don't go off screen top
+    bubble.x = lastX;
+    bubble.y = lastY - 72;
+    bubble.offset = by - (lastY - 72);
+
     return { bx, by, nubX: clamp(lastX - 3, bx + 4, bx + W - 10) };
   }
 
-  const p = getBubblePos();
+  const bp = getBubblePos();
+
+  // Proximity fade: non-player bubbles fade when a player walks near
+  function proximityOpacity() {
+    if (isPlayerBubble) return 1;
+    let minDist = 999;
+    for (const pl of _playerRefs) {
+      if (!pl.exists || !pl.exists() || pl.hp <= 0) continue;
+      const dx = Math.abs(lastX - pl.pos.x);
+      const dy = Math.abs(lastY - pl.pos.y);
+      minDist = Math.min(minDist, dx + dy);
+    }
+    // Fade from 1.0 at 80px to 0.15 at 30px
+    if (minDist > 80) return 1;
+    if (minDist < 30) return 0.15;
+    return 0.15 + (minDist - 30) / 50 * 0.85;
+  }
 
   // Bubble background
-  add([rect(W, 19), pos(p.bx, p.by),
+  add([rect(W, 19), pos(bp.bx, bp.by),
        color(250, 248, 230), opacity(1), z(800), lifespan(duration, { fade: 0.45 }),
-       { update() { const q = getBubblePos(); this.pos.x = q.bx; this.pos.y = q.by; } }]);
+       { update() { const q = getBubblePos(); this.pos.x = q.bx; this.pos.y = q.by;
+                     this.opacity = Math.min(this.opacity, proximityOpacity()); } }]);
 
   // Bubble text
-  add([text(msg, { size: 8 }), pos(p.bx + 4, p.by + 4),
+  add([text(msg, { size: 8 }), pos(bp.bx + 4, bp.by + 4),
        color(30, 30, 30), opacity(1), z(801), lifespan(duration, { fade: 0.45 }),
-       { update() { const q = getBubblePos(); this.pos.x = q.bx + 4; this.pos.y = q.by + 4; } }]);
+       { update() { const q = getBubblePos(); this.pos.x = q.bx + 4; this.pos.y = q.by + 4;
+                     this.opacity = Math.min(this.opacity, proximityOpacity()); } }]);
 
   // Pointer nub below the bubble
-  add([rect(7, 7), pos(p.nubX, p.by + 17),
+  add([rect(7, 7), pos(bp.nubX, bp.by + 17),
        color(250, 248, 230), opacity(1), z(800), lifespan(duration, { fade: 0.45 }),
-       { update() { const q = getBubblePos(); this.pos.x = q.nubX; this.pos.y = q.by + 17; } }]);
+       { update() { const q = getBubblePos(); this.pos.x = q.nubX; this.pos.y = q.by + 17;
+                     this.opacity = Math.min(this.opacity, proximityOpacity()); } }]);
 }
 
 /** Spawn a floating damage / score number that rises and fades. */
@@ -397,6 +459,7 @@ function spawnPlayer(idx) {
     },
   ]);
   if (useSprite) p.play("idle");
+  _playerRefs.push(p);
   return p;
 }
 
@@ -521,10 +584,11 @@ function updateEnemy(e, target, onAttack) {
   // Still stunned — depth sort and bail
   if (e.state !== "walk") { e.z = e.pos.y; return; }
 
-  // Taunt player (speech bubble)
+  // Taunt player (speech bubble) — skip if too close to target to avoid covering them
   if (e.tauntCooldown <= 0) {
     e.tauntCooldown = rand(6, 14);
-    showSpeechBubble(choose(e.def.taunts), e);
+    const distToTarget = target ? Math.abs(e.pos.x - target.pos.x) + Math.abs(e.pos.y - target.pos.y) : 999;
+    if (distToTarget > 60) showSpeechBubble(choose(e.def.taunts), e);
   }
 
   // Vector toward target
@@ -630,10 +694,16 @@ function updateNPC(n, players, enemies) {
     n.state = "walk";
   }
 
-  // React to a nearby fight with a speech bubble
+  // React to a nearby fight with a speech bubble — skip if too close to a player
   if (fightNearby && n.reactCooldown <= 0 && Math.random() < 0.25) {
     n.reactCooldown = rand(3.5, 8);
-    showSpeechBubble(choose(n.def.phrases), n);
+    const nearestPlayer = alivePlayers.reduce((closest, p) => {
+      const d = Math.abs(n.pos.x - p.pos.x) + Math.abs(n.pos.y - p.pos.y);
+      return d < closest.d ? { d, p } : closest;
+    }, { d: 999, p: null });
+    if (nearestPlayer.d > 60) {
+      showSpeechBubble(choose(n.def.phrases), n);
+    }
     n.state = "react";
     wait(1.2, () => { if (n.state === "react") n.state = "walk"; });
   }
