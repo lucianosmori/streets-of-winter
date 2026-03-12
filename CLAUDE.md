@@ -28,10 +28,19 @@ title → game → gameover → retry/title
 - **Players** (1-2): WASD/IJKL movement, Z/X/Q or U/O/P attacks. Spawned via `spawnPlayer(idx)`.
 - **Enemies** (6 basic + 5 bosses): AI targets nearest player, pathfinds, attacks in range. Spawned via `spawnEnemy(type, x, y)`.
 - **NPCs** (7 cultural archetypes): Wander, flee danger, react to fights with speech bubbles.
+- **Pets** (5 animal types): Sub-type of friendly NPC. Smaller than human NPCs (~10–14px wide, ~12–20px tall). Same wander/flee behaviour as human NPCs but **no speech bubbles**. Archetypes: `squirrel`, `cat`, `dog`, `raccoon`, `raven`. Higher speeds than human NPCs (squirrel ~60, cat/dog ~35–50, raccoon ~40, raven ~38 hopping gait). Raccoons are especially numerous on the ByWard Market level.
 - **Pickups** (4 health + 7 weapons): Dropped by enemies (28% chance) or pre-spawned.
 
 ### Wave System
 Each level: 3 enemy waves → boss fight → next level. 5 levels total (Bank St → ByWard → Canal → Curry St → Parliament Hill).
+
+#### Level 2 — ByWard Market (Raccoon Incident)
+The Market level is set at night. The old Rideau Centre McDonald's — infamous for its wildlife incidents and eventual closure — casts a golden-arched glow on the snowy street. Key narrative elements:
+- **McDonald's storefront** added to the store layout (replaces or joins the current 5 stores). Golden arches sign, boarded partial windows, lit from inside. A sign reads "RIDEAU LOCATION — CLOSED DUE TO INCIDENT".
+- **Raccoon NPCs** are abundant on this level specifically. A cluster of raccoons scatters from overturned garbage bags near the McDonald's entrance when the player passes.
+- The `bossIntro` banner and NPC speech bubbles reference the incident (e.g. *"Did you hear what happened at that McDonald's??"*, *"The raccoons took OVER, man"*).
+- Enemy waves remain: stripper+grunt → agile+stripper → stripper+heavy+agile. Boss: **The Duo** (stripper bosses ×2) guarding the Barefax door. Strippers/slashers are still the primary enemy threat.
+- The raccoon incident is **ambient flavour** for now; future mechanic idea: raccoon NPCs distract enemies briefly when startled.
 
 ### Combat
 - Punch (68px range, 12 dmg), Kick (90px range, 22 dmg), Special (115px AoE, 35 dmg, costs 20 HP)
@@ -93,6 +102,7 @@ Depth-sorted by Y position. NPCs at z~290, pickups at z~285, players/enemies at 
 - **4 enemy sprites** (agile, stripper, crackhead, kicker) — using colored rectangles
 - **4 boss sprites** (Duo, Chain Daddy, Chef, Overlord) — using colored rectangles
 - **4 NPC sprites** (lgbtq, hijab, ukrainian, palestinian) — using colored rectangles
+- **5 pet sprites** (squirrel, cat, dog, raccoon, raven) — no sprites yet; 4×1 walk-cycle grid, tiny frames (see `assets/CLAUDE.md` for per-animal dimensions)
 - **7 pickup sprites** (bottle, fish, spice_cart, fruit_cart, flagpole, skate, statue)
 - **Impact effects** (punch/kick VFX)
 - See `assets/CLAUDE.md` for sprite guidelines, `assets/SPRITE_PROMPT.md` for generation prompts
@@ -102,15 +112,28 @@ Depth-sorted by Y position. NPCs at z~290, pickups at z~285, players/enemies at 
 - No music (street theme, boss themes)
 - `loadSound()` stubs exist in game.js but are commented out
 
-### Features
-- Character select screen (P1/P2 character choice)
-- Difficulty modes
-- Score persistence / high score table
-- Combo system
-- Player 2 full integration testing
+### Features & Polish — Idea Backlog
 
-### Polish
+Priority tiers: **1** = core/blocking, **2** = important gameplay, **3** = nice-to-have, **4** = stretch/flavour
+
+#### Tier 1 — Core / Blocking
+- Player 2 (Priya) full integration testing — controls, hitboxes, co-op flow
+- ByWard McDonald's storefront added to `LEVELS[1].stores` — narrative anchor for the level
 - Death animations for enemies without sprites (currently just flash + destroy)
-- Level transition animations
-- Boss intro cinematics (currently just text banners)
+
+#### Tier 2 — Important Gameplay
+- **Pets system** — `spawnPet(type, x, y)` factory in `entities.js`, pet entries in `NPC_DEFS` with `isPet: true` flag, level `npcTypes` pools can include pet types
+- **ByWard raccoon scatter** — trigger event when player crosses McDonald's x-position: spawn 3–5 raccoon pets that flee in random directions + flash a brief banner ("RACCOON INCIDENT ZONE")
+- Combo system — chain punches/kicks for multiplied damage or extra hits
+- Character select screen — P1/P2 pick their fighter before the game starts
+- Boss intro cinematics — brief pan or banner with boss name/portrait, not just text
+
+#### Tier 3 — Nice to Have
+- **Street traffic** — cars pass through the background lane one at a time, alternating directions (left-to-right / right-to-left), at irregular intervals. Players and enemies are not affected (traffic is in the road lane, behind the action). Adds life to the scene. Different car colours/types per level. Honk SFX optional.
+- Level transition animations — fade or slide between levels
+- Difficulty modes — Easy / Normal / Hard toggle on title screen
+- Score persistence / high score table — localStorage-backed leaderboard
+
+#### Tier 4 — Stretch / Flavour
+- **NPCs can take damage** — enemies can accidentally hit civilians during combat (stray punch/kick with AoE overlap). NPC flashes, stumbles, plays a hurt phrase (*"Hey, watch it!"*). No kill — NPCs bottom out at 1 HP and flee permanently. Optional: triggers a penalty or just adds chaos flavour.
 - ~~Speech bubble overlap / readability~~ — DONE (stacking, proximity fade, suppression)

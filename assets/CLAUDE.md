@@ -236,6 +236,38 @@ for r in range(rows):
 ### NPCs (suggested 4×1 — simple walk cycle)
 turban, lgbtq, hijab, african, quebecois, ukrainian, palestinian
 
+### Pet NPCs (4×1 — walk cycle only, tiny frames)
+
+Sub-type of NPC. Smaller scale than human NPCs, animal walk cycles only (no react/attack/speech states). Marked `isPet: true` in `NPC_DEFS`. Raccoons appear heavily on ByWard Market level.
+
+**In-engine scaling:** same formula as human NPCs — `def.h / (def.spriteH || 126)`. Set `spriteH` equal to the frame height below so scale resolves correctly at game size.
+Example: raccoon `spriteH: 16` → scale = 16/126 ≈ 0.127 (very small, correct).
+
+| Animal   | File                | Frame W | Frame H | Sheet total | spriteH |
+|----------|---------------------|---------|---------|-------------|---------|
+| squirrel | npc_squirrel.png    | 23px    | 14px    | 92 × 14px   | 14      |
+| cat      | npc_cat.png         | 24px    | 16px    | 96 × 16px   | 16      |
+| dog      | npc_dog.png         | 28px    | 18px    | 112 × 18px  | 18      |
+| raccoon  | npc_raccoon.png     | 26px    | 16px    | 104 × 16px  | 16      |
+| raven    | npc_raven.png       | 22px    | 20px    | 88 × 20px   | 20      |
+
+**Style notes:**
+- Pixel art, top-down 2.5D side view, consistent with human NPC sheets but much smaller
+- Raccoon: dark-ringed tail prominent, hunched scavenger pose, grey/black/white palette
+- Raven: black feathered, **hopping gait on the ground** (not flying), Ottawa winter setting
+- All pets face right in source sheet; engine flips via `flipX` for left-facing
+- No outlines heavier than 1px at this scale
+
+**Planned NPC_DEFS sketch (js/constants.js):**
+```js
+// Pets — sub-type of NPC, no speech bubbles (phrases: []), isPet: true
+squirrel: { col:[150,140,120], accentCol:[120,100, 70], w:10, h:12, speed:60, phrases:[], spriteH:14, sprite:"npc_squirrel", isPet:true },
+cat:      { col:[160,140,110], accentCol:[200,160,100], w:12, h:14, speed:48, phrases:[], spriteH:16, sprite:"npc_cat",      isPet:true },
+dog:      { col:[180,150,100], accentCol:[220,190,140], w:14, h:16, speed:42, phrases:[], spriteH:18, sprite:"npc_dog",      isPet:true },
+raccoon:  { col:[120,120,120], accentCol:[ 40, 40, 40], w:12, h:14, speed:40, phrases:[], spriteH:16, sprite:"npc_raccoon",  isPet:true },
+raven:    { col:[ 40, 40, 50], accentCol:[ 80, 80,100], w:11, h:16, speed:38, phrases:[], spriteH:20, sprite:"npc_raven",    isPet:true },
+```
+
 ### Backgrounds (single images, 800×260px upper area)
 bg_bankstreet, bg_byward, bg_canal, bg_currystreet, bg_parliament
 (Note: GROUND_TOP is now 260, not 195)
