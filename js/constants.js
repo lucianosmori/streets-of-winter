@@ -297,7 +297,7 @@ const NPC_DEFS = {
   turban: {
     col:[210, 170, 110], accentCol:[255, 120, 0],   w:22, h:44, speed:25,
     phrases:["Arre yaar!", "Bas karo!", "Chai piyoge?"],
-    // TODO: sprite:"npc_turban"
+    sprite: "npc_turban",
   },
   lgbtq: {
     col:[255, 140, 200], accentCol:[255, 80, 200],  w:22, h:44, speed:30,
@@ -312,12 +312,12 @@ const NPC_DEFS = {
   african: {
     col:[160, 100, 50],  accentCol:[220, 160, 40],  w:22, h:44, speed:28,
     phrases:["Habari!", "Selam!", "Insha'Allah!"],
-    // TODO: sprite:"npc_african"
+    sprite: "npc_african",
   },
   quebecois: {
     col:[220, 180, 140], accentCol:[200, 60, 60],   w:24, h:44, speed:22,
     phrases:["Tabarnak!", "Câlisse!", "Go Sens go!"],
-    // TODO: sprite:"npc_quebecois"
+    sprite: "npc_quebecois",
   },
   ukrainian: {
     col:[255, 220, 180], accentCol:[30, 120, 220],  w:22, h:44, speed:25,

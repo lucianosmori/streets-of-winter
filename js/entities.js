@@ -560,13 +560,13 @@ function updateEnemy(e, target, onAttack) {
 function spawnNPC(type, x, y) {
   const def = NPC_DEFS[type];
 
-  // TODO: Swap rect/color for sprite(def.sprite) and add walk animation.
-  //       Accent colour (turban, keffiyeh, etc.) rendered as a small separate rect.
+  const useSprite = !!def.sprite;
   const n = add([
-    rect(def.w, def.h),
+    useSprite ? sprite(def.sprite) : rect(def.w, def.h),
+    useSprite ? scale(def.h / (def.spriteH || 126)) : scale(1),
     pos(x, y),
     anchor("bot"),
-    color(...def.col),
+    useSprite ? color(255, 255, 255) : color(...def.col),
     z(290),   // NPCs slightly behind player/enemies by default
     {
       def,
@@ -578,6 +578,7 @@ function spawnNPC(type, x, y) {
       facing:       1,
     },
   ]);
+  if (useSprite) n.play("walk");
   return n;
 }
 
@@ -625,6 +626,13 @@ function updateNPC(n, players, enemies) {
     if (n.dir !== 0) n.facing = n.dir;
     n.pos.x += n.dir * n.def.speed * dt();
     n.pos.x  = clamp(n.pos.x, 20, SCREEN_W - 20);
+  }
+
+  // Sprite animation & facing
+  if (n.def.sprite) {
+    n.flipX = n.facing < 0;
+    const moving = n.state === "walk" && n.dir !== 0 || n.state === "flee";
+    if (moving && n.curAnim() !== "walk") n.play("walk");
   }
 
   n.z = n.pos.y;  // depth sort

@@ -78,11 +78,26 @@ loadSprite("boss_earl", "assets/heavy_boss_art.png", {
 // loadSprite("boss_overlord",  "assets/boss_overlord.png",  { sliceX:8, sliceY:5 });
 
 // ── NPC spritesheets ──────────────────────────────────────────────────────────
-// loadSprite("npc_turban",     "assets/npc_turban.png",     { sliceX:4 });
+loadSprite("npc_turban", "assets/npc_turban.png", {
+  sliceX: 4, sliceY: 1,
+  anims: {
+    walk: { from: 0, to: 3, loop: true, speed: 6 },
+  },
+});
 // loadSprite("npc_lgbtq",      "assets/npc_lgbtq.png",      { sliceX:4 });
 // loadSprite("npc_hijab",      "assets/npc_hijab.png",      { sliceX:4 });
-// loadSprite("npc_african",    "assets/npc_african.png",    { sliceX:4 });
-// loadSprite("npc_quebecois",  "assets/npc_quebecois.png",  { sliceX:4 });
+loadSprite("npc_african", "assets/npc_african.png", {
+  sliceX: 4, sliceY: 1,
+  anims: {
+    walk: { from: 0, to: 3, loop: true, speed: 6 },
+  },
+});
+loadSprite("npc_quebecois", "assets/npc_quebecois.png", {
+  sliceX: 4, sliceY: 1,
+  anims: {
+    walk: { from: 0, to: 3, loop: true, speed: 6 },
+  },
+});
 // loadSprite("npc_ukrainian",  "assets/npc_ukrainian.png",  { sliceX:4 });
 // loadSprite("npc_palestinian","assets/npc_palestinian.png",{ sliceX:4 });
 
