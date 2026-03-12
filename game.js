@@ -65,11 +65,11 @@ loadSprite("enemy_heavy", "assets/heavy_art.png", {
 loadSprite("boss_earl", "assets/heavy_boss_art.png", {
   sliceX: 8, sliceY: 4,
   anims: {
-    attack: { from: 0,  to: 7,  loop: false, speed: 10 },  // row 0: punch/slam
-    walk:   { from: 8,  to: 15, loop: true,  speed: 7  },  // row 1: heavy stride
-    idle:   { from: 8,  to: 15, loop: true,  speed: 5  },  // reuse walk as idle
-    hurt:   { from: 24, to: 27, loop: false, speed: 8  },  // row 3 cols 0-3: stagger
-    death:  { from: 28, to: 31, loop: false, speed: 5  },  // row 3 cols 4-7: defeat
+    walk:   { from: 0,  to: 7,  loop: true,  speed: 7  },  // row 0: heavy stride
+    attack: { from: 8,  to: 15, loop: false, speed: 10 },  // row 1: punch combo
+    hurt:   { from: 16, to: 19, loop: false, speed: 8  },  // row 2 cols 0-3: stagger (standing)
+    death:  { from: 20, to: 23, loop: false, speed: 5  },  // row 2 cols 4-7: collapse (lying)
+    idle:   { from: 24, to: 31, loop: true,  speed: 5  },  // row 3: idle/menacing
   },
 });
 // loadSprite("boss_duo",       "assets/boss_duo.png",       { sliceX:8, sliceY:5 });

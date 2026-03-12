@@ -259,7 +259,7 @@ const ENEMY_DEFS = {
   },
   // ── Boss variants ──────────────────────────────────────────────────────────
   heavy_boss: {
-    label:"BIG EARL",    col:[120, 40, 20],  w:40, h:56,
+    label:"BIG EARL",    col:[120, 40, 20],  w:40, h:72,
     hp:200, speed:35, damage:16, attackRange:52, attackCooldown:2.0, isBoss:true,
     taunts:["Bank Street's mine!", "You're done in Ottawa!"],
     sprite:"boss_earl",

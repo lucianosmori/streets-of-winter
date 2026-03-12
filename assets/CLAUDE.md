@@ -60,6 +60,113 @@
   ```
 - **Important lesson:** Don't guess row contents from visual inspection. Use the Python bounding-box analysis script to classify frames as STANDING vs LYING (width > height × 1.3 = lying). Row order in AI-generated sheets often doesn't match intuitive expectations.
 
+### heavy_boss_art.png (Boss: Big Earl)
+- **Dimensions:** 2560×880 (repacked & COM-centered from Gemini's original 1408×752)
+- **Grid:** 8 columns × 4 rows = 32 frames, each 320×220px
+- **Original content:** 176×188px per frame, but character filled 100% of frame and body position shifted wildly (x=31 to x=140) between frames. Repacked with transparent padding and center-of-mass alignment so character stays visually stable during animation.
+- **Row layout:**
+  - Row 0 (frames 0-7): Punch/slam attack (standing, y-offset 8-17px from top)
+  - Row 1 (frames 8-15): Walk cycle (full height, y=0)
+  - Row 2 (frames 16-23): Ground slam with blue VFX (full height, y=0) — used as attack anim
+  - Row 3 (frames 24-27): Hurt/stagger (standing)
+  - Row 3 (frames 28-31): Death (standing — no collapse animation exists)
+- **Animation config in game.js:**
+  ```js
+  sliceX: 8, sliceY: 4,
+  anims: {
+    walk:   { from: 8,  to: 15 },  // row 1
+    idle:   { from: 8,  to: 15 },  // reuse walk
+    attack: { from: 16, to: 23 },  // row 2 (ground slam, no y-offset)
+    hurt:   { from: 24, to: 27 },  // row 3 cols 0-3
+    death:  { from: 28, to: 31 },  // row 3 cols 4-7
+  }
+  ```
+- **Scaling:** `spriteH:220` in def, `h:72`. Uses uniform `scale(h/spriteH)`.
+- **Status: STILL BROKEN** — COM-centering repack was attempted but the sprite still displays like an unaligned carousel/movie strip. The Gemini-generated art has fundamentally inconsistent character poses across frames (body proportions, limb positions, and content distribution vary too much). **This sprite likely needs to be regenerated** with a stricter prompt or manually edited frame-by-frame.
+- **Key lesson:** Gemini-generated boss had character body shifting 100+ pixels between frames. COM-centering repack helped but wasn't sufficient — the underlying art quality/consistency is the root problem.
+
+## AI Sprite QA Pipeline (Gemini/Imagen)
+
+**Gemini often produces sprite sheets with issues that can't be fixed by code alone. Always run this pipeline before integrating a new sprite:**
+
+### Step 1: Dimension Check
+```python
+from PIL import Image
+img = Image.open('sheet.png').convert('RGBA')
+w, h = img.size
+cols, rows = 8, 4  # adjust per sheet
+print(f'{w}x{h}, frame {w//cols}x{h//rows}')
+print(f'Clean: {w % cols == 0} (w), {h % rows == 0} (h)')
+```
+If not clean → **repack** (see procedure below).
+
+### Step 2: Frame Content Analysis
+Run the bounding box analysis script (below) to check:
+- **Row contents**: Which rows are walk/attack/hurt/death? Don't guess.
+- **Standing vs Lying**: Use `width > height * 1.3` to classify.
+- **Content fill ratio**: Content should fill ~50-60% of frame width. If >90%, the character will look squat/wide — needs padding repack.
+- **Y-offset consistency**: If content y-offset varies >5px between rows, attack/walk transitions will cause visual jumping.
+
+### Step 3: Body Position Stability (Critical!)
+Check that the character's center of mass (COM) is consistent across frames:
+```python
+from PIL import Image
+img = Image.open('sheet.png').convert('RGBA')
+w, h = img.size
+cols, rows = 8, 4
+fw, fh = w // cols, h // rows
+for r in range(rows):
+    coms = []
+    for c in range(cols):
+        cell = img.crop((c*fw, r*fh, (c+1)*fw, (r+1)*fh))
+        pixels = list(cell.getdata())
+        total = 0; wx = 0
+        for i, p in enumerate(pixels):
+            if p[3] > 10:
+                total += 1; wx += i % fw
+        if total > 50: coms.append(wx / total)
+    if coms:
+        spread = max(coms) - min(coms)
+        print(f'Row {r}: COM range={spread:.0f}px ({"OK" if spread < 15 else "NEEDS COM REPACK"})')
+```
+If COM spread > 15px → character will visibly jump/teleport horizontally during animation. **COM-center repack required.**
+
+### Step 4: COM-Centering Repack
+When character position is unstable across frames:
+```python
+from PIL import Image
+img = Image.open('sheet.png').convert('RGBA')
+cols, rows = 8, 4
+fw, fh = img.size[0]//cols, img.size[1]//rows
+NEW_FW, NEW_FH = fw + 144, fh + 32  # add padding (adjust as needed)
+new_img = Image.new('RGBA', (NEW_FW*cols, NEW_FH*rows), (0,0,0,0))
+target_cx = NEW_FW // 2
+for r in range(rows):
+    for c in range(cols):
+        cell = img.crop((c*fw, r*fh, (c+1)*fw, (r+1)*fh))
+        pixels = list(cell.getdata())
+        total = 0; wx = 0
+        for i, p in enumerate(pixels):
+            if p[3] > 10: total += 1; wx += i % fw
+        if total < 50: continue
+        com_x = wx / total
+        nx = c * NEW_FW + int(target_cx - com_x)
+        ny = r * NEW_FH + (NEW_FH - fh)  # feet at bottom
+        new_img.paste(cell, (nx, ny))
+new_img.save('sheet_fixed.png')
+```
+
+### Decision Tree: Fix Asset vs Fix Code
+- **Dimensions wrong** → Repack asset (padding + clean division)
+- **Row order unexpected** → Remap animation frame ranges in code
+- **Content fills >90% of frame** → Repack asset with padding
+- **COM spread >15px between frames** → COM-center repack asset
+- **No death collapse frames** → Regenerate sprite or accept standing death
+- **Y-offset varies between rows** → Use rows with consistent y=0 for attack anim
+- **Character too similar to another entity** → Regenerate sprite with different description
+
+**Rule of thumb:** If the problem is in the pixel data, fix the asset. Don't endlessly tweak code to compensate for bad sprites.
+
 ## Sprite Sheet Repack Procedure
 
 When sprite sheets have non-uniform frame spacing or non-divisible dimensions:
@@ -120,7 +227,7 @@ for r in range(rows):
 ### Bosses (suggested 10×5 grids — more frames for complex attacks)
 | Sprite | Type | Level |
 |--------|------|-------|
-| boss_heavy.png | heavy_boss / Big Earl | Bank Street |
+| heavy_boss_art.png | heavy_boss / Big Earl | Bank Street | BROKEN — needs regen |
 | boss_stripper.png | stripper_boss / The Duo (×2) | ByWard Market |
 | boss_chain.png | heavy_chain / Chain Daddy | Rideau Canal |
 | boss_druglord.png | drug_lord / The Chef | Curry Street |

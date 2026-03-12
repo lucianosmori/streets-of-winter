@@ -453,7 +453,7 @@ function spawnEnemy(type, x, y) {
   const useSprite = !!def.sprite;
   const e = add([
     useSprite ? sprite(def.sprite) : rect(def.w, def.h),
-    useSprite ? scale(def.h / 192) : scale(1),
+    useSprite ? scale(def.h / (def.spriteH || 192)) : scale(1),
     pos(x, y),
     anchor("bot"),
     useSprite ? color(255, 255, 255) : color(...def.col),

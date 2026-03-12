@@ -76,13 +76,17 @@ Depth-sorted by Y position. NPCs at z~290, pickups at z~285, players/enemies at 
 - Detailed pixel-art storefront rendering with windows, signs, awnings, doors
 - Proportional building layout (upper floors 65% / ground floor 35%)
 - `assets/SPRITE_PROMPT.md` — ready-to-use prompts for Gemini/Imagen sprite generation
+- Enemy "Heavy" sprite sheet (8×4 grid, 1408×768px)
+- Boss "Big Earl" sprite sheet (8×4 grid, 2560×880px) — COM-repacked from Gemini output, **still broken** (unaligned carousel effect, needs regen)
+- AI Sprite QA Pipeline in `assets/CLAUDE.md` — dimension check, content analysis, COM stability, repack procedures
+- `spriteH` per-entity override for non-standard frame heights in scaling formula
 
 ## What's Missing / TODO
 
 ### Sprites (Critical)
 - **Player 2 (Priya)** sprite sheet — no sprite exists yet
-- **5 enemy sprites** (agile, heavy, stripper, crackhead, kicker) — using colored rectangles
-- **5 boss sprites** — using colored rectangles
+- **3 enemy sprites** (agile, stripper, crackhead, kicker) — using colored rectangles
+- **4 boss sprites** (Duo, Chain Daddy, Chef, Overlord) — using colored rectangles
 - **All NPC sprites** (7 types) — using colored rectangles
 - **Impact effects** (punch/kick VFX)
 - See `assets/CLAUDE.md` for sprite guidelines, `assets/SPRITE_PROMPT.md` for generation prompts
