@@ -30,6 +30,11 @@ The sprite sheet MUST have dimensions that divide evenly by the grid size.
 | 10×5 | 116×126 | **1160×630** (bosses) |
 | 4×1 | 116×126 | **464×126** (NPCs — walk cycle only) |
 | 4×1 | 48×48 | **192×48** (pickups/items) |
+| 4×1 | 23×14 | **92×14** (pet: squirrel) |
+| 4×1 | 24×16 | **96×16** (pet: cat) |
+| 4×1 | 28×18 | **112×18** (pet: dog) |
+| 4×1 | 26×16 | **104×16** (pet: raccoon) |
+| 4×1 | 22×20 | **88×20** (pet: raven) |
 
 ---
 
@@ -195,6 +200,59 @@ Bundled up for Ottawa winter. Friendly, non-threatening appearance.
 
 ---
 
+## Pet NPC Sprite Sheets (tiny — 4 columns × 1 row, animal-specific dimensions)
+
+Pets are a sub-type of friendly NPC — small animals that wander the streets. Walk cycle only (4 frames). See `assets/CLAUDE.md` for exact per-animal frame dimensions.
+
+### Base style note (prepend to all pet prompts):
+```
+Pixel art sprite sheet for a 2D side-scrolling beat 'em up game.
+Style: 16-bit retro pixel art. Side-on profile view, animal facing right.
+Background: fully transparent PNG with alpha. No anti-aliasing, hard pixel edges.
+Ottawa, Canada winter setting — snow on the ground implied by context.
+4-frame walk cycle: stride out, mid-step, stride back, mid-step.
+ALL frames face RIGHT. Engine flips horizontally for left-facing.
+```
+
+### Squirrel — npc_squirrel.png (92×14px, 4 frames of 23×14)
+```
+Pixel art sprite sheet, 92x14 pixels, 4 columns by 1 row. Each cell 23x14. Transparent background.
+Grey squirrel, bushy tail arched over back, scurrying side-on walk cycle, winter fur.
+4 frames showing quick bounding stride. Tiny creature, max ~10px body height.
+```
+
+### Cat — npc_cat.png (96×16px, 4 frames of 24×16)
+```
+Pixel art sprite sheet, 96x16 pixels, 4 columns by 1 row. Each cell 24x16. Transparent background.
+Stray tabby or grey alley cat, cautious prowling walk cycle, side-on view.
+Winter street cat — a little scruffy. Tail up or low-slung. 4 frames.
+```
+
+### Dog — npc_dog.png (112×18px, 4 frames of 28×18)
+```
+Pixel art sprite sheet, 112x18 pixels, 4 columns by 1 row. Each cell 28x18. Transparent background.
+Medium-sized mutt, scruffy Ottawa street dog, trotting walk cycle, side-on view.
+Floppy ears, mixed breed look, tail wagging slightly. 4 frames.
+```
+
+### Raccoon — npc_raccoon.png (104×16px, 4 frames of 26×16)
+```
+Pixel art sprite sheet, 104x16 pixels, 4 columns by 1 row. Each cell 26x16. Transparent background.
+Urban raccoon, grey body, black mask markings, ringed tail prominent, hunched scavenger walk.
+Side-on view, 4-frame walk cycle. Ottawa winter setting.
+This raccoon just escaped a McDonald's incident — slightly frantic energy in the pose.
+```
+
+### Raven — npc_raven.png (88×20px, 4 frames of 22×20)
+```
+Pixel art sprite sheet, 88x20 pixels, 4 columns by 1 row. Each cell 22x20. Transparent background.
+Black raven or crow, hopping walk cycle — ground level only, NOT flying.
+Glossy black feathers, side-on profile, 4 frames of hopping gait.
+Ottawa winter setting, occasional head-bob between hops.
+```
+
+---
+
 ## Pickup / Item Sprites (4 columns × 1 row = 192×48)
 
 ```
@@ -251,7 +309,7 @@ Flat perspective, suitable for a side-scrolling game background.
 ```storefronts: Tim Hortons, Dollarama, pawn shop, laundromat, shawarma place. Gritty urban strip, neon signs, snow on awnings.```
 
 **Level 2 — ByWard Market:**
-```storefronts: Barefax club, craft brewery, vintage shop, tattoo parlor, pub. Nightlife district, flickering lights, wet pavement.```
+```storefronts: Barefax nightclub (purple neon), McDonald's with golden arches (partially boarded up, lit inside — a sign reads "RIDEAU LOCATION CLOSED"), craft brewery, vintage shop, tattoo parlor. Nightlife district, flickering lights, wet snowy pavement. Overturned garbage bags near the McDonald's entrance. Raccoon silhouettes in the shadows.```
 
 **Level 3 — Rideau Canal:**
 ```open frozen canal, skate shack, hot chocolate stand, distant Parliament silhouette, snow-covered trees. Bright winter day, ice surface.```
