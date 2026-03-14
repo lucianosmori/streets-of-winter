@@ -46,7 +46,16 @@ loadSprite("enemy_grunt", "assets/grunt_art.png", {
     idle:   { from: 24, to: 31, loop: true,  speed: 6  },  // row 3: idle/patrol (all standing)
   },
 });
-// loadSprite("enemy_agile",    "assets/enemy_agile.png",    { /* same layout */ });
+loadSprite("enemy_agile", "assets/agile_art.png", {
+  sliceX: 8, sliceY: 4,
+  anims: {
+    walk:   { from: 0,  to: 7,  loop: true,  speed: 9  },   // row 0: skating approach
+    attack: { from: 8,  to: 15, loop: false, speed: 10 },   // row 1: slash attack
+    hurt:   { from: 16, to: 19, loop: false, speed: 8  },   // row 2 cols 0-3: flinch
+    death:  { from: 20, to: 23, loop: false, speed: 6  },   // row 2 cols 4-7: collapse
+    idle:   { from: 24, to: 31, loop: true,  speed: 6  },   // row 3: idle
+  },
+});
 loadSprite("enemy_heavy", "assets/heavy_art.png", {
   sliceX: 8, sliceY: 4,
   anims: {
@@ -57,7 +66,16 @@ loadSprite("enemy_heavy", "assets/heavy_art.png", {
     idle:   { from: 24, to: 31, loop: true,  speed: 6  },   // row 3: idle/patrol
   },
 });
-// loadSprite("enemy_stripper", "assets/enemy_stripper.png", { /* same layout */ });
+loadSprite("enemy_stripper", "assets/stripper_art.png", {
+  sliceX: 8, sliceY: 4,
+  anims: {
+    walk:   { from: 0,  to: 7,  loop: true,  speed: 8  },   // row 0: walk cycle
+    attack: { from: 8,  to: 15, loop: false, speed: 10 },   // row 1: whip/scarf attack
+    hurt:   { from: 16, to: 19, loop: false, speed: 8  },   // row 2 cols 0-3: flinch
+    death:  { from: 20, to: 23, loop: false, speed: 6  },   // row 2 cols 4-7: collapse
+    idle:   { from: 24, to: 31, loop: true,  speed: 6  },   // row 3: idle/posing
+  },
+});
 // loadSprite("enemy_crackhead","assets/enemy_crackhead.png",{ /* same layout */ });
 // loadSprite("enemy_kicker",   "assets/enemy_kicker.png",   { /* same layout */ });
 
@@ -72,7 +90,16 @@ loadSprite("boss_earl", "assets/heavy_boss_art.png", {
     idle:   { from: 24, to: 31, loop: true,  speed: 5  },  // row 3: idle/menacing
   },
 });
-// loadSprite("boss_duo",       "assets/boss_duo.png",       { sliceX:8, sliceY:5 });
+loadSprite("boss_duo", "assets/boss_duo_art.png", {
+  sliceX: 8, sliceY: 4,
+  anims: {
+    idle:   { from: 0,  to: 7,  loop: true,  speed: 6  },   // row 0: idle/taunt
+    walk:   { from: 8,  to: 15, loop: true,  speed: 7  },   // row 1: walk
+    attack: { from: 16, to: 23, loop: false, speed: 10 },   // row 2: attack combo
+    hurt:   { from: 24, to: 27, loop: false, speed: 8  },   // row 3 cols 0-3: hurt
+    death:  { from: 28, to: 31, loop: false, speed: 5  },   // row 3 cols 4-7: death
+  },
+});
 // loadSprite("boss_chain",     "assets/boss_chain.png",     { sliceX:8, sliceY:5 });
 // loadSprite("boss_chef",      "assets/boss_chef.png",      { sliceX:8, sliceY:5 });
 // loadSprite("boss_overlord",  "assets/boss_overlord.png",  { sliceX:8, sliceY:5 });
@@ -84,7 +111,12 @@ loadSprite("npc_turban", "assets/npc_turban.png", {
     walk: { from: 0, to: 3, loop: true, speed: 6 },
   },
 });
-// loadSprite("npc_lgbtq",      "assets/npc_lgbtq.png",      { sliceX:4 });
+loadSprite("npc_lgbtq", "assets/npc_lgbtq.png", {
+  sliceX: 4, sliceY: 1,
+  anims: {
+    walk: { from: 0, to: 3, loop: true, speed: 6 },
+  },
+});
 // loadSprite("npc_hijab",      "assets/npc_hijab.png",      { sliceX:4 });
 loadSprite("npc_african", "assets/npc_african.png", {
   sliceX: 4, sliceY: 1,
@@ -98,7 +130,12 @@ loadSprite("npc_quebecois", "assets/npc_quebecois.png", {
     walk: { from: 0, to: 3, loop: true, speed: 6 },
   },
 });
-// loadSprite("npc_ukrainian",  "assets/npc_ukrainian.png",  { sliceX:4 });
+loadSprite("npc_ukrainian", "assets/npc_ukrainian.png", {
+  sliceX: 4, sliceY: 1,
+  anims: {
+    walk: { from: 0, to: 3, loop: true, speed: 6 },
+  },
+});
 // loadSprite("npc_palestinian","assets/npc_palestinian.png",{ sliceX:4 });
 
 // ── Pickup sprites ───────────────────────────────────────────────────────────

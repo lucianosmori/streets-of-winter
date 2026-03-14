@@ -231,7 +231,7 @@ const ENEMY_DEFS = {
     label:"SLIDER",  col:[120, 80, 140], w:24, h:44,
     hp:35,  speed:90,  damage:6,  attackRange:45, attackCooldown:0.9,
     taunts:["Too slow, bud!", "Catch this deke!", "Shinny's over!"],
-    // TODO: sprite:"enemy_agile"
+    sprite:"enemy_agile",
   },
   heavy: {
     label:"HEAVY",   col:[140, 60, 40],  w:34, h:50,
@@ -243,7 +243,7 @@ const ENEMY_DEFS = {
     label:"WHIPLASH", col:[220, 100, 160], w:22, h:46,
     hp:45,  speed:80,  damage:10, attackRange:62, attackCooldown:1.1,
     taunts:["Back off!", "Dance with me!", "Whip it!"],
-    // TODO: sprite:"enemy_stripper"
+    sprite:"enemy_stripper",
   },
   crackhead: {
     label:"ADDICT",  col:[110, 100, 75], w:22, h:42,
@@ -268,7 +268,7 @@ const ENEMY_DEFS = {
     label:"THE DUO",     col:[200, 50, 140], w:30, h:52,
     hp:180, speed:75, damage:14, attackRange:70, attackCooldown:1.2, isBoss:true,
     taunts:["You can't handle us!", "Two's company!"],
-    // TODO: sprite:"boss_duo"
+    sprite:"boss_duo",
   },
   heavy_chain: {
     label:"CHAIN DADDY", col:[80, 80, 40],   w:42, h:54,
@@ -302,7 +302,7 @@ const NPC_DEFS = {
   lgbtq: {
     col:[255, 140, 200], accentCol:[255, 80, 200],  w:22, h:44, speed:30,
     phrases:["Love wins!", "Stay fabulous!", "You go girl!"],
-    // TODO: sprite:"npc_lgbtq"
+    sprite: "npc_lgbtq",
   },
   hijab: {
     col:[100, 120, 200], accentCol:[60, 80, 160],   w:22, h:44, speed:20,
@@ -322,7 +322,7 @@ const NPC_DEFS = {
   ukrainian: {
     col:[255, 220, 180], accentCol:[30, 120, 220],  w:22, h:44, speed:25,
     phrases:["Slava Ukraini!", "Davai!", "Nemozhlyvo!"],
-    // TODO: sprite:"npc_ukrainian"
+    sprite: "npc_ukrainian",
   },
   palestinian: {
     col:[210, 190, 160], accentCol:[20, 120, 40],   w:22, h:44, speed:30,
