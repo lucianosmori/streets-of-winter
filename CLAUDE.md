@@ -86,12 +86,17 @@ Depth-sorted by Y position. NPCs at z~290, pickups at z~285, players/enemies at 
 - Proportional building layout (upper floors 65% / ground floor 35%)
 - `assets/SPRITE_PROMPT.md` — ready-to-use prompts for Gemini/Imagen sprite generation
 - Enemy "Heavy" sprite sheet (8×4 grid, 1408×768px)
+- Enemy "Agile/Slider" sprite sheet (8×4 grid) — rollerblader with mohawk
+- Enemy "Stripper/Whiplash" sprite sheet (8×4 grid) — integrated with animations
 - Boss "Big Earl" sprite sheet (8×4 grid, 2560×880px) — COM-repacked from Gemini output, **still broken** (unaligned carousel effect, needs regen)
+- Boss "The Duo" sprite sheet (8×4 grid) — dual stripper bosses for ByWard level
 - AI Sprite QA Pipeline in `assets/CLAUDE.md` — dimension check, content analysis, COM stability, repack procedures
 - `/sprite-qa` skill in `.claude/skills/sprite-qa/SKILL.md` — automated QA pipeline
+- `/remove-bg` skill — removes white background from Gemini-generated sprites via flood-fill
+- `/update-docs` skill — syncs CLAUDE.md, MEMORY.md, and memory files with codebase state
 - `spriteH` per-entity override for non-standard frame heights in scaling formula
-- NPC sprites: turban, quebecois, african (4×1 grid, 464×126px, 116×126 per frame)
-- Pickup sprites: donut, coffee, samosa, cart (48×48 single frame PNGs)
+- NPC sprites: turban, quebecois, african, lgbtq, ukrainian (4×1 grid, 116×126 per frame)
+- Pickup sprites: donut, coffee, samosa, cart, bottle (48×48 single frame PNGs)
 - Sprite-aware pickup system: `spawnPickup` auto-detects `def.sprite`, scales via `def.h / 48`
 - Speech bubble QoL: follow characters, auto-stack to avoid overlap, proximity fade near player, suppression within 60px of player
 
@@ -99,11 +104,11 @@ Depth-sorted by Y position. NPCs at z~290, pickups at z~285, players/enemies at 
 
 ### Sprites (Critical)
 - **Player 2 (Priya)** sprite sheet — no sprite exists yet
-- **4 enemy sprites** (agile, stripper, crackhead, kicker) — using colored rectangles
-- **4 boss sprites** (Duo, Chain Daddy, Chef, Overlord) — using colored rectangles
-- **4 NPC sprites** (lgbtq, hijab, ukrainian, palestinian) — using colored rectangles
+- **2 enemy sprites** (crackhead, kicker) — using colored rectangles
+- **3 boss sprites** (Chain Daddy, Chef, Overlord) — using colored rectangles
+- **2 NPC sprites** (hijab, palestinian) — using colored rectangles
 - **5 pet sprites** (squirrel, cat, dog, raccoon, raven) — no sprites yet; 4×1 walk-cycle grid, tiny frames (see `assets/CLAUDE.md` for per-animal dimensions)
-- **7 pickup sprites** (bottle, fish, spice_cart, fruit_cart, flagpole, skate, statue)
+- **6 pickup sprites** (fish, spice_cart, fruit_cart, flagpole, skate, statue)
 - **Impact effects** (punch/kick VFX)
 - See `assets/CLAUDE.md` for sprite guidelines, `assets/SPRITE_PROMPT.md` for generation prompts
 
