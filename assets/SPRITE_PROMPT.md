@@ -10,11 +10,13 @@ Use this prompt template with **Gemini (Imagen 3 / Veo)** or similar image gener
 Pixel art sprite sheet for a 2D side-scrolling beat 'em up game.
 Style: 16-bit retro pixel art, similar to Streets of Rage or Final Fight.
 View: side-on profile view, character facing right.
-Background: fully transparent (PNG with alpha).
+Background: plain white. No grid lines, no dividers, no borders between frames.
 No anti-aliasing, hard pixel edges only.
 Winter clothing theme — characters wear coats, toques, scarves, boots.
 Ottawa, Canada setting.
 ```
+
+> **Post-generation:** Run `/remove-bg <file>` to replace the white background with transparency.
 
 ---
 
@@ -43,7 +45,7 @@ The sprite sheet MUST have dimensions that divide evenly by the grid size.
 ### Player 1 — Taxpayer (REFERENCE: already exists as hero_taxpayer.png)
 ```
 Pixel art sprite sheet, 1392x756 pixels, 12 columns by 6 rows grid.
-Each cell is 116x126 pixels. Transparent background.
+Each cell is 116x126 pixels. Plain white background. No grid lines or dividers between frames.
 Character: stocky white male, mid-30s, brown winter coat, dark toque, work boots.
 Annoyed office-worker-turned-fighter look. Slightly cartoonish proportions.
 
@@ -58,7 +60,7 @@ Row 6: Additional poses (crouch, weapon hold, victory).
 ### Player 2 — Priya
 ```
 Pixel art sprite sheet, 1392x756 pixels, 12 columns by 6 rows grid.
-Each cell is 116x126 pixels. Transparent background.
+Each cell is 116x126 pixels. Plain white background. No grid lines or dividers between frames.
 Character: South Asian woman, late 20s, green winter parka, long dark braid,
 combat boots, confident fighter stance. Quick and agile build.
 
@@ -73,7 +75,7 @@ Special attack: green energy spin with maple leaf VFX.
 ### Template prompt for enemies:
 ```
 Pixel art sprite sheet, 928x504 pixels, 8 columns by 4 rows grid.
-Each cell is 116x126 pixels. Transparent background.
+Each cell is 116x126 pixels. Plain white background. No grid lines or dividers between frames.
 Character: [DESCRIPTION]. Menacing but slightly comical.
 
 Row 1: Walk cycle — 8 frames, approaching from right side.
@@ -127,7 +129,7 @@ running shoes. Martial arts-influenced kicks. Balanced fighting stance.
 ### Template prompt for bosses:
 ```
 Pixel art sprite sheet, 1160x630 pixels, 10 columns by 5 rows grid.
-Each cell is 116x126 pixels. Transparent background.
+Each cell is 116x126 pixels. Plain white background. No grid lines or dividers between frames.
 Character: [DESCRIPTION]. Imposing, larger than regular enemies.
 Clearly a boss character — more detailed, more intimidating.
 
@@ -182,7 +184,7 @@ Largest sprite. Dark energy / shadow VFX on special attack.
 ### Template:
 ```
 Pixel art sprite sheet, 464x126 pixels, 4 columns by 1 row.
-Each cell is 116x126 pixels. Transparent background.
+Each cell is 116x126 pixels. Plain white background. No grid lines or dividers between frames.
 Character: [DESCRIPTION]. Peaceful civilian, non-combatant.
 4-frame walk cycle: left foot forward, neutral, right foot forward, neutral.
 Bundled up for Ottawa winter. Friendly, non-threatening appearance.
@@ -208,7 +210,7 @@ Pets are a sub-type of friendly NPC — small animals that wander the streets. W
 ```
 Pixel art sprite sheet for a 2D side-scrolling beat 'em up game.
 Style: 16-bit retro pixel art. Side-on profile view, animal facing right.
-Background: fully transparent PNG with alpha. No anti-aliasing, hard pixel edges.
+Background: plain white. No grid lines or dividers between frames. No anti-aliasing, hard pixel edges.
 Ottawa, Canada winter setting — snow on the ground implied by context.
 4-frame walk cycle: stride out, mid-step, stride back, mid-step.
 ALL frames face RIGHT. Engine flips horizontally for left-facing.
@@ -216,28 +218,28 @@ ALL frames face RIGHT. Engine flips horizontally for left-facing.
 
 ### Squirrel — npc_squirrel.png (92×14px, 4 frames of 23×14)
 ```
-Pixel art sprite sheet, 92x14 pixels, 4 columns by 1 row. Each cell 23x14. Transparent background.
+Pixel art sprite sheet, 92x14 pixels, 4 columns by 1 row. Each cell 23x14. Plain white background. No grid lines or dividers between frames.
 Grey squirrel, bushy tail arched over back, scurrying side-on walk cycle, winter fur.
 4 frames showing quick bounding stride. Tiny creature, max ~10px body height.
 ```
 
 ### Cat — npc_cat.png (96×16px, 4 frames of 24×16)
 ```
-Pixel art sprite sheet, 96x16 pixels, 4 columns by 1 row. Each cell 24x16. Transparent background.
+Pixel art sprite sheet, 96x16 pixels, 4 columns by 1 row. Each cell 24x16. Plain white background. No grid lines or dividers between frames.
 Stray tabby or grey alley cat, cautious prowling walk cycle, side-on view.
 Winter street cat — a little scruffy. Tail up or low-slung. 4 frames.
 ```
 
 ### Dog — npc_dog.png (112×18px, 4 frames of 28×18)
 ```
-Pixel art sprite sheet, 112x18 pixels, 4 columns by 1 row. Each cell 28x18. Transparent background.
+Pixel art sprite sheet, 112x18 pixels, 4 columns by 1 row. Each cell 28x18. Plain white background. No grid lines or dividers between frames.
 Medium-sized mutt, scruffy Ottawa street dog, trotting walk cycle, side-on view.
 Floppy ears, mixed breed look, tail wagging slightly. 4 frames.
 ```
 
 ### Raccoon — npc_raccoon.png (104×16px, 4 frames of 26×16)
 ```
-Pixel art sprite sheet, 104x16 pixels, 4 columns by 1 row. Each cell 26x16. Transparent background.
+Pixel art sprite sheet, 104x16 pixels, 4 columns by 1 row. Each cell 26x16. Plain white background. No grid lines or dividers between frames.
 Urban raccoon, grey body, black mask markings, ringed tail prominent, hunched scavenger walk.
 Side-on view, 4-frame walk cycle. Ottawa winter setting.
 This raccoon just escaped a McDonald's incident — slightly frantic energy in the pose.
@@ -245,7 +247,7 @@ This raccoon just escaped a McDonald's incident — slightly frantic energy in t
 
 ### Raven — npc_raven.png (88×20px, 4 frames of 22×20)
 ```
-Pixel art sprite sheet, 88x20 pixels, 4 columns by 1 row. Each cell 22x20. Transparent background.
+Pixel art sprite sheet, 88x20 pixels, 4 columns by 1 row. Each cell 22x20. Plain white background. No grid lines or dividers between frames.
 Black raven or crow, hopping walk cycle — ground level only, NOT flying.
 Glossy black feathers, side-on profile, 4 frames of hopping gait.
 Ottawa winter setting, occasional head-bob between hops.
@@ -257,7 +259,7 @@ Ottawa winter setting, occasional head-bob between hops.
 
 ```
 Pixel art sprite sheet, 192x48 pixels, 4 items in a row.
-Each cell is 48x48 pixels. Transparent background.
+Each cell is 48x48 pixels. Plain white background. No grid lines or dividers between frames.
 Top-down-ish 3/4 view, clear silhouettes, bright colors so they
 stand out on the ground. Ottawa/Canadian themed items.
 ```
@@ -266,7 +268,7 @@ stand out on the ground. Ottawa/Canadian themed items.
 
 **Batch 1 (health items):**
 ```
-4 food pickup items on transparent background:
+4 food pickup items on plain white background:
 1. Glazed donut (Tim Hortons style, golden-brown)
 2. Samosa (golden triangle, crispy)
 3. Coffee cup (paper cup with lid, brown)
@@ -275,7 +277,7 @@ stand out on the ground. Ottawa/Canadian themed items.
 
 **Batch 2 (weapons):**
 ```
-4 weapon pickup items on transparent background:
+4 weapon pickup items on plain white background:
 1. Beer bottle (green glass)
 2. Shopping cart (grey metal, small)
 3. Spice cart (wooden with orange/red jars)
@@ -284,7 +286,7 @@ stand out on the ground. Ottawa/Canadian themed items.
 
 **Batch 3 (weapons continued):**
 ```
-4 weapon pickup items on transparent background:
+4 weapon pickup items on plain white background:
 1. Canadian flagpole (red flag, thin pole)
 2. Ice skate (silver blade, white boot)
 3. Small statue (bronze/grey, parliament style)
@@ -327,7 +329,7 @@ Flat perspective, suitable for a side-scrolling game background.
 After generating any sprite sheet:
 
 1. **Verify dimensions** — must match the exact pixel size specified
-2. **Check transparency** — background must be fully transparent (PNG-32)
+2. **Remove background** — run `/remove-bg <file>` to replace white background with transparency
 3. **Check grid alignment** — `width % columns == 0` and `height % rows == 0`
 4. **If dimensions are wrong** — repack using the procedure in `assets/CLAUDE.md`
 5. **Test in-game** — load with correct `sliceX`/`sliceY`, verify no frame tearing

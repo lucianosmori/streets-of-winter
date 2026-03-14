@@ -143,6 +143,7 @@ loadSprite("pickup_donut",  "assets/pickup_donut.png");
 loadSprite("pickup_coffee", "assets/pickup_coffee.png");
 loadSprite("pickup_samosa", "assets/pickup_samosa.png");
 loadSprite("pickup_cart",   "assets/pickup_cart.png");
+loadSprite("pickup_bottle","assets/pickup_bottle.png");
 
 // ── Backgrounds ───────────────────────────────────────────────────────────────
 // loadSprite("bg_bankstreet",  "assets/bg_bankstreet.png");

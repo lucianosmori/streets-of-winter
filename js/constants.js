@@ -340,7 +340,7 @@ const PICKUP_DEFS = {
   samosa:     { col:[200,150, 50], label:"SAMOSA",  heal:25, isWeapon:false,                   w:16, h:16, sprite:"pickup_samosa" },
   coffee:     { col:[100, 60, 30], label:"COFFEE",  heal:15, isWeapon:false,                   w:14, h:20, sprite:"pickup_coffee" },
   fish:       { col:[150,200,220], label:"FISH",    heal:10, isWeapon:false,                   w:28, h:14 },
-  bottle:     { col:[100,160, 80], label:"BOTTLE",  heal: 0, isWeapon:true,  damage:18, uses:3, w:10, h:24 },
+  bottle:     { col:[100,160, 80], label:"BOTTLE",  heal: 0, isWeapon:true,  damage:18, uses:3, w:10, h:24, sprite:"pickup_bottle" },
   cart:       { col:[160,160,160], label:"CART",    heal: 0, isWeapon:true,  damage:30, uses:2, w:40, h:28, sprite:"pickup_cart" },
   spice_cart: { col:[200,100, 20], label:"SPICE",   heal: 0, isWeapon:true,  damage:22, uses:3, w:36, h:28 },
   fruit_cart: { col:[220,140, 60], label:"FRUITS",  heal: 0, isWeapon:true,  damage:25, uses:2, w:40, h:28 },
