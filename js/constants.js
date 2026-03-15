@@ -97,7 +97,7 @@ const LEVELS = [
   // ── Level 2 ────────────────────────────────────────────────────────────────
   {
     id: 2, name: "ByWard Market", subtitle: "The Market",
-    skyCol: [55, 60, 75], groundCol: [190, 185, 175],
+    skyCol: [30, 32, 50], groundCol: [170, 165, 158],
     stores: [
       { label: "BYWARD MUFFIN", x: 0, w: 152, h: 175,
         col: [130, 80, 35], signCol: [160, 100, 35],
@@ -105,9 +105,10 @@ const LEVELS = [
       { label: "BAREFAX", x: 160, w: 162, h: 195,
         col: [90, 18, 90], signCol: [150, 20, 130],
         signTextCol: [255, 100, 220], awningCol: [100, 15, 85] },
-      { label: "FLOWERS", x: 330, w: 132, h: 150,
-        col: [35, 110, 65], signCol: [30, 120, 55],
-        signTextCol: [255, 255, 240], awningCol: [25, 95, 50] },
+      { label: "McDONALD'S", x: 330, w: 132, h: 170,
+        col: [110, 25, 22], signCol: [218, 170, 0],
+        signTextCol: [255, 50, 50], awningCol: [100, 18, 12],
+        isMcDonalds: true },
       { label: "MARKET STALL", x: 470, w: 162, h: 140,
         col: [140, 105, 25], signCol: [160, 120, 20],
         signTextCol: [255, 240, 180], awningCol: [120, 85, 15] },
@@ -116,6 +117,7 @@ const LEVELS = [
         signTextCol: [255, 255, 255], awningCol: [145, 130, 25] },
     ],
     npcTypes: ["lgbtq", "ukrainian", "turban"],
+    petTypes: ["raccoon"],
     waves: [
       [{ type:"grunt",    count:2 }, { type:"stripper", count:1 }],
       [{ type:"agile",    count:2 }, { type:"stripper", count:2 }],
@@ -328,6 +330,14 @@ const NPC_DEFS = {
     col:[210, 190, 160], accentCol:[20, 120, 40],   w:22, h:44, speed:30,
     phrases:["Free Palestine!", "Intifada!", "Ya free!"],
     // TODO: sprite:"npc_palestinian"
+  },
+  // ── Pets (isPet: true) ────────────────────────────────────────────────
+  raccoon: {
+    col:[100, 90, 75], accentCol:[60, 55, 45], w:14, h:16, speed:40,
+    isPet: true,
+    phrases:[],
+    sprite: "pet_raccoon",
+    spriteH: 512,
   },
 };
 

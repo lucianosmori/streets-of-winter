@@ -138,6 +138,14 @@ loadSprite("npc_ukrainian", "assets/npc_ukrainian.png", {
 });
 // loadSprite("npc_palestinian","assets/npc_palestinian.png",{ sliceX:4 });
 
+// ── Pet spritesheets ────────────────────────────────────────────────────────
+loadSprite("pet_raccoon", "assets/npc_raccoon.png", {
+  sliceX: 4, sliceY: 1,
+  anims: {
+    walk: { from: 0, to: 3, loop: true, speed: 8 },
+  },
+});
+
 // ── Pickup sprites ───────────────────────────────────────────────────────────
 loadSprite("pickup_donut",  "assets/pickup_donut.png");
 loadSprite("pickup_coffee", "assets/pickup_coffee.png");
@@ -261,6 +269,15 @@ scene("game", ({ numPlayers = 1, levelIdx = 0 }) => {
     npcs.push(spawnNPC(type, rand(50, SCREEN_W - 50), rand(GROUND_TOP + 28, GROUND_BOTTOM - 8)));
   }
 
+  // Background pets
+  if (lvl.petTypes) {
+    const petCount = levelIdx === 1 ? 4 : 2;   // extra raccoons on ByWard
+    for (let i = 0; i < petCount; i++) {
+      const type = choose(lvl.petTypes);
+      npcs.push(spawnPet(type, rand(50, SCREEN_W - 50), rand(GROUND_TOP + 28, GROUND_BOTTOM - 8)));
+    }
+  }
+
   // Initial pickups scattered around the level
   for (let i = 0; i < 3; i++) {
     const type = choose(lvl.pickups);
@@ -276,6 +293,35 @@ scene("game", ({ numPlayers = 1, levelIdx = 0 }) => {
 
   // Kick off wave 1
   advanceWave();
+
+  // ── ByWard raccoon scatter event (near McDonald's) ───────────────────────
+  if (levelIdx === 1) {
+    let raccoonScatterDone = false;
+    const mcStore = lvl.stores.find(s => s.isMcDonalds);
+    if (mcStore) {
+      const scatterX = mcStore.x + mcStore.w / 2;
+      onUpdate(() => {
+        if (raccoonScatterDone) return;
+        for (const p of players) {
+          if (p.hp <= 0) continue;
+          if (Math.abs(p.pos.x - scatterX) < 50) {
+            raccoonScatterDone = true;
+            showBanner("RACCOON INCIDENT ZONE", 2);
+            for (let i = 0; i < 4; i++) {
+              const r = spawnPet("raccoon",
+                scatterX + rand(-15, 15),
+                rand(GROUND_TOP + 30, GROUND_BOTTOM - 10));
+              r.dir = choose([-1, 1]);
+              r.facing = r.dir;
+              r.walkTimer = 3;   // run in chosen direction for 3s
+              npcs.push(r);
+            }
+            break;
+          }
+        }
+      });
+    }
+  }
 
 
   // ── Wave / boss system ──────────────────────────────────────────────────────

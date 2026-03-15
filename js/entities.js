@@ -191,6 +191,72 @@ function drawLevelBackground(lvl) {
     }
   }
 
+  // ── Special: McDonald's extras ─────────────────────────────────────────
+  for (const s of lvl.stores) {
+    if (!s.isMcDonalds) continue;
+    const wt = GROUND_TOP - s.h;
+    const gfFrac = 0.35;
+    const signH = 26;
+    const signY = wt + Math.floor(s.h * (1 - gfFrac)) - signH;
+    const awnY = signY + signH + 3;
+    const awnH = 9;
+    const gfTop = awnY + awnH + 3;
+
+    // Golden arches glow behind building
+    add([rect(s.w + 12, s.h + 8), pos(s.x - 6, wt - 4),
+         color(255, 190, 30), opacity(0.08), fixed(), z(-291)]);
+
+    // Large golden "M" on sign (over the regular sign text)
+    add([text("M", { size: 20 }),
+         pos(s.x + Math.floor(s.w / 2) - 7, signY + 2),
+         color(255, 188, 0), fixed(), z(-263)]);
+
+    // Board up alternating upper-floor windows
+    const winW = 16, winH = 18, winGapX = 8;
+    const winAreaTop = wt + 10;
+    const numCols = Math.max(1, Math.floor((s.w - 22 + winGapX) / (winW + winGapX)));
+    const totalWinW = numCols * winW + (numCols - 1) * winGapX;
+    const winOffX = s.x + Math.floor((s.w - totalWinW) / 2);
+    for (let c = 0; c < numCols; c += 2) {
+      const wx = winOffX + c * (winW + winGapX);
+      // Wood plank over window
+      add([rect(winW + 2, winH + 2), pos(wx - 1, winAreaTop - 1),
+           color(110, 75, 40), fixed(), z(-272)]);
+      // Plank grain lines
+      add([rect(winW, 2), pos(wx, winAreaTop + 6),
+           color(85, 55, 30), fixed(), z(-271)]);
+      add([rect(winW, 2), pos(wx, winAreaTop + 12),
+           color(85, 55, 30), fixed(), z(-271)]);
+    }
+
+    // "RIDEAU — CLOSED" sign on ground floor
+    add([rect(s.w - 12, 14), pos(s.x + 6, gfTop + 2),
+         color(160, 18, 18), fixed(), z(-251)]);
+    add([text("RIDEAU — CLOSED", { size: 6 }),
+         pos(s.x + 12, gfTop + 5), color(255, 240, 200), fixed(), z(-250)]);
+
+    // Overturned garbage bags on sidewalk near entrance
+    const garbY = GROUND_TOP + 6;
+    add([rect(14, 10), pos(s.x + Math.floor(s.w / 2) - 22, garbY),
+         color(35, 38, 30), fixed(), z(-244)]);
+    add([rect(18, 8), pos(s.x + Math.floor(s.w / 2) + 6, garbY + 3),
+         color(28, 30, 24), fixed(), z(-244)]);
+    // Scattered trash bits
+    const trashCols = [[160,140,80],[120,100,60],[180,160,100],[140,120,70]];
+    for (let g = 0; g < 4; g++) {
+      add([rect(3, 3),
+           pos(s.x + Math.floor(s.w / 2) - 28 + g * 14, garbY + 14 + (g % 2) * 4),
+           color(...trashCols[g]), fixed(), z(-243)]);
+    }
+
+    // Warm amber glow from inside (through ground floor windows)
+    const glowH = GROUND_TOP - gfTop - 2;
+    if (glowH > 4) {
+      add([rect(s.w - 8, glowH), pos(s.x + 4, gfTop + 1),
+           color(255, 200, 80), opacity(0.15), fixed(), z(-256)]);
+    }
+  }
+
   // ── Sidewalk ──────────────────────────────────────────────────────────────
   add([rect(SCREEN_W, GROUND_BOTTOM - GROUND_TOP), pos(0, GROUND_TOP),
        color(...lvl.groundCol), fixed(), z(-250)]);
@@ -668,6 +734,17 @@ function spawnNPC(type, x, y) {
 }
 
 /**
+ * Spawn a pet NPC (small animal, no speech bubbles).
+ * Thin wrapper around spawnNPC — behaviour differences handled via def.isPet.
+ * @param {string} type — key into NPC_DEFS (must have isPet: true)
+ * @param {number} x, y — spawn position (feet)
+ * @returns {KAPLAYObj} pet game object
+ */
+function spawnPet(type, x, y) {
+  return spawnNPC(type, x, y);
+}
+
+/**
  * Run one frame of NPC AI.  NPCs wander, react to nearby fights, and flee
  * from enemies that get too close.
  * @param {KAPLAYObj}   n       — NPC game object
@@ -694,8 +771,8 @@ function updateNPC(n, players, enemies) {
     n.state = "walk";
   }
 
-  // React to a nearby fight with a speech bubble — skip if too close to a player
-  if (fightNearby && n.reactCooldown <= 0 && Math.random() < 0.25) {
+  // React to a nearby fight with a speech bubble — skip for pets and if too close to a player
+  if (!n.def.isPet && fightNearby && n.reactCooldown <= 0 && Math.random() < 0.25) {
     n.reactCooldown = rand(3.5, 8);
     const nearestPlayer = alivePlayers.reduce((closest, p) => {
       const d = Math.abs(n.pos.x - p.pos.x) + Math.abs(n.pos.y - p.pos.y);
