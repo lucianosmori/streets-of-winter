@@ -308,9 +308,9 @@ function drawLevelBackground(lvl) {
   // ── Level name plate (with drop shadow) ───────────────────────────────────
   const lvlText = `LVL ${lvl.id}  ${lvl.name.toUpperCase()}`;
   add([text(lvlText, { size: 10 }),
-       pos(7, 5), color(0, 0, 0), fixed(), z(599)]);
+       pos(7, 8), color(0, 0, 0), fixed(), z(599)]);
   add([text(lvlText, { size: 10 }),
-       pos(6, 4), color(210, 210, 220), fixed(), z(600)]);
+       pos(6, 7), color(210, 210, 220), fixed(), z(600)]);
 }
 
 
@@ -872,7 +872,7 @@ function drawHUD(players, waveIdx, lvl, enemies, bossObjs, phase) {
   for (let i = 0; i < players.length; i++) {
     const p  = players[i];
     const bx = 14 + i * 228;
-    const by = 14;
+    const by = 20;     // extra top padding for object-fit:cover crop
 
     // Name
     drawText({ text: p.cfg.name, pos: vec2(bx, by),      size: 8,  color: rgb(...p.cfg.col) });
@@ -905,15 +905,15 @@ function drawHUD(players, waveIdx, lvl, enemies, bossObjs, phase) {
   // ── Centre: wave or boss indicator ──────────────────────────────────────
   if (phase === "wave") {
     drawText({ text: `WAVE  ${waveIdx + 1} / ${lvl.waves.length}`,
-               pos: vec2(SCREEN_W / 2 - 34, 14), size: 13, color: rgb(255, 215, 60) });
+               pos: vec2(SCREEN_W / 2 - 34, 20), size: 13, color: rgb(255, 215, 60) });
   } else if (phase === "bossIntro" || phase === "boss") {
     drawText({ text: "BOSS!",
-               pos: vec2(SCREEN_W / 2 - 22, 14), size: 15, color: rgb(255, 50, 50) });
+               pos: vec2(SCREEN_W / 2 - 22, 20), size: 15, color: rgb(255, 50, 50) });
   }
 
   // ── Enemy count (top-right) ──────────────────────────────────────────────
   const alive = enemies.filter(e => e.state !== "dead").length;
-  drawText({ text: `× ${alive}`, pos: vec2(SCREEN_W - 56, 14),
+  drawText({ text: `× ${alive}`, pos: vec2(SCREEN_W - 56, 20),
              size: 13, color: rgb(215, 85, 85) });
 
   // ── Boss HP bar (bottom of screen) ──────────────────────────────────────
@@ -944,11 +944,13 @@ function drawHUD(players, waveIdx, lvl, enemies, bossObjs, phase) {
     }
   }
 
-  // ── Controls legend (bottom) ─────────────────────────────────────────────
-  drawText({
-    text:  "P1 WASD Move  Z Punch  X Kick  Q Special  |  P2 IJKL / U O P",
-    pos:   vec2(SCREEN_W / 2 - 215, SCREEN_H - 13),
-    size:  8,
-    color: rgb(95, 95, 95),
-  });
+  // ── Controls legend (bottom, hidden on touch devices) ───────────────────
+  if (!window.matchMedia("(pointer: coarse)").matches) {
+    drawText({
+      text:  "P1 WASD Move  Z Punch  X Kick  Q Special  |  P2 IJKL / U O P",
+      pos:   vec2(SCREEN_W / 2 - 215, SCREEN_H - 18),
+      size:  8,
+      color: rgb(95, 95, 95),
+    });
+  }
 }
