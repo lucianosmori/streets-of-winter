@@ -53,16 +53,17 @@ test.describe('Page Load & Canvas', () => {
       const ctx = canvas?.getContext('2d');
       if (!ctx) return false;
 
-      const imgData = ctx.getImageData(0, 0, 10, 10);
+      const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
       const data = imgData.data;
 
-      // Check if any pixel is not black (initial background color is [18, 18, 28])
-      // We check if there's any variation from the dark background
-      let pixelSum = 0;
+      // Background color is [18, 18, 28] — return true if any pixel differs
+      const BG_R = 18, BG_G = 18, BG_B = 28;
       for (let i = 0; i < data.length; i += 4) {
-        pixelSum += data[i] + data[i + 1] + data[i + 2]; // R + G + B
+        if (data[i] !== BG_R || data[i + 1] !== BG_G || data[i + 2] !== BG_B) {
+          return true;
+        }
       }
-      return pixelSum > 200; // Some non-black pixels present
+      return false;
     });
 
     expect(hasPixelData).toBe(true);

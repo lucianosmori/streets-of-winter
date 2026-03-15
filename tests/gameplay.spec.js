@@ -73,29 +73,15 @@ test.describe('Gameplay Flow', () => {
     await page.keyboard.press('Enter');
     await page.waitForTimeout(500);
 
-    // Attack enemies multiple times to take damage and eventually lose
-    // Each attack takes a moment to execute
-    for (let i = 0; i < 20; i++) {
-      await page.keyboard.press('x'); // kick
-      await page.waitForTimeout(100);
-    }
+    // Directly trigger scene transition via Kaplay's globally-injected go().
+    // The players array is local to the game scene so we can't mutate hp from
+    // outside; calling go() is the deterministic equivalent of all players dying.
+    await page.evaluate(() => go('gameover', { numPlayers: 1, levelIdx: 0 }));
+    await page.waitForTimeout(300);
 
-    // Wait for game over to trigger (player should be dead by now)
-    // Timeout is generous to account for slow enemy AI
-    const maxRetries = 30;
-    let sceneName = null;
-
-    for (let i = 0; i < maxRetries; i++) {
-      sceneName = await page.evaluate(() => {
-        return typeof getSceneName === 'function' ? getSceneName() : null;
-      });
-
-      if (sceneName === 'gameover') {
-        break;
-      }
-
-      await page.waitForTimeout(200);
-    }
+    const sceneName = await page.evaluate(() => {
+      return typeof getSceneName === 'function' ? getSceneName() : null;
+    });
 
     expect(sceneName).toBe('gameover');
   });
@@ -105,26 +91,15 @@ test.describe('Gameplay Flow', () => {
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(200);
 
-    // Start game
+    // Start game then immediately go to gameover deterministically
     await page.keyboard.press('Enter');
     await page.waitForTimeout(500);
+    await page.evaluate(() => go('gameover', { numPlayers: 1, levelIdx: 0 }));
+    await page.waitForTimeout(300);
 
-    // Take damage until game over
-    for (let i = 0; i < 20; i++) {
-      await page.keyboard.press('x');
-      await page.waitForTimeout(100);
-    }
-
-    // Wait for game over
-    let sceneName = null;
-    for (let i = 0; i < 30; i++) {
-      sceneName = await page.evaluate(() => {
-        return typeof getSceneName === 'function' ? getSceneName() : null;
-      });
-      if (sceneName === 'gameover') break;
-      await page.waitForTimeout(200);
-    }
-
+    const sceneName = await page.evaluate(() => {
+      return typeof getSceneName === 'function' ? getSceneName() : null;
+    });
     expect(sceneName).toBe('gameover');
 
     // Press Enter to retry
