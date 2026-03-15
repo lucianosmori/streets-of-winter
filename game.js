@@ -637,10 +637,11 @@ scene("game", ({ numPlayers = 1, levelIdx = 0 }) => {
     }
   });
 
-  // ── Portrait camera follow ───────────────────────────────────────────────
-  // In portrait orientation: zoom in 2x and track the player horizontally.
-  // Background entities are world-space (no fixed()), so they scroll correctly.
-  // HUD and snow use onDraw screen-space draws — unaffected by camPos/camScale.
+  // ── Camera follow ────────────────────────────────────────────────────────
+  // CSS object-fit:cover fills the screen, cropping sides in portrait.
+  // Camera pans to keep the player centered within the visible strip.
+  // In landscape the full 800-wide world is visible, so no panning needed.
+  let _camX = SCREEN_W / 2;
   onUpdate(() => {
     const portrait = window.innerHeight > window.innerWidth;
     if (portrait) {
@@ -648,14 +649,20 @@ scene("game", ({ numPlayers = 1, levelIdx = 0 }) => {
       const targetX = living.length > 0
         ? living.reduce((s, p) => s + p.pos.x, 0) / living.length
         : SCREEN_W / 2;
-      // Clamp so world edges stay off-screen (viewport = SCREEN_W/2 wide at scale 2)
-      const camX = clamp(targetX, SCREEN_W / 4, SCREEN_W * 3 / 4);
-      // Y=300 shows y:200–400 — the full ground action area with a slice of buildings
-      setCamScale(2);
-      setCamPos(camX, 300);
-    } else {
+      // Visible game-unit width = canvas_w * (SCREEN_H / canvas_h)
+      // object-fit:cover scales by height, so visible width depends on aspect.
+      const aspect = window.innerWidth / window.innerHeight;
+      const visibleW = SCREEN_W * aspect * (SCREEN_H / SCREEN_W);
+      //               = SCREEN_H * aspect
+      const halfVW = visibleW / 2;
+      const camX = clamp(targetX, halfVW, SCREEN_W - halfVW);
+      _camX = lerp(_camX, camX, 0.08);
       setCamScale(1);
-      setCamPos(SCREEN_W / 2, SCREEN_H / 2);
+      setCamPos(_camX, SCREEN_H / 2);
+    } else {
+      _camX = lerp(_camX, SCREEN_W / 2, 0.1);
+      setCamScale(1);
+      setCamPos(_camX, SCREEN_H / 2);
     }
   });
 
