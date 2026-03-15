@@ -39,10 +39,10 @@ function drawLevelBackground(lvl) {
                 {x:580,w:45,h:62},{x:700,w:38,h:44},{x:760,w:42,h:58}];
   for (const sl of sils) {
     add([rect(sl.w, sl.h), pos(sl.x, GROUND_TOP - sl.h - 145),
-         color(...dk(lvl.skyCol, 6)), fixed(), z(-299)]);
+         color(...dk(lvl.skyCol, 6)), z(-299)]);
     // Tiny lit window on silhouette
     add([rect(3, 3), pos(sl.x + sl.w / 2, GROUND_TOP - sl.h - 140),
-         color(180, 170, 100), opacity(0.4), fixed(), z(-298)]);
+         color(180, 170, 100), opacity(0.4), z(-298)]);
   }
 
   // ── Storefronts ───────────────────────────────────────────────────────────
@@ -54,21 +54,21 @@ function drawLevelBackground(lvl) {
 
     // ─ Wall ─
     add([rect(s.w - 2, s.h), pos(s.x + 1, wt),
-         color(...s.col), fixed(), z(-290)]);
+         color(...s.col), z(-290)]);
 
     // ─ Roof ledge ─
     add([rect(s.w + 2, 5), pos(s.x - 1, wt - 3),
-         color(...dk(s.col, 35)), fixed(), z(-289)]);
+         color(...dk(s.col, 35)), z(-289)]);
 
     // ─ Snow on roof ─
     add([rect(s.w - 4, 7), pos(s.x + 2, wt - 8),
-         color(228, 234, 248), fixed(), z(-288)]);
+         color(228, 234, 248), z(-288)]);
     // Icicle drips
     let ic = s.x + 14;
     while (ic < s.x + s.w - 10) {
       const icicleH = 3 + Math.floor(Math.random() * 6);
       add([rect(2, icicleH), pos(ic, wt),
-           color(210, 220, 242), fixed(), z(-287)]);
+           color(210, 220, 242), z(-287)]);
       ic += 16 + Math.floor(Math.random() * 20);
     }
 
@@ -81,7 +81,7 @@ function drawLevelBackground(lvl) {
     // ─ Wall panel lines (subtle siding) ─
     for (let ly = wt + 18; ly < signY - 4; ly += 20) {
       add([rect(s.w - 6, 1), pos(s.x + 3, ly),
-           color(...dk(s.col, 16)), fixed(), z(-285)]);
+           color(...dk(s.col, 16)), z(-285)]);
     }
 
     // ─ Windows (framed glass with highlight) ─
@@ -97,32 +97,32 @@ function drawLevelBackground(lvl) {
         const wx = winOffX + c * (winW + winGapX);
         // Frame
         add([rect(winW + 4, winH + 4), pos(wx - 2, wy - 2),
-             color(...dk(s.col, 28)), fixed(), z(-280)]);
+             color(...dk(s.col, 28)), z(-280)]);
         // Glass pane
         add([rect(winW, winH), pos(wx, wy),
-             color(120, 155, 195), fixed(), z(-278)]);
+             color(120, 155, 195), z(-278)]);
         // Reflection highlight
         add([rect(3, winH - 4), pos(wx + 2, wy + 2),
-             color(165, 200, 232), fixed(), z(-276)]);
+             color(165, 200, 232), z(-276)]);
         // Warm interior glow (bottom half)
         add([rect(winW - 4, 6), pos(wx + 2, wy + winH - 8),
-             color(200, 180, 120), opacity(0.35), fixed(), z(-275)]);
+             color(200, 180, 120), opacity(0.35), z(-275)]);
       }
     }
 
     // ─ Sign band (large, prominent) ─
     // Sign background
     add([rect(s.w - 4, signH), pos(s.x + 2, signY),
-         color(...sc), fixed(), z(-270)]);
+         color(...sc), z(-270)]);
     // Sign border (top, bottom, sides)
     add([rect(s.w - 4, 2), pos(s.x + 2, signY - 2),
-         color(...lt(sc, 65)), fixed(), z(-269)]);
+         color(...lt(sc, 65)), z(-269)]);
     add([rect(s.w - 4, 2), pos(s.x + 2, signY + signH),
-         color(...lt(sc, 45)), fixed(), z(-269)]);
+         color(...lt(sc, 45)), z(-269)]);
     add([rect(2, signH + 4), pos(s.x, signY - 2),
-         color(...lt(sc, 50)), fixed(), z(-269)]);
+         color(...lt(sc, 50)), z(-269)]);
     add([rect(2, signH + 4), pos(s.x + s.w - 2, signY - 2),
-         color(...lt(sc, 50)), fixed(), z(-269)]);
+         color(...lt(sc, 50)), z(-269)]);
 
     // Sign text (large with drop shadow for readability)
     const fontSize = Math.min(14, Math.floor((s.w - 16) / s.label.length * 1.6));
@@ -130,23 +130,23 @@ function drawLevelBackground(lvl) {
     const textY = signY + Math.floor((signH - fontSize) / 2);
     // Shadow
     add([text(s.label, { size: fontSize }),
-         pos(textX + 1, textY + 1), color(0, 0, 0), fixed(), z(-266)]);
+         pos(textX + 1, textY + 1), color(0, 0, 0), z(-266)]);
     // Main text
     add([text(s.label, { size: fontSize }),
-         pos(textX, textY), color(...stc), fixed(), z(-265)]);
+         pos(textX, textY), color(...stc), z(-265)]);
 
     // ─ Awning (striped) ─
     const awnY = signY + signH + 3;
     add([rect(s.w - 6, awnH), pos(s.x + 3, awnY),
-         color(...ac), fixed(), z(-260)]);
+         color(...ac), z(-260)]);
     // Stripes
     for (let sx = s.x + 3; sx < s.x + s.w - 6; sx += 12) {
       add([rect(6, awnH), pos(sx, awnY),
-           color(...lt(ac, 28)), fixed(), z(-259)]);
+           color(...lt(ac, 28)), z(-259)]);
     }
     // Awning shadow below
     add([rect(s.w - 6, 3), pos(s.x + 3, awnY + awnH),
-         color(0, 0, 0), opacity(0.12), fixed(), z(-258)]);
+         color(0, 0, 0), opacity(0.12), z(-258)]);
 
     // ─ Ground floor (storefront windows + door) ─
     const gfTop = awnY + awnH + 3;
@@ -154,7 +154,7 @@ function drawLevelBackground(lvl) {
     if (gfH > 6) {
       // Ground floor wall (slightly lighter)
       add([rect(s.w - 4, gfH), pos(s.x + 2, gfTop),
-           color(...lt(s.col, 15)), fixed(), z(-255)]);
+           color(...lt(s.col, 15)), z(-255)]);
 
       const doorW = 14;
       const doorX = s.x + Math.floor(s.w / 2) - doorW / 2;
@@ -163,30 +163,30 @@ function drawLevelBackground(lvl) {
       // Left storefront window
       if (sfWinW > 8) {
         add([rect(sfWinW + 2, gfH - 2), pos(s.x + 7, gfTop + 1),
-             color(...dk(s.col, 20)), fixed(), z(-254)]); // frame
+             color(...dk(s.col, 20)), z(-254)]); // frame
         add([rect(sfWinW, gfH - 4), pos(s.x + 8, gfTop + 2),
-             color(155, 185, 145), fixed(), z(-253)]); // glass
+             color(155, 185, 145), z(-253)]); // glass
         add([rect(sfWinW - 4, gfH - 8), pos(s.x + 10, gfTop + 4),
-             color(215, 205, 165), fixed(), z(-252)]); // warm glow
+             color(215, 205, 165), z(-252)]); // warm glow
       }
 
       // Door
       add([rect(doorW + 2, gfH - 2), pos(doorX - 1, gfTop + 1),
-           color(...dk(s.col, 30)), fixed(), z(-254)]); // frame
+           color(...dk(s.col, 30)), z(-254)]); // frame
       add([rect(doorW, gfH - 4), pos(doorX, gfTop + 2),
-           color(...dk(s.col, 18)), fixed(), z(-253)]); // door panel
+           color(...dk(s.col, 18)), z(-253)]); // door panel
       add([rect(2, 3), pos(doorX + doorW - 4, gfTop + Math.floor(gfH / 2)),
-           color(210, 190, 110), fixed(), z(-252)]); // handle
+           color(210, 190, 110), z(-252)]); // handle
 
       // Right storefront window
       if (sfWinW > 8) {
         const rwx = s.x + s.w - sfWinW - 9;
         add([rect(sfWinW + 2, gfH - 2), pos(rwx, gfTop + 1),
-             color(...dk(s.col, 20)), fixed(), z(-254)]);
+             color(...dk(s.col, 20)), z(-254)]);
         add([rect(sfWinW, gfH - 4), pos(rwx + 1, gfTop + 2),
-             color(155, 185, 145), fixed(), z(-253)]);
+             color(155, 185, 145), z(-253)]);
         add([rect(sfWinW - 4, gfH - 8), pos(rwx + 3, gfTop + 4),
-             color(215, 205, 165), fixed(), z(-252)]);
+             color(215, 205, 165), z(-252)]);
       }
     }
   }
@@ -204,12 +204,12 @@ function drawLevelBackground(lvl) {
 
     // Golden arches glow behind building
     add([rect(s.w + 12, s.h + 8), pos(s.x - 6, wt - 4),
-         color(255, 190, 30), opacity(0.08), fixed(), z(-291)]);
+         color(255, 190, 30), opacity(0.08), z(-291)]);
 
     // Large golden "M" on sign (over the regular sign text)
     add([text("M", { size: 20 }),
          pos(s.x + Math.floor(s.w / 2) - 7, signY + 2),
-         color(255, 188, 0), fixed(), z(-263)]);
+         color(255, 188, 0), z(-263)]);
 
     // Board up alternating upper-floor windows
     const winW = 16, winH = 18, winGapX = 8;
@@ -221,88 +221,88 @@ function drawLevelBackground(lvl) {
       const wx = winOffX + c * (winW + winGapX);
       // Wood plank over window
       add([rect(winW + 2, winH + 2), pos(wx - 1, winAreaTop - 1),
-           color(110, 75, 40), fixed(), z(-272)]);
+           color(110, 75, 40), z(-272)]);
       // Plank grain lines
       add([rect(winW, 2), pos(wx, winAreaTop + 6),
-           color(85, 55, 30), fixed(), z(-271)]);
+           color(85, 55, 30), z(-271)]);
       add([rect(winW, 2), pos(wx, winAreaTop + 12),
-           color(85, 55, 30), fixed(), z(-271)]);
+           color(85, 55, 30), z(-271)]);
     }
 
     // "RIDEAU — CLOSED" sign on ground floor
     add([rect(s.w - 12, 14), pos(s.x + 6, gfTop + 2),
-         color(160, 18, 18), fixed(), z(-251)]);
+         color(160, 18, 18), z(-251)]);
     add([text("RIDEAU — CLOSED", { size: 6 }),
-         pos(s.x + 12, gfTop + 5), color(255, 240, 200), fixed(), z(-250)]);
+         pos(s.x + 12, gfTop + 5), color(255, 240, 200), z(-250)]);
 
     // Overturned garbage bags on sidewalk near entrance
     const garbY = GROUND_TOP + 6;
     add([rect(14, 10), pos(s.x + Math.floor(s.w / 2) - 22, garbY),
-         color(35, 38, 30), fixed(), z(-244)]);
+         color(35, 38, 30), z(-244)]);
     add([rect(18, 8), pos(s.x + Math.floor(s.w / 2) + 6, garbY + 3),
-         color(28, 30, 24), fixed(), z(-244)]);
+         color(28, 30, 24), z(-244)]);
     // Scattered trash bits
     const trashCols = [[160,140,80],[120,100,60],[180,160,100],[140,120,70]];
     for (let g = 0; g < 4; g++) {
       add([rect(3, 3),
            pos(s.x + Math.floor(s.w / 2) - 28 + g * 14, garbY + 14 + (g % 2) * 4),
-           color(...trashCols[g]), fixed(), z(-243)]);
+           color(...trashCols[g]), z(-243)]);
     }
 
     // Warm amber glow from inside (through ground floor windows)
     const glowH = GROUND_TOP - gfTop - 2;
     if (glowH > 4) {
       add([rect(s.w - 8, glowH), pos(s.x + 4, gfTop + 1),
-           color(255, 200, 80), opacity(0.15), fixed(), z(-256)]);
+           color(255, 200, 80), opacity(0.15), z(-256)]);
     }
   }
 
   // ── Sidewalk ──────────────────────────────────────────────────────────────
   add([rect(SCREEN_W, GROUND_BOTTOM - GROUND_TOP), pos(0, GROUND_TOP),
-       color(...lvl.groundCol), fixed(), z(-250)]);
+       color(...lvl.groundCol), z(-250)]);
 
   // Slab pattern (alternating shades)
   for (let sx = 0; sx < SCREEN_W; sx += 65) {
     const shade = (Math.floor(sx / 65) % 2 === 0) ? 4 : -3;
     const sc = shade > 0 ? lt(lvl.groundCol, shade) : dk(lvl.groundCol, -shade);
     add([rect(63, GROUND_BOTTOM - GROUND_TOP - 8), pos(sx + 1, GROUND_TOP + 4),
-         color(...sc), fixed(), z(-249)]);
+         color(...sc), z(-249)]);
   }
 
   // Slab seam lines (vertical)
   for (let cx = 65; cx < SCREEN_W; cx += 65) {
     add([rect(1, GROUND_BOTTOM - GROUND_TOP - 4), pos(cx, GROUND_TOP + 2),
-         color(...dk(lvl.groundCol, 28)), fixed(), z(-248)]);
+         color(...dk(lvl.groundCol, 28)), z(-248)]);
   }
 
   // Horizontal seam
   add([rect(SCREEN_W, 1),
        pos(0, GROUND_TOP + Math.floor((GROUND_BOTTOM - GROUND_TOP) / 2)),
-       color(...dk(lvl.groundCol, 18)), fixed(), z(-248)]);
+       color(...dk(lvl.groundCol, 18)), z(-248)]);
 
   // Snow patches on sidewalk
   for (let i = 0; i < 8; i++) {
     add([rect(20 + Math.random() * 35, 3 + Math.random() * 5),
          pos(Math.random() * (SCREEN_W - 50) + 5,
              GROUND_TOP + 8 + Math.random() * (GROUND_BOTTOM - GROUND_TOP - 20)),
-         color(225, 230, 245), opacity(0.22), fixed(), z(-247)]);
+         color(225, 230, 245), opacity(0.22), z(-247)]);
   }
 
   // Curb
   add([rect(SCREEN_W, 5), pos(0, GROUND_BOTTOM - 5),
-       color(...dk(lvl.groundCol, 35)), fixed(), z(-246)]);
+       color(...dk(lvl.groundCol, 35)), z(-246)]);
   add([rect(SCREEN_W, 2), pos(0, GROUND_BOTTOM - 1),
-       color(25, 20, 15), fixed(), z(-245)]);
+       color(25, 20, 15), z(-245)]);
 
   // ── Road ──────────────────────────────────────────────────────────────────
   add([rect(SCREEN_W, SCREEN_H - GROUND_BOTTOM), pos(0, GROUND_BOTTOM),
-       color(42, 38, 32), fixed(), z(-250)]);
+       color(42, 38, 32), z(-250)]);
 
   // Dashed centre line
   const roadMidY = GROUND_BOTTOM + Math.floor((SCREEN_H - GROUND_BOTTOM) / 2);
   for (let lx = 12; lx < SCREEN_W; lx += 44) {
     add([rect(22, 2), pos(lx, roadMidY),
-         color(190, 170, 45), fixed(), z(-248)]);
+         color(190, 170, 45), z(-248)]);
   }
 
   // ── Level name plate (with drop shadow) ───────────────────────────────────

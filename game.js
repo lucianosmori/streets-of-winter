@@ -176,6 +176,8 @@ loadSprite("pickup_spice_cart", "assets/pickup_spice_cart.png");
 // =============================================================================
 
 scene("title", () => {
+  setCamScale(1); setCamPos(SCREEN_W / 2, SCREEN_H / 2);  // reset from any game-scene camera
+
   // Background
   add([rect(SCREEN_W, SCREEN_H), pos(0, 0), color(10, 12, 22), fixed(), z(0)]);
 
@@ -635,6 +637,28 @@ scene("game", ({ numPlayers = 1, levelIdx = 0 }) => {
     }
   });
 
+  // ── Portrait camera follow ───────────────────────────────────────────────
+  // In portrait orientation: zoom in 2x and track the player horizontally.
+  // Background entities are world-space (no fixed()), so they scroll correctly.
+  // HUD and snow use onDraw screen-space draws — unaffected by camPos/camScale.
+  onUpdate(() => {
+    const portrait = window.innerHeight > window.innerWidth;
+    if (portrait) {
+      const living = players.filter(p => p.hp > 0);
+      const targetX = living.length > 0
+        ? living.reduce((s, p) => s + p.pos.x, 0) / living.length
+        : SCREEN_W / 2;
+      // Clamp so world edges stay off-screen (viewport = SCREEN_W/2 wide at scale 2)
+      const camX = clamp(targetX, SCREEN_W / 4, SCREEN_W * 3 / 4);
+      // Y=300 shows y:200–400 — the full ground action area with a slice of buildings
+      setCamScale(2);
+      setCamPos(camX, 300);
+    } else {
+      setCamScale(1);
+      setCamPos(SCREEN_W / 2, SCREEN_H / 2);
+    }
+  });
+
 
   // ── Utility ─────────────────────────────────────────────────────────────────
 
@@ -653,6 +677,8 @@ scene("game", ({ numPlayers = 1, levelIdx = 0 }) => {
 // =============================================================================
 
 scene("gameover", ({ numPlayers = 1, levelIdx = 0 }) => {
+  setCamScale(1); setCamPos(SCREEN_W / 2, SCREEN_H / 2);
+
   const lvl = LEVELS[levelIdx];
 
   // Dark overlay
@@ -677,6 +703,8 @@ scene("gameover", ({ numPlayers = 1, levelIdx = 0 }) => {
 // =============================================================================
 
 scene("victory", ({ numPlayers = 1 }) => {
+  setCamScale(1); setCamPos(SCREEN_W / 2, SCREEN_H / 2);
+
   add([rect(SCREEN_W, SCREEN_H), pos(0, 0), color(10, 20, 10), fixed(), z(0)]);
 
   add([text("OTTAWA IS SAVED!", { size: 38, align: "center" }),

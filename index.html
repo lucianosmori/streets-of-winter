@@ -20,32 +20,23 @@
       display: block;
     }
 
-    /* ── Rotate overlay ──────────────────────────────────────────────────────── */
-    #rotate-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: #05050a;
-      z-index: 9999;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      color: #fff;
-      font-family: monospace;
-      font-size: 1.1rem;
-      text-align: center;
-      gap: 20px;
-    }
-    #rotate-overlay .icon {
-      font-size: 3rem;
-      animation: spin 1.5s ease-in-out infinite alternate;
-    }
-    @keyframes spin {
-      from { transform: rotate(-20deg); }
-      to   { transform: rotate(20deg);  }
-    }
+    /* ── Portrait mode: game view at top, gamepad at bottom ─────────────────── */
+    /*
+     * Kaplay's letterbox mode fills the canvas to the full viewport (390×844)
+     * and renders the 2:1 game centered within it.  Game area in portrait:
+     *   width  = 100vw,  height = 50vw  (maintaining 800:400 = 2:1 ratio)
+     *   top offset inside canvas = (100vh - 50vw) / 2 = 50vh - 25vw
+     *
+     * We shift the canvas UP by that offset so the game content lands at y=0.
+     */
     @media (orientation: portrait) {
-      #rotate-overlay { display: flex; }
+      body { overflow: hidden; }
+      canvas {
+        transform: translateY(calc(-50vh + 25vw)) !important;
+      }
+      /* Menu buttons: float above the d-pad / action buttons */
+      #menu-btns { bottom: 110px; }
+      #gamepad   { height: 185px; }
     }
 
     /* ── Virtual gamepad ─────────────────────────────────────────────────────── */
@@ -156,12 +147,6 @@
   </style>
 </head>
 <body>
-
-  <!-- Portrait-mode blocker -->
-  <div id="rotate-overlay">
-    <div class="icon">📱</div>
-    <div>Rotate your device<br>to landscape to play</div>
-  </div>
 
   <!-- Virtual gamepad (visible on touch devices only) -->
   <div id="gamepad">
