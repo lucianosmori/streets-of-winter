@@ -45,26 +45,40 @@ test.describe('Page Load & Canvas', () => {
   test('canvas is not blank (has pixel data)', async ({ page }) => {
     await page.goto('/');
 
-    // Give the game a moment to render
-    await page.waitForTimeout(500);
+    // Poll until Kaplay renders content beyond the background color [18, 18, 28].
+    // Kaplay v3001 uses WebGL — sample via readPixels across a grid of points.
+    const BG = [18, 18, 28];
+    let hasPixelData = false;
 
-    const hasPixelData = await page.evaluate(() => {
-      const canvas = document.querySelector('canvas');
-      const ctx = canvas?.getContext('2d');
-      if (!ctx) return false;
+    for (let attempt = 0; attempt < 20; attempt++) {
+      await page.waitForTimeout(200);
 
-      const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      const data = imgData.data;
+      hasPixelData = await page.evaluate(([bgR, bgG, bgB]) => {
+        const canvas = document.querySelector('canvas');
+        if (!canvas || canvas.width === 0) return false;
 
-      // Background color is [18, 18, 28] — return true if any pixel differs
-      const BG_R = 18, BG_G = 18, BG_B = 28;
-      for (let i = 0; i < data.length; i += 4) {
-        if (data[i] !== BG_R || data[i + 1] !== BG_G || data[i + 2] !== BG_B) {
-          return true;
+        const gl = canvas.getContext('webgl') || canvas.getContext('webgl2');
+        if (!gl) return false;
+
+        const pixel = new Uint8Array(4);
+        // Sample a grid of points across the canvas to find any non-background pixel
+        const steps = [0.25, 0.5, 0.75];
+        for (const sx of steps) {
+          for (const sy of steps) {
+            const x = Math.floor(canvas.width * sx);
+            // WebGL Y-axis is bottom-up, so flip
+            const y = Math.floor(canvas.height * (1 - sy));
+            gl.readPixels(x, y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixel);
+            if (pixel[0] !== bgR || pixel[1] !== bgG || pixel[2] !== bgB) {
+              return true;
+            }
+          }
         }
-      }
-      return false;
-    });
+        return false;
+      }, BG);
+
+      if (hasPixelData) break;
+    }
 
     expect(hasPixelData).toBe(true);
   });
