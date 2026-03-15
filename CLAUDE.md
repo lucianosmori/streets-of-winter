@@ -10,7 +10,10 @@ game.js             — Scenes (title/game/gameover/victory), combat, wave syste
 js/constants.js     — All tuning values, level defs, enemy/NPC/pickup stats
 js/entities.js      — Factory functions (player, enemy, NPC, pickup), AI, HUD, snow
 assets/             — Sprites, sounds (see assets/CLAUDE.md for sprite guidelines)
-.github/workflows/  — GitHub Pages deploy on push to main
+tests/              — Playwright E2E tests (smoke, constants regression, gameplay flow)
+package.json        — Dev deps: @playwright/test, serve
+playwright.config.js — Test runner config (webServer, chromium, landscape viewport)
+.github/workflows/  — deploy.yml (push to main) + playwright.yml (workflow_dispatch)
 ```
 
 **Load order:** index.html → Kaplay CDN → constants.js → entities.js → game.js
@@ -99,6 +102,11 @@ Depth-sorted by Y position. NPCs at z~290, pickups at z~285, players/enemies at 
 - Pickup sprites: donut, coffee, samosa, cart, bottle (48×48 single frame PNGs)
 - Sprite-aware pickup system: `spawnPickup` auto-detects `def.sprite`, scales via `def.h / 48`
 - Speech bubble QoL: follow characters, auto-stack to avoid overlap, proximity fade near player, suppression within 60px of player
+- McDonald's storefront on ByWard level — golden arches, boarded windows, CLOSED sign, garbage bags, amber glow
+- Pet system: `spawnPet()` factory wrapper, raccoon def in `NPC_DEFS` with `isPet: true`, pets skip speech bubbles
+- ByWard raccoon scatter event: 4 raccoons burst from McDonald's garbage when player walks near (banner: "RACCOON INCIDENT ZONE")
+- ByWard sky darkened to night setting [30,32,50]
+- Playwright E2E test suite: 20 tests across smoke/constants/gameplay, `workflow_dispatch` CI via `.github/workflows/playwright.yml`
 
 ## What's Missing / TODO
 
@@ -123,12 +131,9 @@ Priority tiers: **1** = core/blocking, **2** = important gameplay, **3** = nice-
 
 #### Tier 1 — Core / Blocking
 - Player 2 (Priya) full integration testing — controls, hitboxes, co-op flow
-- ByWard McDonald's storefront added to `LEVELS[1].stores` — narrative anchor for the level
 - Death animations for enemies without sprites (currently just flash + destroy)
 
 #### Tier 2 — Important Gameplay
-- **Pets system** — `spawnPet(type, x, y)` factory in `entities.js`, pet entries in `NPC_DEFS` with `isPet: true` flag, level `npcTypes` pools can include pet types
-- **ByWard raccoon scatter** — trigger event when player crosses McDonald's x-position: spawn 3–5 raccoon pets that flee in random directions + flash a brief banner ("RACCOON INCIDENT ZONE")
 - Combo system — chain punches/kicks for multiplied damage or extra hits
 - Character select screen — P1/P2 pick their fighter before the game starts
 - Boss intro cinematics — brief pan or banner with boss name/portrait, not just text
