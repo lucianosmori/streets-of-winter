@@ -147,11 +147,13 @@ loadSprite("pet_raccoon", "assets/npc_raccoon.png", {
 });
 
 // ── Pickup sprites ───────────────────────────────────────────────────────────
-loadSprite("pickup_donut",  "assets/pickup_donut.png");
-loadSprite("pickup_coffee", "assets/pickup_coffee.png");
-loadSprite("pickup_samosa", "assets/pickup_samosa.png");
-loadSprite("pickup_cart",   "assets/pickup_cart.png");
-loadSprite("pickup_bottle","assets/pickup_bottle.png");
+loadSprite("pickup_donut",      "assets/pickup_donut.png");
+loadSprite("pickup_coffee",     "assets/pickup_coffee.png");
+loadSprite("pickup_samosa",     "assets/pickup_samosa.png");
+loadSprite("pickup_cart",       "assets/pickup_cart.png");
+loadSprite("pickup_bottle",     "assets/pickup_bottle.png");
+loadSprite("pickup_fruit_cart", "assets/pickup_fruit_cart.png");
+loadSprite("pickup_spice_cart", "assets/pickup_spice_cart.png");
 
 // ── Backgrounds ───────────────────────────────────────────────────────────────
 // loadSprite("bg_bankstreet",  "assets/bg_bankstreet.png");
