@@ -107,6 +107,11 @@ Depth-sorted by Y position. NPCs at z~290, pickups at z~285, players/enemies at 
 - ByWard raccoon scatter event: 4 raccoons burst from McDonald's garbage when player walks near (banner: "RACCOON INCIDENT ZONE")
 - ByWard sky darkened to night setting [30,32,50]
 - Playwright E2E test suite: 20 tests across smoke/constants/gameplay, `workflow_dispatch` CI via `.github/workflows/playwright.yml`
+- **Mobile fullscreen layout** — dynamic `VIEW_W`/`VIEW_H` computed from screen aspect ratio at init; game fills the entire phone screen with zero letterboxing in portrait mode
+- Camera follow with clamping — smooth horizontal tracking of the player, clamped so world edges stay at screen edges (no empty/grey background visible)
+- HUD adapted for portrait — both player HP bars and boss HP bars now display correctly on mobile; wave/enemy indicators centered within the narrow viewport
+- Virtual gamepad repositioned — START pill moved to right side (above action buttons), BACK pill moved to left side (above d-pad)
+- Mobile-friendly menu screens — title, gameover, and victory scenes adapt text to `VIEW_W`; mobile users see touch-specific prompts ("Tap START")
 
 ## What's Missing / TODO
 
@@ -130,6 +135,7 @@ Depth-sorted by Y position. NPCs at z~290, pickups at z~285, players/enemies at 
 Priority tiers: **1** = core/blocking, **2** = important gameplay, **3** = nice-to-have, **4** = stretch/flavour
 
 #### Tier 1 — Core / Blocking
+- **Responsive layout** — the game should be responsive based on screen size. On mobile, keep the current vertical/portrait fullscreen view (dynamic `VIEW_W`). On desktop, restore the original horizontal/landscape view (`VIEW_W = SCREEN_W = 800`). The initial mobile layout change broke the desktop horizontal view — it currently uses a narrow viewport even on wide screens. Needs detection at init (screen aspect ratio or pointer type) to choose the right mode, and ideally re-adapt on orientation change / window resize.
 - Player 2 (Priya) full integration testing — controls, hitboxes, co-op flow
 - Death animations for enemies without sprites (currently just flash + destroy)
 
