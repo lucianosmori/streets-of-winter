@@ -25,13 +25,15 @@ function drawLevelBackground(lvl) {
   const lt = (c, a) => [Math.min(255,c[0]+a), Math.min(255,c[1]+a), Math.min(255,c[2]+a)];
 
   // ── Sky gradient (4 bands for depth) ──────────────────────────────────────
+  // World-space (not fixed) so they pan correctly with the camera.
+  // Extra wide so they cover any camera position within the 800-wide world.
   const skyBands = 4;
   const bandH = Math.ceil(GROUND_TOP / skyBands);
   for (let i = 0; i < skyBands; i++) {
     const f = i / (skyBands - 1);
-    add([rect(SCREEN_W, bandH + 1), pos(0, i * bandH),
+    add([rect(SCREEN_W + 200, bandH + 1), pos(-100, i * bandH),
          color(lvl.skyCol[0] + f * 12, lvl.skyCol[1] + f * 8, lvl.skyCol[2] + f * 15),
-         fixed(), z(-300)]);
+         z(-300)]);
   }
 
   // ── Distant skyline silhouettes ───────────────────────────────────────────
@@ -306,11 +308,12 @@ function drawLevelBackground(lvl) {
   }
 
   // ── Level name plate (with drop shadow) ───────────────────────────────────
+  const vw = typeof VIEW_W !== "undefined" ? VIEW_W : SCREEN_W;
   const lvlText = `LVL ${lvl.id}  ${lvl.name.toUpperCase()}`;
   add([text(lvlText, { size: 10 }),
-       pos(7, 8), color(0, 0, 0), fixed(), z(599)]);
+       pos(vw / 2 + 1, 8), anchor("top"), color(0, 0, 0), fixed(), z(599)]);
   add([text(lvlText, { size: 10 }),
-       pos(6, 7), color(210, 210, 220), fixed(), z(600)]);
+       pos(vw / 2, 7), anchor("top"), color(210, 210, 220), fixed(), z(600)]);
 }
 
 
@@ -326,12 +329,14 @@ let _snowParticles = [];
  */
 function initSnow(count = 55) {
   _snowParticles = [];
+  const sw = typeof VIEW_W !== "undefined" ? VIEW_W : SCREEN_W;
+  const sh = typeof VIEW_H !== "undefined" ? VIEW_H : SCREEN_H;
   for (let i = 0; i < count; i++) {
     _snowParticles.push({
-      x:     rand(0, SCREEN_W),
-      y:     rand(0, SCREEN_H),
+      x:     rand(0, sw),
+      y:     rand(0, sh),
       speed: rand(28, 85),
-      drift: rand(-18, 18),   // gentle horizontal float
+      drift: rand(-18, 18),
       size:  rand(1, 3),
       alpha: rand(0.25, 0.85),
     });
@@ -340,12 +345,14 @@ function initSnow(count = 55) {
 
 /** Advance snow physics.  Call in onUpdate(). */
 function updateSnow() {
+  const sw = typeof VIEW_W !== "undefined" ? VIEW_W : SCREEN_W;
+  const sh = typeof VIEW_H !== "undefined" ? VIEW_H : SCREEN_H;
   for (const p of _snowParticles) {
     p.y += p.speed * dt();
     p.x += p.drift * dt();
-    if (p.y > SCREEN_H + 4) { p.y = -4;           p.x = rand(0, SCREEN_W); }
-    if (p.x < -4)            { p.x = SCREEN_W + 4; }
-    if (p.x > SCREEN_W + 4)  { p.x = -4;           }
+    if (p.y > sh + 4) { p.y = -4;    p.x = rand(0, sw); }
+    if (p.x < -4)     { p.x = sw + 4; }
+    if (p.x > sw + 4) { p.x = -4;     }
   }
 }
 
@@ -867,20 +874,26 @@ function spawnPickup(type, x, y) {
  * @param {string}      phase    — "wave" | "bossIntro" | "boss" | "levelClear"
  */
 function drawHUD(players, waveIdx, lvl, enemies, bossObjs, phase) {
+  // VIEW_W / VIEW_H are the viewport dimensions (may differ from SCREEN_W in portrait)
+  const vw = typeof VIEW_W !== "undefined" ? VIEW_W : SCREEN_W;
+  const vh = typeof VIEW_H !== "undefined" ? VIEW_H : SCREEN_H;
 
   // ── Per-player bars ──────────────────────────────────────────────────────
+  const barW = Math.min(200, vw - 20);           // fit within narrow viewport
+  const barSpacing = barW + 18;
+
   for (let i = 0; i < players.length; i++) {
     const p  = players[i];
-    const bx = 14 + i * 228;
-    const by = 20;     // extra top padding for object-fit:cover crop
+    const bx = 8 + i * barSpacing;
+    const by = 18;
 
     // Name
-    drawText({ text: p.cfg.name, pos: vec2(bx, by),      size: 8,  color: rgb(...p.cfg.col) });
+    drawText({ text: p.cfg.name, pos: vec2(bx, by), size: 8, color: rgb(...p.cfg.col) });
     // HP bar track
-    drawRect({ pos: vec2(bx, by + 11), width: 200, height: 12, color: rgb(22, 22, 22) });
-    // HP bar fill — turns red below 25 HP
+    drawRect({ pos: vec2(bx, by + 11), width: barW, height: 12, color: rgb(22, 22, 22) });
+    // HP bar fill
     const ratio = Math.max(0, p.hp / p.maxHp);
-    drawRect({ pos: vec2(bx, by + 11), width: 200 * ratio, height: 12,
+    drawRect({ pos: vec2(bx, by + 11), width: barW * ratio, height: 12,
                color: p.hp < 25 ? rgb(210, 40, 40) : rgb(60, 195, 60) });
     // HP number
     drawText({ text: `${p.hp}`, pos: vec2(bx + 4, by + 12), size: 9, color: rgb(240, 240, 240) });
@@ -895,36 +908,35 @@ function drawHUD(players, waveIdx, lvl, enemies, bossObjs, phase) {
     // Special cooldown / ready indicator
     if (p.specialCooldown > 0) {
       drawText({ text: `SPL ${Math.ceil(p.specialCooldown)}s`,
-                 pos: vec2(bx + 142, by + 27), size: 8, color: rgb(160, 100, 200) });
+                 pos: vec2(bx + barW - 52, by + 27), size: 8, color: rgb(160, 100, 200) });
     } else {
       drawText({ text: "SPL RDY",
-                 pos: vec2(bx + 142, by + 27), size: 8, color: rgb(210, 160, 255) });
+                 pos: vec2(bx + barW - 52, by + 27), size: 8, color: rgb(210, 160, 255) });
     }
   }
 
   // ── Centre: wave or boss indicator ──────────────────────────────────────
   if (phase === "wave") {
-    drawText({ text: `WAVE  ${waveIdx + 1} / ${lvl.waves.length}`,
-               pos: vec2(SCREEN_W / 2 - 34, 20), size: 13, color: rgb(255, 215, 60) });
+    drawText({ text: `WAVE ${waveIdx + 1}/${lvl.waves.length}`,
+               pos: vec2(vw / 2 - 26, 5), size: 11, color: rgb(255, 215, 60) });
   } else if (phase === "bossIntro" || phase === "boss") {
     drawText({ text: "BOSS!",
-               pos: vec2(SCREEN_W / 2 - 22, 20), size: 15, color: rgb(255, 50, 50) });
+               pos: vec2(vw / 2 - 18, 5), size: 13, color: rgb(255, 50, 50) });
   }
 
   // ── Enemy count (top-right) ──────────────────────────────────────────────
   const alive = enemies.filter(e => e.state !== "dead").length;
-  drawText({ text: `× ${alive}`, pos: vec2(SCREEN_W - 56, 20),
-             size: 13, color: rgb(215, 85, 85) });
+  drawText({ text: `×${alive}`, pos: vec2(vw - 30, 5),
+             size: 11, color: rgb(215, 85, 85) });
 
   // ── Boss HP bar (bottom of screen) ──────────────────────────────────────
   if (phase === "boss" && bossObjs.length > 0) {
-    const bossBarW = 420;
-    const bossBarX = (SCREEN_W - bossBarW) / 2;
-    const bossBarY = SCREEN_H - 36;
+    const bossBarW = Math.min(420, vw - 16);
+    const bossBarX = (vw - bossBarW) / 2;
+    const bossBarY = vh - 36;
 
-    // Combined HP across all boss instances (The Duo = 2 health bars merged)
-    let totalHp    = 0, totalMaxHp = 0;
-    let bossLabel  = "";
+    let totalHp = 0, totalMaxHp = 0;
+    let bossLabel = "";
     for (const b of bossObjs) {
       if (b.state !== "dead") {
         totalHp    += b.hp;
@@ -938,17 +950,17 @@ function drawHUD(players, waveIdx, lvl, enemies, bossObjs, phase) {
                  color: rgb(12, 12, 12) });
       drawRect({ pos: vec2(bossBarX, bossBarY), height: 14,
                  width: bossBarW * (totalHp / totalMaxHp), color: rgb(180, 25, 25) });
-      drawText({ text: `${bossLabel}  ${totalHp} / ${totalMaxHp}`,
+      drawText({ text: `${bossLabel}  ${totalHp}/${totalMaxHp}`,
                  pos: vec2(bossBarX + 5, bossBarY + 1), size: 10,
                  color: rgb(255, 195, 195) });
     }
   }
 
-  // ── Controls legend (bottom, hidden on touch devices) ───────────────────
+  // ── Controls legend (bottom, desktop only) ──────────────────────────────
   if (!window.matchMedia("(pointer: coarse)").matches) {
     drawText({
       text:  "P1 WASD Move  Z Punch  X Kick  Q Special  |  P2 IJKL / U O P",
-      pos:   vec2(SCREEN_W / 2 - 215, SCREEN_H - 18),
+      pos:   vec2(vw / 2 - 215, vh - 18),
       size:  8,
       color: rgb(95, 95, 95),
     });

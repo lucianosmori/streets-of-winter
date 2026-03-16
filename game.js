@@ -7,10 +7,19 @@
 //   js/entities.js   — factory functions, AI helpers, HUD draw
 // =============================================================================
 
+// ── Viewport: match screen aspect so game fills the entire display ─────────
+// In portrait the viewport is narrow (showing ~185 game-units of the 800-wide
+// world).  In landscape the full 800-wide world is visible.
+const _isPortrait = window.innerHeight > window.innerWidth;
+const VIEW_W = _isPortrait
+  ? Math.round(SCREEN_H * (window.innerWidth / window.innerHeight))
+  : SCREEN_W;
+const VIEW_H = SCREEN_H;   // always 400
+
 kaplay({
-  width:      SCREEN_W,
-  height:     SCREEN_H,
-  letterbox:  true,        // maintain aspect ratio with black bars on resize
+  width:      VIEW_W,
+  height:     VIEW_H,
+  letterbox:  true,        // maintain aspect ratio — no bars since we matched it
   background: [18, 18, 28],
   pixelDensity: window.devicePixelRatio,
 });
@@ -176,62 +185,63 @@ loadSprite("pickup_spice_cart", "assets/pickup_spice_cart.png");
 // =============================================================================
 
 scene("title", () => {
-  setCamScale(1); setCamPos(SCREEN_W / 2, SCREEN_H / 2);  // reset from any game-scene camera
+  setCamScale(1); setCamPos(VIEW_W / 2, VIEW_H / 2);  // reset from any game-scene camera
+
+  const cx = VIEW_W / 2;   // horizontal centre of viewport
 
   // Background
-  add([rect(SCREEN_W, SCREEN_H), pos(0, 0), color(10, 12, 22), fixed(), z(0)]);
+  add([rect(VIEW_W, VIEW_H), pos(0, 0), color(10, 12, 22), fixed(), z(0)]);
 
   // Gradient bands (decorative — mimics a lit street from below)
-  add([rect(SCREEN_W, 80),  pos(0, SCREEN_H - 80),  color(30, 20, 10),  fixed(), z(1)]);
-  add([rect(SCREEN_W, 40),  pos(0, SCREEN_H - 40),  color(45, 30, 12),  fixed(), z(1)]);
+  add([rect(VIEW_W, 80),  pos(0, VIEW_H - 80),  color(30, 20, 10),  fixed(), z(1)]);
+  add([rect(VIEW_W, 40),  pos(0, VIEW_H - 40),  color(45, 30, 12),  fixed(), z(1)]);
 
   // Title
   add([text("OTTAWA RAGE", { size: 44, align: "center" }),
-       pos(SCREEN_W / 2, 80), anchor("center"),
+       pos(cx, 80), anchor("center"),
        color(255, 200, 50), fixed(), z(10)]);
   add([text("Streets of Winter", { size: 16, align: "center" }),
-       pos(SCREEN_W / 2, 140), anchor("center"),
+       pos(cx, 140), anchor("center"),
        color(160, 200, 220), fixed(), z(10)]);
 
   // Subtitle / tagline
-  add([text("Ottawa's last hope fights through 5 neighbourhoods of winter chaos.",
-            { size: 8, align: "center", width: 600 }),
-       pos(SCREEN_W / 2, 175), anchor("center"),
+  add([text("Ottawa's last hope fights through\n5 neighbourhoods of winter chaos.",
+            { size: 8, align: "center", width: VIEW_W - 20 }),
+       pos(cx, 175), anchor("center"),
        color(130, 130, 150), fixed(), z(10)]);
 
   // Controls prompt (flashing)
+  const isMobile = window.matchMedia("(pointer: coarse)").matches;
+  const promptMsg = isMobile
+    ? "[ START ]  to begin"
+    : "[ ENTER ]  1 Player        [ TAB ]  2 Players";
   const prompt = add([
-    text("[ ENTER ]  1 Player        [ TAB ]  2 Players", { size: 12, align: "center" }),
-    pos(SCREEN_W / 2, 235), anchor("center"),
+    text(promptMsg, { size: 12, align: "center", width: VIEW_W - 20 }),
+    pos(cx, 235), anchor("center"),
     color(255, 245, 120), fixed(), z(10),
   ]);
-  // Flash
   let flashT = 0;
   prompt.onUpdate(() => {
     flashT += dt();
     prompt.opacity = 0.5 + 0.5 * Math.sin(flashT * 3.5);
   });
 
-  // Controls legend
-  add([text("P1: WASD Move   Z Punch   X Kick   Q Special",
-            { size: 9, align: "center" }),
-       pos(SCREEN_W / 2, 272), anchor("center"),
-       color(130, 180, 130), fixed(), z(10)]);
-  add([text("P2: IJKL Move   U Punch   O Kick   P Special",
-            { size: 9, align: "center" }),
-       pos(SCREEN_W / 2, 288), anchor("center"),
-       color(130, 180, 220), fixed(), z(10)]);
-
-  // Pickup hint
-  add([text("Walk over items to collect them.  Weapons boost your attack range & damage.",
-            { size: 7, align: "center", width: 600 }),
-       pos(SCREEN_W / 2, 316), anchor("center"),
-       color(100, 100, 110), fixed(), z(10)]);
+  // Controls legend (desktop only — mobile has gamepad)
+  if (!isMobile) {
+    add([text("P1: WASD Move   Z Punch   X Kick   Q Special",
+              { size: 9, align: "center" }),
+         pos(cx, 272), anchor("center"),
+         color(130, 180, 130), fixed(), z(10)]);
+    add([text("P2: IJKL Move   U Punch   O Kick   P Special",
+              { size: 9, align: "center" }),
+         pos(cx, 288), anchor("center"),
+         color(130, 180, 220), fixed(), z(10)]);
+  }
 
   // Copyright / flavour
-  add([text("© Unofficial Ottawa Love Letter — no politicians were harmed.",
+  add([text("© Unofficial Ottawa Love Letter",
             { size: 7, align: "center" }),
-       pos(SCREEN_W / 2, SCREEN_H - 18), anchor("center"),
+       pos(cx, VIEW_H - 18), anchor("center"),
        color(70, 70, 80), fixed(), z(10)]);
 
   // Snow on title screen
@@ -638,40 +648,28 @@ scene("game", ({ numPlayers = 1, levelIdx = 0 }) => {
   });
 
   // ── Camera follow ────────────────────────────────────────────────────────
-  // CSS object-fit:cover fills the screen, cropping sides in portrait.
-  // Camera pans to keep the player centered within the visible strip.
-  // In landscape the full 800-wide world is visible, so no panning needed.
-  let _camX = SCREEN_W / 2;
+  // Viewport width (VIEW_W) matches the screen aspect, so the game fills the
+  // entire display.  In portrait the view is narrow (~185 units); camera pans
+  // to keep the player centered.  Clamped so we never show outside the world.
+  let _camX = VIEW_W / 2;
   onUpdate(() => {
-    const portrait = window.innerHeight > window.innerWidth;
-    if (portrait) {
-      const living = players.filter(p => p.hp > 0);
-      const targetX = living.length > 0
-        ? living.reduce((s, p) => s + p.pos.x, 0) / living.length
-        : SCREEN_W / 2;
-      // Visible game-unit width = canvas_w * (SCREEN_H / canvas_h)
-      // object-fit:cover scales by height, so visible width depends on aspect.
-      const aspect = window.innerWidth / window.innerHeight;
-      const visibleW = SCREEN_W * aspect * (SCREEN_H / SCREEN_W);
-      //               = SCREEN_H * aspect
-      const halfVW = visibleW / 2;
-      const camX = clamp(targetX, halfVW, SCREEN_W - halfVW);
-      _camX = lerp(_camX, camX, 0.08);
-      setCamScale(1);
-      setCamPos(_camX, SCREEN_H / 2);
-    } else {
-      _camX = lerp(_camX, SCREEN_W / 2, 0.1);
-      setCamScale(1);
-      setCamPos(_camX, SCREEN_H / 2);
-    }
+    const living = players.filter(p => p.hp > 0);
+    const targetX = living.length > 0
+      ? living.reduce((s, p) => s + p.pos.x, 0) / living.length
+      : SCREEN_W / 2;
+    const halfVW = VIEW_W / 2;
+    const camX = clamp(targetX, halfVW, SCREEN_W - halfVW);
+    _camX = lerp(_camX, camX, 0.08);
+    setCamScale(1);
+    setCamPos(_camX, VIEW_H / 2);
   });
 
 
   // ── Utility ─────────────────────────────────────────────────────────────────
 
   function showBanner(msg, duration) {
-    add([text(msg, { size: 28, align: "center" }),
-         pos(SCREEN_W / 2, SCREEN_H / 2 - 20), anchor("center"),
+    add([text(msg, { size: 28, align: "center", width: VIEW_W - 20 }),
+         pos(VIEW_W / 2, VIEW_H / 2 - 20), anchor("center"),
          color(255, 215, 60), opacity(1), fixed(), z(500),
          lifespan(duration, { fade: 0.4 })]);
   }
@@ -684,16 +682,20 @@ scene("game", ({ numPlayers = 1, levelIdx = 0 }) => {
 // =============================================================================
 
 scene("gameover", ({ numPlayers = 1, levelIdx = 0 }) => {
-  setCamScale(1); setCamPos(SCREEN_W / 2, SCREEN_H / 2);
+  setCamScale(1); setCamPos(VIEW_W / 2, VIEW_H / 2);
 
   const lvl = LEVELS[levelIdx];
+  const cx = VIEW_W / 2;
+  const isMobile = window.matchMedia("(pointer: coarse)").matches;
 
   // Dark overlay
-  add([rect(SCREEN_W, SCREEN_H), pos(0, 0), color(0, 0, 0), opacity(0.82), fixed(), z(998)]);
+  add([rect(VIEW_W, VIEW_H), pos(0, 0), color(0, 0, 0), opacity(0.82), fixed(), z(998)]);
 
-  add([text(`GAME OVER\n\nFell on  ${lvl.name}\n\n[ ENTER ]  Try Again\n[ TAB ]  Title Screen`,
-            { size: 21, align: "center" }),
-       pos(SCREEN_W / 2, SCREEN_H / 2), anchor("center"),
+  const msg = isMobile
+    ? `GAME OVER\n\nFell on  ${lvl.name}\n\nTap START to retry`
+    : `GAME OVER\n\nFell on  ${lvl.name}\n\n[ ENTER ]  Try Again\n[ TAB ]  Title Screen`;
+  add([text(msg, { size: 21, align: "center", width: VIEW_W - 20 }),
+       pos(cx, VIEW_H / 2), anchor("center"),
        color(255, 70, 70), fixed(), z(999)]);
 
   initSnow(30);
@@ -710,22 +712,27 @@ scene("gameover", ({ numPlayers = 1, levelIdx = 0 }) => {
 // =============================================================================
 
 scene("victory", ({ numPlayers = 1 }) => {
-  setCamScale(1); setCamPos(SCREEN_W / 2, SCREEN_H / 2);
+  setCamScale(1); setCamPos(VIEW_W / 2, VIEW_H / 2);
 
-  add([rect(SCREEN_W, SCREEN_H), pos(0, 0), color(10, 20, 10), fixed(), z(0)]);
+  const cx = VIEW_W / 2;
+  const isMobile = window.matchMedia("(pointer: coarse)").matches;
 
-  add([text("OTTAWA IS SAVED!", { size: 38, align: "center" }),
-       pos(SCREEN_W / 2, 90), anchor("center"),
+  add([rect(VIEW_W, VIEW_H), pos(0, 0), color(10, 20, 10), fixed(), z(0)]);
+
+  add([text("OTTAWA IS\nSAVED!", { size: 38, align: "center" }),
+       pos(cx, 90), anchor("center"),
        color(100, 255, 100), fixed(), z(10)]);
 
-  add([text("You fought through every neighbourhood.\nOttawa thanks you, eh.",
-            { size: 14, align: "center" }),
-       pos(SCREEN_W / 2, 180), anchor("center"),
+  add([text("You fought through\nevery neighbourhood.\nOttawa thanks you, eh.",
+            { size: 14, align: "center", width: VIEW_W - 20 }),
+       pos(cx, 200), anchor("center"),
        color(180, 240, 180), fixed(), z(10)]);
 
-  add([text("[ ENTER ]  Play Again       [ TAB ]  Title Screen",
-            { size: 12, align: "center" }),
-       pos(SCREEN_W / 2, 265), anchor("center"),
+  const replayMsg = isMobile
+    ? "Tap START to replay"
+    : "[ ENTER ]  Play Again\n[ TAB ]  Title Screen";
+  add([text(replayMsg, { size: 12, align: "center", width: VIEW_W - 20 }),
+       pos(cx, 290), anchor("center"),
        color(255, 245, 120), fixed(), z(10)]);
 
   // Celebratory heavy snow
