@@ -8,10 +8,13 @@
 // =============================================================================
 
 // ── Viewport: match screen aspect so game fills the entire display ─────────
-// In portrait the viewport is narrow (showing ~185 game-units of the 800-wide
-// world).  In landscape the full 800-wide world is visible.
+// Mobile portrait → narrow viewport (~185 units of the 800-wide world).
+// Desktop / mobile landscape → full 800-wide world visible.
+// We use pointer:coarse to distinguish touch devices from desktop — a desktop
+// browser with a tall window should NOT get portrait mode.
+const _isMobile   = window.matchMedia("(pointer: coarse)").matches;
 const _isPortrait = window.innerHeight > window.innerWidth;
-const VIEW_W = _isPortrait
+const VIEW_W = (_isMobile && _isPortrait)
   ? Math.round(SCREEN_H * (window.innerWidth / window.innerHeight))
   : SCREEN_W;
 const VIEW_H = SCREEN_H;   // always 400
@@ -21,8 +24,22 @@ kaplay({
   height:     VIEW_H,
   letterbox:  true,        // maintain aspect ratio — no bars since we matched it
   background: [18, 18, 28],
-  pixelDensity: window.devicePixelRatio,
+  pixelDensity: _isMobile ? window.devicePixelRatio : 1,
 });
+
+// ── Orientation / resize → reload so VIEW_W recalculates ───────────────────
+// Kaplay can't change its internal resolution after init, so we reload when
+// the aspect ratio flips (portrait ↔ landscape).  Game state is lost but
+// this only happens on deliberate device rotation.
+{
+  const _initPortrait = _isPortrait;
+  function _checkOrientation() {
+    const nowPortrait = window.innerHeight > window.innerWidth;
+    if (nowPortrait !== _initPortrait) location.reload();
+  }
+  window.addEventListener("orientationchange", () => setTimeout(_checkOrientation, 200));
+  window.addEventListener("resize", _checkOrientation);
+}
 
 
 // =============================================================================
