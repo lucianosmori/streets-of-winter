@@ -674,10 +674,22 @@ function updateEnemy(e, target, onAttack) {
     // Close enough — strike if cooldown ready
     if (e.attackCooldown <= 0) {
       e.attackCooldown = e.def.attackCooldown;
-      onAttack(e.def.damage);
-      // Tiny red flash on attack
-      add([rect(14, 14), pos(e.pos.x + e.facing * 14, e.pos.y - 28),
-           anchor("center"), color(255, 60, 60), opacity(1), z(e.pos.y + 5), lifespan(0.1)]);
+
+      if (e.def.isRaccoonThrower) {
+        // Throw a raccoon projectile instead of dealing melee damage
+        if (typeof window.spawnRaccoonProjectile === "function") {
+          window.spawnRaccoonProjectile(e.pos.x, e.pos.y, target);
+        }
+        // Small toss flash
+        add([rect(10, 10), pos(e.pos.x + e.facing * 20, e.pos.y - 30),
+             anchor("center"), color(100, 90, 70), opacity(1), z(e.pos.y + 5), lifespan(0.15)]);
+      } else {
+        onAttack(e.def.damage);
+        // Tiny red flash on attack
+        add([rect(14, 14), pos(e.pos.x + e.facing * 14, e.pos.y - 28),
+             anchor("center"), color(255, 60, 60), opacity(1), z(e.pos.y + 5), lifespan(0.1)]);
+      }
+
       if (e.def.sprite) {
         e.play("attack");
         e._lastState = "attack";  // force walk to re-trigger after attack ends

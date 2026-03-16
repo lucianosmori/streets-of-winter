@@ -206,6 +206,10 @@ scene("title", () => {
 
   const cx = VIEW_W / 2;   // horizontal centre of viewport
 
+  // ── Level select state ──────────────────────────────────────────────────────
+  let selectedLevel  = 0;
+  let autoStartTimer = 5;
+
   // Background
   add([rect(VIEW_W, VIEW_H), pos(0, 0), color(10, 12, 22), fixed(), z(0)]);
 
@@ -215,17 +219,49 @@ scene("title", () => {
 
   // Title
   add([text("OTTAWA RAGE", { size: 44, align: "center" }),
-       pos(cx, 80), anchor("center"),
+       pos(cx, 65), anchor("center"),
        color(255, 200, 50), fixed(), z(10)]);
   add([text("Streets of Winter", { size: 16, align: "center" }),
-       pos(cx, 140), anchor("center"),
+       pos(cx, 116), anchor("center"),
        color(160, 200, 220), fixed(), z(10)]);
 
-  // Subtitle / tagline
-  add([text("Ottawa's last hope fights through\n5 neighbourhoods of winter chaos.",
-            { size: 8, align: "center", width: VIEW_W - 20 }),
-       pos(cx, 175), anchor("center"),
-       color(130, 130, 150), fixed(), z(10)]);
+  // ── Level list (drawn each frame) ─────────────────────────────────────────
+  const listStartY = 148;
+  const rowH       = 22;
+  const levelObjs  = [];   // {cursor, label} text objects for each level
+
+  LEVELS.forEach((lvl, i) => {
+    const y = listStartY + i * rowH;
+
+    const cursor = add([
+      text("\u25b6", { size: 11 }),
+      pos(cx - 90, y), anchor("center"),
+      color(255, 215, 0), fixed(), z(10),
+    ]);
+
+    const label = add([
+      text(`${i + 1}.  ${lvl.name}`, { size: 11, align: "left" }),
+      pos(cx - 72, y), anchor("left"),
+      color(220, 215, 200), fixed(), z(10),
+    ]);
+
+    // Invisible hit rect for touch/mouse tap
+    const hitH = rowH - 2;
+    const hitW = 200;
+    const hitRect = add([
+      rect(hitW, hitH),
+      pos(cx - 100, y - hitH / 2), anchor("topleft"),
+      area(),
+      color(0, 0, 0), opacity(0.01), fixed(), z(9),
+      { levelIdx: i },
+    ]);
+    hitRect.onClick(() => {
+      selectedLevel  = i;
+      autoStartTimer = 5;
+    });
+
+    levelObjs.push({ cursor, label });
+  });
 
   // Controls prompt (flashing)
   const isMobile = window.matchMedia("(pointer: coarse)").matches;
@@ -233,8 +269,8 @@ scene("title", () => {
     ? "[ START ]  to begin"
     : "[ ENTER ]  1 Player        [ TAB ]  2 Players";
   const prompt = add([
-    text(promptMsg, { size: 12, align: "center", width: VIEW_W - 20 }),
-    pos(cx, 235), anchor("center"),
+    text(promptMsg, { size: 11, align: "center", width: VIEW_W - 20 }),
+    pos(cx, listStartY + LEVELS.length * rowH + 16), anchor("center"),
     color(255, 245, 120), fixed(), z(10),
   ]);
   let flashT = 0;
@@ -243,20 +279,28 @@ scene("title", () => {
     prompt.opacity = 0.5 + 0.5 * Math.sin(flashT * 3.5);
   });
 
+  // Auto-start timer label
+  const timerLabel = add([
+    text("", { size: 9, align: "center" }),
+    pos(cx, listStartY + LEVELS.length * rowH + 36), anchor("center"),
+    color(160, 155, 130), fixed(), z(10),
+  ]);
+
   // Controls legend (desktop only — mobile has gamepad)
   if (!isMobile) {
+    const legendY = listStartY + LEVELS.length * rowH + 56;
     add([text("P1: WASD Move   Z Punch   X Kick   Q Special",
-              { size: 9, align: "center" }),
-         pos(cx, 272), anchor("center"),
+              { size: 8, align: "center" }),
+         pos(cx, legendY), anchor("center"),
          color(130, 180, 130), fixed(), z(10)]);
     add([text("P2: IJKL Move   U Punch   O Kick   P Special",
-              { size: 9, align: "center" }),
-         pos(cx, 288), anchor("center"),
+              { size: 8, align: "center" }),
+         pos(cx, legendY + 14), anchor("center"),
          color(130, 180, 220), fixed(), z(10)]);
   }
 
   // Copyright / flavour
-  add([text("© Unofficial Ottawa Love Letter",
+  add([text("\u00a9 Unofficial Ottawa Love Letter",
             { size: 7, align: "center" }),
        pos(cx, VIEW_H - 18), anchor("center"),
        color(70, 70, 80), fixed(), z(10)]);
@@ -266,8 +310,37 @@ scene("title", () => {
   onUpdate(() => updateSnow());
   onDraw(() => drawSnow());
 
-  onKeyPress("enter", () => go("game", { numPlayers: 1, levelIdx: 0 }));
-  onKeyPress("tab",   () => go("game", { numPlayers: 2, levelIdx: 0 }));
+  // ── Update cursor visibility + timer each frame ────────────────────────────
+  onUpdate(() => {
+    // Refresh cursor and dimming each frame
+    levelObjs.forEach(({ cursor, label }, i) => {
+      const selected = i === selectedLevel;
+      cursor.opacity = selected ? 1 : 0;
+      // Mutate the existing Color object (Kaplay doesn't support direct reassignment)
+      if (selected) { label.color.r = 255; label.color.g = 215; label.color.b = 0;   }
+      else          { label.color.r = 140; label.color.g = 135; label.color.b = 120; }
+    });
+
+    // Auto-start countdown
+    autoStartTimer -= dt();
+    const secs = Math.max(0, Math.ceil(autoStartTimer));
+    timerLabel.text = secs > 0 ? `Starting in ${secs}...` : "";
+    if (autoStartTimer <= 0) {
+      go("game", { numPlayers: 1, levelIdx: 0 });
+    }
+  });
+
+  // ── Input ──────────────────────────────────────────────────────────────────
+  const resetTimer = () => { autoStartTimer = 5; };
+
+  const navUp   = () => { selectedLevel = Math.max(0, selectedLevel - 1);              resetTimer(); };
+  const navDown = () => { selectedLevel = Math.min(LEVELS.length - 1, selectedLevel + 1); resetTimer(); };
+  onKeyPress("arrowup",   navUp);
+  onKeyPress("w",         navUp);
+  onKeyPress("arrowdown", navDown);
+  onKeyPress("s",         navDown);
+  onKeyPress("enter", () => go("game", { numPlayers: 1, levelIdx: selectedLevel }));
+  onKeyPress("tab",   () => go("game", { numPlayers: 2, levelIdx: selectedLevel }));
 });
 
 
@@ -280,13 +353,27 @@ scene("game", ({ numPlayers = 1, levelIdx = 0 }) => {
   const lvl = LEVELS[levelIdx];
 
   // ── Scene state ─────────────────────────────────────────────────────────────
-  let players  = [];   // player game objects
-  let enemies  = [];   // active enemy game objects
-  let npcs     = [];   // background NPC game objects
-  let pickups  = [];   // pickup game objects
-  let waveIdx  = -1;   // current wave (incremented by advanceWave)
-  let bossObjs = [];   // boss game object(s) for current encounter
-  let phase    = "wave"; // "wave" | "bossIntro" | "boss" | "levelClear"
+  let players     = [];   // player game objects
+  let enemies     = [];   // active enemy game objects
+  let npcs        = [];   // background NPC game objects
+  let pickups     = [];   // pickup game objects
+  let projectiles = [];   // raccoon-thrower projectiles
+  let waveIdx     = -1;   // current wave (incremented by advanceWave)
+  let bossObjs    = [];   // boss game object(s) for current encounter
+  let phase       = "wave"; // "wave" | "bossIntro" | "boss" | "levelClear"
+
+  // Expose projectile spawner so entities.js can call it for raccoon_thrower attacks
+  window.spawnRaccoonProjectile = function spawnRaccoonProjectile(fromX, fromY, target) {
+    const dir = target.pos.x < fromX ? -1 : 1;
+    const p = add([
+      rect(14, 10),
+      pos(fromX + dir * 20, fromY - 25),
+      color(100, 90, 70),
+      z(295),
+      { vx: dir * 320, vy: -80, gravity: 200, damage: 10 },
+    ]);
+    projectiles.push(p);
+  };
 
 
   // ── Build the scene ─────────────────────────────────────────────────────────
@@ -392,13 +479,17 @@ scene("game", ({ numPlayers = 1, levelIdx = 0 }) => {
       phase    = "boss";
       bossObjs = [];
 
-      const count = lvl.boss.count || 1;
-      for (let i = 0; i < count; i++) {
-        const bossY = lerp(GROUND_TOP + 30, GROUND_BOTTOM - 10, (i + 1) / (count + 1));
-        const boss  = spawnEnemy(lvl.boss.type, SCREEN_W - 60 - i * 55, bossY);
+      // Support both legacy { type, count } and new { types: [{type,name}, ...] }
+      const bossList = lvl.boss.types
+        ? lvl.boss.types
+        : Array.from({ length: lvl.boss.count || 1 }, () => ({ type: lvl.boss.type }));
+
+      bossList.forEach((b, i) => {
+        const bossY = lerp(GROUND_TOP + 30, GROUND_BOTTOM - 10, (i + 1) / (bossList.length + 1));
+        const boss  = spawnEnemy(b.type, SCREEN_W - 60 - i * 55, bossY);
         enemies.push(boss);
         bossObjs.push(boss);
-      }
+      });
     });
   }
 
@@ -478,7 +569,7 @@ scene("game", ({ numPlayers = 1, levelIdx = 0 }) => {
     if (p.heldWeapon) {
       p.heldWeapon.uses--;
       if (p.heldWeapon.uses <= 0) {
-        showSpeechBubble("BROKE!", p);
+        showSpeechBubble("Cancelame ESTA!👇", p);
         p.heldWeapon = null;
       }
     }
@@ -647,6 +738,38 @@ scene("game", ({ numPlayers = 1, levelIdx = 0 }) => {
     for (const pk of pickups) {
       pk.bobTimer = (pk.bobTimer || 0) + dt() * 2.5;
       pk.pos.y   += Math.sin(pk.bobTimer) * 0.28;
+    }
+  });
+
+  // Raccoon projectiles — move + collide with players
+  onUpdate(() => {
+    for (let i = projectiles.length - 1; i >= 0; i--) {
+      const p = projectiles[i];
+      p.pos.x += p.vx * dt();
+      p.pos.y += p.vy * dt();
+      p.vy    += p.gravity * dt();
+
+      // Destroy when off-screen or hits the ground
+      if (p.pos.x < -60 || p.pos.x > SCREEN_W + 60 || p.pos.y > GROUND_BOTTOM) {
+        destroy(p);
+        projectiles.splice(i, 1);
+        continue;
+      }
+
+      // Check against each living player
+      let hit = false;
+      for (const pl of players) {
+        if (pl.hp <= 0 || pl.hurtTimer > 0) continue;
+        if (Math.abs(p.pos.x - pl.pos.x) < 20 && Math.abs(p.pos.y - pl.pos.y) < 28) {
+          hitPlayer(pl, p.damage);
+          hit = true;
+          break;
+        }
+      }
+      if (hit) {
+        destroy(p);
+        projectiles.splice(i, 1);
+      }
     }
   });
 

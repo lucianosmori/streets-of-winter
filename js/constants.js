@@ -64,7 +64,7 @@ const PLAYER_CONFIGS = [
 const LEVELS = [
   // ── Level 1 ────────────────────────────────────────────────────────────────
   {
-    id: 1, name: "Bank Street Shops", subtitle: "The Strip",
+    id: 1, name: "Bank Street", subtitle: "The Strip",
     skyCol: [60, 65, 80], groundCol: [200, 195, 185],
     stores: [
       { label: "TIM HORTONS", x: 0, w: 156, h: 195,
@@ -123,78 +123,52 @@ const LEVELS = [
       [{ type:"agile",    count:2 }, { type:"stripper", count:2 }],
       [{ type:"stripper", count:2 }, { type:"heavy",    count:1 }, { type:"agile", count:2 }],
     ],
-    boss:      { type:"stripper_boss", name:"The Duo", count:2 },
+    boss: {
+      types: [
+        { type:"stripper_boss",   name:"Roxanne"    },
+        { type:"raccoon_thrower", name:"Trash King" },
+      ],
+      name: "The Duo",
+    },
     pickups:   ["bottle", "fruit_cart", "donut"],
-    bossIntro: "THE DUO guard the Barefax door!",
+    bossIntro: "THE DUO guard the Barefax door — one packing heat, one packing RACCOONS!",
   },
 
   // ── Level 3 ────────────────────────────────────────────────────────────────
   {
-    id: 3, name: "Rideau Canal", subtitle: "The Canal",
-    skyCol: [70, 80, 100], groundCol: [210, 220, 230],  // snow / ice palette
+    id: 3, name: "Wellington Street", subtitle: "The Parade",
+    skyCol: [50, 55, 75], groundCol: [195, 188, 175],
     stores: [
-      { label: "SKATE SHACK", x: 0, w: 148, h: 155,
-        col: [70, 70, 110], signCol: [55, 65, 120],
-        signTextCol: [255, 255, 255], awningCol: [50, 55, 90] },
-      { label: "HOT CHOC", x: 156, w: 142, h: 145,
-        col: [110, 60, 25], signCol: [100, 55, 20],
-        signTextCol: [255, 230, 180], awningCol: [85, 45, 15] },
-      { label: "PARLIAMENT >>", x: 306, w: 198, h: 130,
-        col: [45, 72, 45], signCol: [40, 65, 40],
-        signTextCol: [220, 200, 140], awningCol: [35, 55, 35] },
-      { label: "CANAL TRAIL", x: 512, w: 148, h: 138,
-        col: [60, 80, 100], signCol: [50, 70, 95],
-        signTextCol: [255, 255, 255], awningCol: [42, 62, 82] },
-      { label: "FISH HUT", x: 668, w: 132, h: 145,
-        col: [82, 55, 35], signCol: [75, 48, 28],
-        signTextCol: [255, 240, 200], awningCol: [62, 40, 22] },
+      { label: "HUMMUS HOUSE",   x: 0,   w: 150, h: 178,
+        col: [190, 155, 75],  signCol: [185, 30, 15],
+        signTextCol: [255, 230, 80],  awningCol: [160, 130, 55] },
+      { label: "PRIDE CORNER",   x: 158, w: 158, h: 192,
+        col: [220, 100, 160], signCol: [255, 80, 180],
+        signTextCol: [255, 255, 255], awningCol: [190, 70, 130] },
+      { label: "THE WELLINGTON", x: 324, w: 172, h: 185,
+        col: [65, 70, 110],   signCol: [55, 60, 120],
+        signTextCol: [230, 225, 200], awningCol: [50, 55, 90]  },
+      { label: "FLAG STORE",     x: 504, w: 138, h: 162,
+        col: [140, 35, 35],   signCol: [150, 25, 25],
+        signTextCol: [255, 255, 255], awningCol: [115, 28, 28] },
+      { label: "KEBAB SPOT",     x: 650, w: 150, h: 175,
+        col: [160, 110, 30],  signCol: [170, 95, 20],
+        signTextCol: [255, 240, 160], awningCol: [135, 90, 22] },
     ],
-    npcTypes: ["hijab", "quebecois", "african"],
+    npcTypes: ["hijab", "lgbtq", "turban"],
     waves: [
-      [{ type:"agile",    count:3 }],
-      [{ type:"agile",    count:2 }, { type:"crackhead", count:2 }],
-      [{ type:"kicker",   count:2 }, { type:"crackhead", count:2 }, { type:"agile", count:1 }],
+      [{ type:"arab",     count:3 }, { type:"grunt",    count:1 }],
+      [{ type:"stripper", count:2 }, { type:"agile",    count:2 }],
+      [{ type:"arab",     count:2 }, { type:"stripper", count:2 }, { type:"agile", count:1 }],
     ],
-    boss:      { type:"heavy_chain", name:"Chain Daddy" },
-    pickups:   ["skate", "fish", "coffee"],
-    bossIntro: "CHAIN DADDY descends from the barge!",
+    boss:      { type:"big_trans", name:"Big Trans" },
+    pickups:   ["flagpole", "bottle", "coffee"],
+    bossIntro: "BIG TRANS steps out of the Pride float!",
   },
 
   // ── Level 4 ────────────────────────────────────────────────────────────────
   {
-    id: 4, name: "Curry Street", subtitle: "The Strip",
-    skyCol: [50, 45, 60], groundCol: [185, 175, 160],
-    stores: [
-      { label: "DESI KITCHEN", x: 0, w: 156, h: 190,
-        col: [170, 120, 20], signCol: [180, 30, 15],
-        signTextCol: [255, 230, 80], awningCol: [145, 100, 18] },
-      { label: "SPICE WORLD", x: 164, w: 146, h: 175,
-        col: [185, 65, 15], signCol: [200, 60, 10],
-        signTextCol: [255, 240, 120], awningCol: [155, 50, 10] },
-      { label: "BIRYANI HOUSE", x: 318, w: 166, h: 192,
-        col: [155, 115, 18], signCol: [160, 28, 10],
-        signTextCol: [255, 220, 80], awningCol: [130, 95, 15] },
-      { label: "HALAL MEATS", x: 492, w: 136, h: 162,
-        col: [135, 35, 35], signCol: [140, 25, 25],
-        signTextCol: [255, 255, 255], awningCol: [110, 28, 25] },
-      { label: "SWEET SHOP", x: 636, w: 164, h: 175,
-        col: [175, 135, 45], signCol: [180, 140, 30],
-        signTextCol: [255, 255, 255], awningCol: [150, 115, 22] },
-    ],
-    npcTypes: ["turban", "ukrainian", "lgbtq"],
-    waves: [
-      [{ type:"crackhead", count:3 }, { type:"grunt",    count:1 }],
-      [{ type:"crackhead", count:3 }, { type:"kicker",   count:2 }],
-      [{ type:"crackhead", count:2 }, { type:"grunt",    count:2 }, { type:"kicker", count:2 }],
-    ],
-    boss:      { type:"drug_lord", name:"The Chef" },
-    pickups:   ["samosa", "spice_cart", "coffee"],
-    bossIntro: "THE CHEF steps off the food truck!",
-  },
-
-  // ── Level 5 ────────────────────────────────────────────────────────────────
-  {
-    id: 5, name: "Parliament Hill", subtitle: "The Finale",
+    id: 4, name: "Parliament Hill", subtitle: "The Finale",
     skyCol: [40, 50, 70], groundCol: [215, 220, 215],
     stores: [
       { label: "EAST BLOCK", x: 0, w: 148, h: 190,
@@ -217,6 +191,49 @@ const LEVELS = [
     pickups:   ["flagpole", "statue", "samosa"],
     bossIntro: "THE OVERLORD stands atop Parliament!",
   },
+
+  /* ── DISABLED LEVELS (preserved for future reactivation) ─────────────────
+  {
+    id: 3, name: "Rideau Canal", subtitle: "The Canal",
+    skyCol: [70, 80, 100], groundCol: [210, 220, 230],
+    stores: [
+      { label: "SKATE SHACK", x: 0, w: 148, h: 155, col: [70, 70, 110], signCol: [55, 65, 120], signTextCol: [255, 255, 255], awningCol: [50, 55, 90] },
+      { label: "HOT CHOC",    x: 156, w: 142, h: 145, col: [110, 60, 25], signCol: [100, 55, 20], signTextCol: [255, 230, 180], awningCol: [85, 45, 15] },
+      { label: "PARLIAMENT >>", x: 306, w: 198, h: 130, col: [45, 72, 45], signCol: [40, 65, 40], signTextCol: [220, 200, 140], awningCol: [35, 55, 35] },
+      { label: "CANAL TRAIL", x: 512, w: 148, h: 138, col: [60, 80, 100], signCol: [50, 70, 95], signTextCol: [255, 255, 255], awningCol: [42, 62, 82] },
+      { label: "FISH HUT",    x: 668, w: 132, h: 145, col: [82, 55, 35],  signCol: [75, 48, 28],  signTextCol: [255, 240, 200], awningCol: [62, 40, 22] },
+    ],
+    npcTypes: ["hijab", "quebecois", "african"],
+    waves: [
+      [{ type:"agile", count:3 }],
+      [{ type:"agile", count:2 }, { type:"crackhead", count:2 }],
+      [{ type:"kicker", count:2 }, { type:"crackhead", count:2 }, { type:"agile", count:1 }],
+    ],
+    boss: { type:"heavy_chain", name:"Chain Daddy" },
+    pickups: ["skate", "fish", "coffee"],
+    bossIntro: "CHAIN DADDY descends from the barge!",
+  },
+  {
+    id: 4, name: "Curry Street", subtitle: "The Strip",
+    skyCol: [50, 45, 60], groundCol: [185, 175, 160],
+    stores: [
+      { label: "DESI KITCHEN",  x: 0,   w: 156, h: 190, col: [170, 120, 20], signCol: [180, 30, 15],  signTextCol: [255, 230, 80],  awningCol: [145, 100, 18] },
+      { label: "SPICE WORLD",   x: 164, w: 146, h: 175, col: [185, 65, 15],  signCol: [200, 60, 10],  signTextCol: [255, 240, 120], awningCol: [155, 50, 10]  },
+      { label: "BIRYANI HOUSE", x: 318, w: 166, h: 192, col: [155, 115, 18], signCol: [160, 28, 10],  signTextCol: [255, 220, 80],  awningCol: [130, 95, 15]  },
+      { label: "HALAL MEATS",   x: 492, w: 136, h: 162, col: [135, 35, 35],  signCol: [140, 25, 25],  signTextCol: [255, 255, 255], awningCol: [110, 28, 25]  },
+      { label: "SWEET SHOP",    x: 636, w: 164, h: 175, col: [175, 135, 45], signCol: [180, 140, 30], signTextCol: [255, 255, 255], awningCol: [150, 115, 22] },
+    ],
+    npcTypes: ["turban", "ukrainian", "lgbtq"],
+    waves: [
+      [{ type:"crackhead", count:3 }, { type:"grunt",  count:1 }],
+      [{ type:"crackhead", count:3 }, { type:"kicker", count:2 }],
+      [{ type:"crackhead", count:2 }, { type:"grunt",  count:2 }, { type:"kicker", count:2 }],
+    ],
+    boss: { type:"drug_lord", name:"The Chef" },
+    pickups: ["samosa", "spice_cart", "coffee"],
+    bossIntro: "THE CHEF steps off the food truck!",
+  },
+  ── END DISABLED LEVELS ─────────────────────────────────────────────────── */
 ];
 
 // ── Enemy stat table ──────────────────────────────────────────────────────────
@@ -259,6 +276,12 @@ const ENEMY_DEFS = {
     taunts:["Kick your ass!", "Feel the burn!", "Block this!"],
     // TODO: sprite:"enemy_kicker"
   },
+  arab: {
+    label:"PROTESTER", col:[180, 140, 80], w:24, h:44,
+    hp:40,  speed:65,  damage:9,  attackRange:42, attackCooldown:1.4,
+    taunts:["Free Palestine!", "Allahu Akbar!", "Intifada!"],
+    // TODO: sprite:"enemy_arab"
+  },
   // ── Boss variants ──────────────────────────────────────────────────────────
   heavy_boss: {
     label:"BIG EARL",    col:[120, 40, 20],  w:40, h:72,
@@ -289,6 +312,19 @@ const ENEMY_DEFS = {
     hp:300, speed:30, damage:20, attackRange:62, attackCooldown:2.2, isBoss:true,
     taunts:["Ottawa belongs to me!", "The Hill is mine!"],
     // TODO: sprite:"boss_overlord"
+  },
+  raccoon_thrower: {
+    label:"TRASH KING",  col:[90, 80, 65],   w:32, h:52,
+    hp:180, speed:45, damage:12, attackRange:220, attackCooldown:2.0, isBoss:true,
+    taunts:["You wanna piece of me?!", "I got friends!", "CATCH!"],
+    isRaccoonThrower: true,
+    // TODO: sprite:"boss_raccoon_thrower"
+  },
+  big_trans: {
+    label:"BIG TRANS",   col:[100, 180, 220], w:40, h:72,
+    hp:260, speed:38, damage:18, attackRange:58, attackCooldown:1.1, isBoss:true,
+    taunts:["You can't cancel me!", "PRIDE AND POWER!", "Yaaas slay!"],
+    // TODO: sprite:"boss_big_trans"
   },
 };
 
