@@ -18,12 +18,6 @@
       image-rendering: pixelated;
       image-rendering: crisp-edges;
       display: block;
-      width: 100vw !important;
-      height: 100vh !important;
-      height: 100dvh !important; /* dynamic viewport height on mobile */
-      object-fit: cover !important;   /* fill screen, crop sides in portrait */
-      position: fixed !important;
-      top: 0; left: 0;
     }
 
     /* ── Virtual gamepad — overlays the canvas ──────────────────────────────── */
@@ -99,17 +93,9 @@
     #btn-kick    { background: rgba(255,100,30,0.18); right: 0;   bottom: 0; }
     #btn-special { background: rgba(80,160,255,0.18); left: 50px; top: 0;    }
 
-    /* START button — small, top-center */
-    #menu-btns {
-      position: absolute;
-      top: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      gap: 8px;
-      pointer-events: none;
-    }
+    /* Menu pills — positioned above their respective button clusters */
     .menu-btn {
+      position: absolute;
       padding: 6px 16px;
       border-radius: 14px;
       border: 1.5px solid rgba(255,255,255,0.25);
@@ -126,6 +112,10 @@
       background: rgba(0,0,0,0.35);
     }
     .menu-btn:active { filter: brightness(1.5); background: rgba(80,255,120,0.25); }
+    /* START — right side, above action buttons */
+    #btn-start { right: 18px; bottom: 155px; }
+    /* BACK — left side, above d-pad */
+    #btn-back  { left: 18px;  bottom: 185px; }
   </style>
 </head>
 <body>
@@ -143,10 +133,8 @@
       <div class="action-btn" id="btn-kick"    data-key="x">KICK</div>
       <div class="action-btn" id="btn-special" data-key="q">★ SPEC</div>
     </div>
-    <div id="menu-btns">
-      <div class="menu-btn" id="btn-start" data-key="Enter">START</div>
-      <div class="menu-btn" id="btn-back"  data-key="Tab">BACK</div>
-    </div>
+    <div class="menu-btn" id="btn-start" data-key="Enter">START</div>
+    <div class="menu-btn" id="btn-back"  data-key="Tab">BACK</div>
   </div>
 
   <!-- Kaplay.js -->
