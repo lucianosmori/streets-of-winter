@@ -35,7 +35,7 @@ title → game → gameover → retry/title
 - **Pickups** (4 health + 7 weapons): Dropped by enemies (28% chance) or pre-spawned.
 
 ### Wave System
-Each level: 3 enemy waves → boss fight → next level. 5 levels total (Bank St → ByWard → Canal → Curry St → Parliament Hill).
+Each level: 3 enemy waves → boss fight → next level. 5 levels total (Bank St → ByWard → Canal → Wellington St → Parliament Hill).
 
 #### Level 2 — ByWard Market (Raccoon Incident)
 The Market level is set at night. The old Rideau Centre McDonald's — infamous for its wildlife incidents and eventual closure — casts a golden-arched glow on the snowy street. Key narrative elements:
@@ -44,6 +44,32 @@ The Market level is set at night. The old Rideau Centre McDonald's — infamous 
 - The `bossIntro` banner and NPC speech bubbles reference the incident (e.g. *"Did you hear what happened at that McDonald's??"*, *"The raccoons took OVER, man"*).
 - Enemy waves remain: stripper+grunt → agile+stripper → stripper+heavy+agile. Boss: **The Duo** (stripper bosses ×2) guarding the Barefax door. Strippers/slashers are still the primary enemy threat.
 - The raccoon incident is **ambient flavour** for now; future mechanic idea: raccoon NPCs distract enemies briefly when startled.
+
+#### Level 4 — Wellington Street (The Parade) — REDESIGN PLANNED
+Replaces the old "Curry Street" level. Set on **Wellington Street** in front of Parliament Hill, with the iconic Parliament fences visible in the background. The player must push through a massive **protest parade** blocking the street.
+
+**Concept:**
+- The background features the **Parliament Hill iron fences** and stone walls instead of storefronts. The Peace Tower is visible in the distance behind the fence.
+- A **parade/protest** fills the street — a mix of NPCs and enemies all marching together in formation, moving as a coordinated group to simulate a real parade.
+- **Palestinian flags** are carried by marchers throughout the parade.
+- **Hijab NPCs** are mixed into the parade as civilian marchers (non-hostile, part of the crowd).
+- **Enemies** wear a distinctive **keffiyeh face covering** — this is how the player distinguishes threats from civilians in the crowd.
+- Waves escalate in crowd density: wave 1 is a small group, wave 2 is a larger march, wave 3 is a massive flood of marchers.
+- **Boss: The Supreme Leader of Iran** — appears after the parade waves, final confrontation on Wellington St.
+
+**Parade mechanic (to implement):**
+- All parade entities (NPCs + enemies) move together in a synchronized march direction (e.g. left-to-right across the screen).
+- The player must fight through the moving crowd — enemies attack while marching, NPCs scatter or keep marching.
+- Creates a unique "fighting upstream through a crowd" feel different from other levels.
+
+**Art/sprite needs:**
+- Parliament fence background elements (iron fence sections, stone pillars)
+- Keffiyeh-wearing enemy variant sprite
+- Palestinian flag prop (carried by NPCs/enemies)
+- Supreme Leader of Iran boss sprite
+
+#### Level 5 — Parliament Hill (The Finale)
+The final showdown on Parliament Hill itself. Current implementation: East Block / Parliament / West Block storefronts, mixed NPC types, heavy enemy waves, boss is "The Overlord".
 
 ### Combat
 - Punch (68px range, 12 dmg), Kick (90px range, 22 dmg), Special (115px AoE, 35 dmg, costs 20 HP)
@@ -107,6 +133,11 @@ Depth-sorted by Y position. NPCs at z~290, pickups at z~285, players/enemies at 
 - ByWard raccoon scatter event: 4 raccoons burst from McDonald's garbage when player walks near (banner: "RACCOON INCIDENT ZONE")
 - ByWard sky darkened to night setting [30,32,50]
 - Playwright E2E test suite: 20 tests across smoke/constants/gameplay, `workflow_dispatch` CI via `.github/workflows/playwright.yml`
+- **Mobile fullscreen layout** — dynamic `VIEW_W`/`VIEW_H` computed from screen aspect ratio at init; game fills the entire phone screen with zero letterboxing in portrait mode
+- Camera follow with clamping — smooth horizontal tracking of the player, clamped so world edges stay at screen edges (no empty/grey background visible)
+- HUD adapted for portrait — both player HP bars and boss HP bars now display correctly on mobile; wave/enemy indicators centered within the narrow viewport
+- Virtual gamepad repositioned — START pill moved to right side (above action buttons), BACK pill moved to left side (above d-pad)
+- Mobile-friendly menu screens — title, gameover, and victory scenes adapt text to `VIEW_W`; mobile users see touch-specific prompts ("Tap START")
 
 ## What's Missing / TODO
 
@@ -130,10 +161,12 @@ Depth-sorted by Y position. NPCs at z~290, pickups at z~285, players/enemies at 
 Priority tiers: **1** = core/blocking, **2** = important gameplay, **3** = nice-to-have, **4** = stretch/flavour
 
 #### Tier 1 — Core / Blocking
+- **Responsive layout** — the game should be responsive based on screen size. On mobile, keep the current vertical/portrait fullscreen view (dynamic `VIEW_W`). On desktop, restore the original horizontal/landscape view (`VIEW_W = SCREEN_W = 800`). The initial mobile layout change broke the desktop horizontal view — it currently uses a narrow viewport even on wide screens. Needs detection at init (screen aspect ratio or pointer type) to choose the right mode, and ideally re-adapt on orientation change / window resize.
 - Player 2 (Priya) full integration testing — controls, hitboxes, co-op flow
 - Death animations for enemies without sprites (currently just flash + destroy)
 
 #### Tier 2 — Important Gameplay
+- **Wellington Street parade level** — implement Level 4 redesign: replace Curry St with Wellington St, Parliament fences background, synchronized parade march mechanic (NPCs + enemies moving together), keffiyeh enemies, Palestinian flags, hijab NPCs in crowd, Supreme Leader boss. See "Level 4 — Wellington Street" design doc above.
 - Combo system — chain punches/kicks for multiplied damage or extra hits
 - Character select screen — P1/P2 pick their fighter before the game starts
 - Boss intro cinematics — brief pan or banner with boss name/portrait, not just text
