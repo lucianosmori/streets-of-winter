@@ -280,7 +280,7 @@ const ENEMY_DEFS = {
     label:"PROTESTER", col:[180, 140, 80], w:24, h:44,
     hp:40,  speed:65,  damage:9,  attackRange:42, attackCooldown:1.4,
     taunts:["Free Palestine!", "Allahu Akbar!", "Intifada!"],
-    // TODO: sprite:"enemy_arab"
+    sprite:"enemy_arab",
   },
   // ── Boss variants ──────────────────────────────────────────────────────────
   heavy_boss: {
@@ -324,7 +324,7 @@ const ENEMY_DEFS = {
     label:"BIG TRANS",   col:[100, 180, 220], w:40, h:72,
     hp:260, speed:38, damage:18, attackRange:58, attackCooldown:1.1, isBoss:true,
     taunts:["You can't cancel me!", "PRIDE AND POWER!", "Yaaas slay!"],
-    // TODO: sprite:"boss_big_trans"
+    sprite:"boss_big_trans",
   },
 };
 
@@ -345,7 +345,7 @@ const NPC_DEFS = {
   hijab: {
     col:[100, 120, 200], accentCol:[60, 80, 160],   w:22, h:44, speed:20,
     phrases:["Astaghfirullah!", "SubhanAllah!", "Peace be upon you."],
-    // TODO: sprite:"npc_hijab"
+    sprite:"npc_hijab",
   },
   african: {
     col:[160, 100, 50],  accentCol:[220, 160, 40],  w:22, h:44, speed:28,

@@ -102,6 +102,16 @@ loadSprite("enemy_stripper", "assets/stripper_art.png", {
     idle:   { from: 24, to: 31, loop: true,  speed: 6  },   // row 3: idle/posing
   },
 });
+loadSprite("enemy_arab", "assets/enemy_arab.png", {
+  sliceX: 8, sliceY: 4,
+  anims: {
+    walk:   { from: 0,  to: 7,  loop: true,  speed: 7  },   // row 0: walk cycle
+    attack: { from: 8,  to: 15, loop: false, speed: 10 },   // row 1: attack combo
+    hurt:   { from: 16, to: 20, loop: false, speed: 8  },   // row 2 cols 0-4: flinch/stagger
+    death:  { from: 21, to: 23, loop: false, speed: 6  },   // row 2 cols 5-7: collapse
+    idle:   { from: 24, to: 31, loop: true,  speed: 6  },   // row 3: idle/patrol
+  },
+});
 // loadSprite("enemy_crackhead","assets/enemy_crackhead.png",{ /* same layout */ });
 // loadSprite("enemy_kicker",   "assets/enemy_kicker.png",   { /* same layout */ });
 
@@ -126,6 +136,16 @@ loadSprite("boss_duo", "assets/boss_duo_art.png", {
     death:  { from: 28, to: 31, loop: false, speed: 5  },   // row 3 cols 4-7: death
   },
 });
+loadSprite("boss_big_trans", "assets/boss_big_trans.png", {
+  sliceX: 8, sliceY: 4,
+  anims: {
+    walk:   { from: 0,  to: 7,  loop: true,  speed: 6  },   // row 0: walk
+    attack: { from: 8,  to: 15, loop: false, speed: 10 },   // row 1: attack
+    hurt:   { from: 16, to: 20, loop: false, speed: 8  },   // row 2 cols 0-4: flinch
+    death:  { from: 21, to: 23, loop: false, speed: 5  },   // row 2 cols 5-7: collapse
+    idle:   { from: 24, to: 31, loop: true,  speed: 5  },   // row 3: idle/taunt
+  },
+});
 // loadSprite("boss_chain",     "assets/boss_chain.png",     { sliceX:8, sliceY:5 });
 // loadSprite("boss_chef",      "assets/boss_chef.png",      { sliceX:8, sliceY:5 });
 // loadSprite("boss_overlord",  "assets/boss_overlord.png",  { sliceX:8, sliceY:5 });
@@ -143,7 +163,12 @@ loadSprite("npc_lgbtq", "assets/npc_lgbtq.png", {
     walk: { from: 0, to: 3, loop: true, speed: 6 },
   },
 });
-// loadSprite("npc_hijab",      "assets/npc_hijab.png",      { sliceX:4 });
+loadSprite("npc_hijab", "assets/npc_hijab.png", {
+  sliceX: 4, sliceY: 1,
+  anims: {
+    walk: { from: 0, to: 3, loop: true, speed: 6 },
+  },
+});
 loadSprite("npc_african", "assets/npc_african.png", {
   sliceX: 4, sliceY: 1,
   anims: {
@@ -809,7 +834,7 @@ scene("game", ({ numPlayers = 1, levelIdx = 0 }) => {
 
   function showBanner(msg, duration) {
     add([text(msg, { size: 28, align: "center", width: VIEW_W - 20 }),
-         pos(VIEW_W / 2, VIEW_H / 2 - 20), anchor("center"),
+         pos(VIEW_W / 2, VIEW_H / 2 - 25 - VIEW_H * 0.3), anchor("center"),
          color(255, 215, 60), opacity(1), fixed(), z(500),
          lifespan(duration, { fade: 0.4 })]);
   }
