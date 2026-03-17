@@ -197,7 +197,12 @@ loadSprite("npc_ukrainian", "assets/npc_ukrainian.png", {
     walk: { from: 0, to: 3, loop: true, speed: 6 },
   },
 });
-// loadSprite("npc_palestinian","assets/npc_palestinian.png",{ sliceX:4 });
+loadSprite("npc_palestinian", "assets/npc_palestinian.png", {
+  sliceX: 4, sliceY: 1,
+  anims: {
+    walk: { from: 0, to: 3, loop: true, speed: 6 },
+  },
+});
 
 // ── Pet spritesheets ────────────────────────────────────────────────────────
 loadSprite("pet_raccoon", "assets/npc_raccoon.png", {

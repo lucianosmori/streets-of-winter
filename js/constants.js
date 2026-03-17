@@ -161,7 +161,7 @@ const LEVELS = [
     waves: [
       [{ type:"heavy",    count:2 }, { type:"grunt",    count:2 }],
       [{ type:"heavy",    count:2 }, { type:"stripper", count:2 }, { type:"grunt",  count:2 }],
-      [{ type:"heavy",    count:3 }, { type:"kicker",   count:2 }, { type:"stripper", count:2 }],
+      [{ type:"heavy",    count:3 }, { type:"arab",     count:4 }, { type:"stripper", count:2 }],
     ],
     boss:      { type:"syndicate_boss", name:"The Prime Minister" },
     pickups:   ["flagpole", "statue", "samosa"],
@@ -341,7 +341,7 @@ const NPC_DEFS = {
   palestinian: {
     col:[210, 190, 160], accentCol:[20, 120, 40],   w:22, h:44, speed:30,
     phrases:["Free Palestine!", "Intifada!", "Ya free!"],
-    // TODO: sprite:"npc_palestinian"
+    sprite:"npc_palestinian",
   },
   // ── Pets (isPet: true) ────────────────────────────────────────────────
   raccoon: {
