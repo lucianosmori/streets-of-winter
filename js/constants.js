@@ -83,7 +83,7 @@ const LEVELS = [
         col: [75, 50, 35], signCol: [55, 38, 22],
         signTextCol: [255, 170, 50], awningCol: [50, 35, 20] },
     ],
-    npcTypes: ["turban", "quebecois", "african"],
+    npcTypes: ["turban", "quebecois", "hijab"],
     waves: [
       [{ type:"grunt",  count:3 }],
       [{ type:"grunt",  count:2 }, { type:"heavy",  count:1 }],
