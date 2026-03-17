@@ -147,7 +147,7 @@ const LEVELS = [
       [{ type:"arab",     count:2 }, { type:"stripper", count:2 }, { type:"agile", count:1 }],
     ],
     boss:      { type:"big_trans", name:"Big Trans" },
-    pickups:   ["flagpole", "bottle", "coffee"],
+    pickups:   ["donut", "bottle", "coffee"],
     bossIntro: "BIG TRANS steps out of the Pride float!",
   },
 
@@ -164,7 +164,7 @@ const LEVELS = [
       [{ type:"heavy",    count:3 }, { type:"arab",     count:4 }, { type:"stripper", count:2 }],
     ],
     boss:      { type:"syndicate_boss", name:"The Prime Minister" },
-    pickups:   ["flagpole", "statue", "samosa"],
+    pickups:   ["samosa", "cart", "coffee"],
     bossIntro: "THE PRIME MINISTER blocks the door!",
   },
 
