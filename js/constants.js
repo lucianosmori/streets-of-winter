@@ -137,24 +137,9 @@ const LEVELS = [
   // ── Level 3 ────────────────────────────────────────────────────────────────
   {
     id: 3, name: "Wellington Street", subtitle: "The Parade",
-    skyCol: [50, 55, 75], groundCol: [195, 188, 175],
-    stores: [
-      { label: "HUMMUS HOUSE",   x: 0,   w: 150, h: 178,
-        col: [190, 155, 75],  signCol: [185, 30, 15],
-        signTextCol: [255, 230, 80],  awningCol: [160, 130, 55] },
-      { label: "PRIDE CORNER",   x: 158, w: 158, h: 192,
-        col: [220, 100, 160], signCol: [255, 80, 180],
-        signTextCol: [255, 255, 255], awningCol: [190, 70, 130] },
-      { label: "THE WELLINGTON", x: 324, w: 172, h: 185,
-        col: [65, 70, 110],   signCol: [55, 60, 120],
-        signTextCol: [230, 225, 200], awningCol: [50, 55, 90]  },
-      { label: "FLAG STORE",     x: 504, w: 138, h: 162,
-        col: [140, 35, 35],   signCol: [150, 25, 25],
-        signTextCol: [255, 255, 255], awningCol: [115, 28, 28] },
-      { label: "KEBAB SPOT",     x: 650, w: 150, h: 175,
-        col: [160, 110, 30],  signCol: [170, 95, 20],
-        signTextCol: [255, 240, 160], awningCol: [135, 90, 22] },
-    ],
+    skyCol: [75, 140, 200], groundCol: [195, 188, 175],
+    parliamentGate: true,
+    stores: [],
     npcTypes: ["hijab", "lgbtq", "turban"],
     waves: [
       [{ type:"arab",     count:3 }, { type:"grunt",    count:1 }],
@@ -169,27 +154,18 @@ const LEVELS = [
   // ── Level 4 ────────────────────────────────────────────────────────────────
   {
     id: 4, name: "Parliament Hill", subtitle: "The Finale",
-    skyCol: [40, 50, 70], groundCol: [215, 220, 215],
-    stores: [
-      { label: "EAST BLOCK", x: 0, w: 148, h: 190,
-        col: [50, 62, 50], signCol: [42, 55, 42],
-        signTextCol: [220, 200, 140], awningCol: [38, 50, 38] },
-      { label: "PARLIAMENT", x: 156, w: 488, h: 220,
-        col: [45, 72, 45], signCol: [38, 65, 38],
-        signTextCol: [255, 230, 140], awningCol: [32, 55, 32] },
-      { label: "WEST BLOCK", x: 652, w: 148, h: 190,
-        col: [50, 62, 50], signCol: [42, 55, 42],
-        signTextCol: [220, 200, 140], awningCol: [38, 50, 38] },
-    ],
+    skyCol: [55, 90, 150], groundCol: [215, 220, 215],
+    parliamentHill: true,
+    stores: [],
     npcTypes: ["palestinian", "turban", "hijab", "quebecois"],
     waves: [
       [{ type:"heavy",    count:2 }, { type:"grunt",    count:2 }],
       [{ type:"heavy",    count:2 }, { type:"stripper", count:2 }, { type:"grunt",  count:2 }],
       [{ type:"heavy",    count:3 }, { type:"kicker",   count:2 }, { type:"stripper", count:2 }],
     ],
-    boss:      { type:"syndicate_boss", name:"The Overlord" },
+    boss:      { type:"syndicate_boss", name:"The Prime Minister" },
     pickups:   ["flagpole", "statue", "samosa"],
-    bossIntro: "THE OVERLORD stands atop Parliament!",
+    bossIntro: "THE PRIME MINISTER blocks the door!",
   },
 
   /* ── DISABLED LEVELS (preserved for future reactivation) ─────────────────
@@ -308,10 +284,10 @@ const ENEMY_DEFS = {
     // TODO: sprite:"boss_chef"
   },
   syndicate_boss: {
-    label:"OVERLORD",    col:[40, 40, 80],   w:44, h:60,
+    label:"PRIME MINISTER", col:[20, 30, 80], w:44, h:60,
     hp:300, speed:30, damage:20, attackRange:62, attackCooldown:2.2, isBoss:true,
-    taunts:["Ottawa belongs to me!", "The Hill is mine!"],
-    // TODO: sprite:"boss_overlord"
+    taunts:["They call me daddy!", "Ottawa belongs to me!", "The Hill is MINE!"],
+    // TODO: sprite:"boss_carney"
   },
   raccoon_thrower: {
     label:"TRASH KING",  col:[90, 80, 65],   w:32, h:52,
