@@ -149,6 +149,16 @@ loadSprite("boss_big_trans", "assets/boss_big_trans.png", {
 // loadSprite("boss_chain",     "assets/boss_chain.png",     { sliceX:8, sliceY:5 });
 // loadSprite("boss_chef",      "assets/boss_chef.png",      { sliceX:8, sliceY:5 });
 // loadSprite("boss_overlord",  "assets/boss_overlord.png",  { sliceX:8, sliceY:5 });
+loadSprite("boss_carney", "assets/boss_final.png", {
+  sliceX: 8, sliceY: 4,
+  anims: {
+    walk:   { from: 0,  to: 7,  loop: true,  speed: 7  },  // row 0: walk
+    attack: { from: 8,  to: 15, loop: false, speed: 10 },  // row 1: attack
+    hurt:   { from: 16, to: 20, loop: false, speed: 8  },  // row 2: stagger
+    death:  { from: 21, to: 23, loop: false, speed: 5  },  // row 2: collapse
+    idle:   { from: 24, to: 31, loop: true,  speed: 5  },  // row 3: taunt
+  },
+});
 
 // ── NPC spritesheets ──────────────────────────────────────────────────────────
 loadSprite("npc_turban", "assets/npc_turban.png", {

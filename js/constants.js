@@ -287,7 +287,7 @@ const ENEMY_DEFS = {
     label:"PRIME MINISTER", col:[20, 30, 80], w:44, h:60,
     hp:300, speed:30, damage:20, attackRange:62, attackCooldown:2.2, isBoss:true,
     taunts:["They call me daddy!", "Ottawa belongs to me!", "The Hill is MINE!"],
-    // TODO: sprite:"boss_carney"
+    sprite:"boss_carney",
   },
   raccoon_thrower: {
     label:"TRASH KING",  col:[90, 80, 65],   w:32, h:52,
