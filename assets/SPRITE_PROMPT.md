@@ -156,6 +156,20 @@ Flashy club-wear under winter coats, coordinated attack poses.
 ByWard Market bouncers. Acrobatic dual attacks.
 ```
 
+**TRASH KING — Level 2 Co-Boss / raccoon_thrower** (w:32, h:52)
+```
+Burly Ottawa homeless man outside ByWard Market at night. Filthy parka,
+toque pulled down low, fingerless gloves, ragged boots. Permanent scowl.
+Carries a squirming raccoon under each arm; more raccoons cling to his
+shoulders and peek from his coat pockets.
+
+Row 1: Idle/taunt — 10 frames, shifts weight, one raccoon climbs up his arm.
+Row 2: Walk — 10 frames, lumbering side-on stride, raccoons bob on shoulders.
+Row 3: Attack — 10 frames: winds up (3), hurls raccoon overhand (4), watches it fly (3).
+Row 4: Special — 10 frames: grabs TWO raccoons and launches them like shotgun blast, VFX rings.
+Row 5: Hurt (5 frames, staggers) + Death (5 frames, collapses, raccoons scatter off screen).
+```
+
 **CHAIN DADDY — Level 3 Boss** (w:42, h:54)
 ```
 Dock worker with heavy chain weapon, thick winter overalls, wool cap,

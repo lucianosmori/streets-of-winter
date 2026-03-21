@@ -146,6 +146,16 @@ loadSprite("boss_big_trans", "assets/boss_big_trans.png", {
     idle:   { from: 24, to: 31, loop: true,  speed: 5  },   // row 3: idle/taunt
   },
 });
+loadSprite("boss_raccoon_thrower", "assets/boss_raccoon_thrower.png", {
+  sliceX: 10, sliceY: 5,
+  anims: {
+    idle:   { from: 0,  to: 9,  loop: true,  speed: 6  },  // row 0: idle/taunt
+    walk:   { from: 10, to: 19, loop: true,  speed: 8  },  // row 1: walk
+    attack: { from: 20, to: 29, loop: false, speed: 10 },  // row 2: throw raccoon
+    hurt:   { from: 40, to: 44, loop: false, speed: 8  },  // row 4 cols 0-4: stagger
+    death:  { from: 45, to: 49, loop: false, speed: 6  },  // row 4 cols 5-9: collapse
+  },
+});
 // loadSprite("boss_chain",     "assets/boss_chain.png",     { sliceX:8, sliceY:5 });
 // loadSprite("boss_chef",      "assets/boss_chef.png",      { sliceX:8, sliceY:5 });
 // loadSprite("boss_overlord",  "assets/boss_overlord.png",  { sliceX:8, sliceY:5 });
@@ -228,13 +238,50 @@ loadSprite("pickup_spice_cart", "assets/pickup_spice_cart.png");
 // loadSprite("bg_curry",       "assets/bg_curry.png");
 // loadSprite("bg_parliament",  "assets/bg_parliament.png");
 
-// ── Sounds & music ────────────────────────────────────────────────────────────
-// loadSound("sfx_punch",  "assets/sfx_punch.wav");
-// loadSound("sfx_kick",   "assets/sfx_kick.wav");
-// loadSound("sfx_hurt",   "assets/sfx_hurt.wav");
-// loadSound("sfx_pickup", "assets/sfx_pickup.wav");
-// loadSound("sfx_boss",   "assets/sfx_boss.wav");
-// loadSound("music_main", "assets/music_street.mp3");
+// ── Music manager ─────────────────────────────────────────────────────────────
+const Music = (() => {
+  const tracks = {
+    level: new Audio("assets/music_level.mp3"),
+    boss:  new Audio("assets/music_boss.mp3"),
+  };
+  for (const t of Object.values(tracks)) { t.loop = true; t.volume = 0; }
+
+  let current = null;
+  let timers  = [];
+  const VOLUME = 0.5, STEP = 0.04, INTERVAL = 25; // ~300ms fade
+
+  function clearTimers() { timers.forEach(clearInterval); timers = []; }
+
+  function fadeTo(key) {
+    const next = tracks[key];
+    if (current === next) return;
+    clearTimers();
+    // Fade out current
+    if (current) {
+      const prev = current;
+      timers.push(setInterval(() => {
+        prev.volume = Math.max(0, prev.volume - STEP);
+        if (prev.volume <= 0) { prev.pause(); prev.currentTime = 0; }
+      }, INTERVAL));
+    }
+    // Fade in next
+    current = next;
+    next.currentTime = 0;
+    next.play().catch(() => {});
+    timers.push(setInterval(() => {
+      next.volume = Math.min(VOLUME, next.volume + STEP);
+      if (next.volume >= VOLUME) clearTimers();
+    }, INTERVAL));
+  }
+
+  function stop() {
+    clearTimers();
+    for (const t of Object.values(tracks)) { t.pause(); t.currentTime = 0; t.volume = 0; }
+    current = null;
+  }
+
+  return { play: fadeTo, stop };
+})();
 
 
 // =============================================================================
@@ -406,17 +453,23 @@ scene("game", ({ numPlayers = 1, levelIdx = 0 }) => {
   window.spawnRaccoonProjectile = function spawnRaccoonProjectile(fromX, fromY, target) {
     const dir = target.pos.x < fromX ? -1 : 1;
     const p = add([
-      rect(14, 10),
+      sprite("pet_raccoon"),
+      anchor("center"),
+      scale(0.20),
+      rotate(0),
+      color(255, 255, 255),
       pos(fromX + dir * 20, fromY - 25),
-      color(100, 90, 70),
       z(295),
       { vx: dir * 320, vy: -80, gravity: 200, damage: 10 },
     ]);
+    p.flipX = dir < 0;
+    p.play("walk");
     projectiles.push(p);
   };
 
 
   // ── Build the scene ─────────────────────────────────────────────────────────
+  Music.play("level");
   drawLevelBackground(lvl);
   initSnow(52);
 
@@ -513,7 +566,7 @@ scene("game", ({ numPlayers = 1, levelIdx = 0 }) => {
   function beginBossSequence() {
     phase = "bossIntro";
     showBanner(lvl.bossIntro, 2.5);
-    // TODO: play("sfx_boss") here
+    Music.play("boss");
 
     wait(3, () => {
       phase    = "boss";
@@ -547,8 +600,10 @@ scene("game", ({ numPlayers = 1, levelIdx = 0 }) => {
       wait(4, () => {
         const next = levelIdx + 1;
         if (next < LEVELS.length) {
+          Music.stop();
           go("game", { numPlayers, levelIdx: next });
         } else {
+          Music.stop();
           go("victory", { numPlayers });
         }
       });
@@ -788,6 +843,7 @@ scene("game", ({ numPlayers = 1, levelIdx = 0 }) => {
       p.pos.x += p.vx * dt();
       p.pos.y += p.vy * dt();
       p.vy    += p.gravity * dt();
+      p.angle += 400 * dt();  // spin in flight
 
       // Destroy when off-screen or hits the ground
       if (p.pos.x < -60 || p.pos.x > SCREEN_W + 60 || p.pos.y > GROUND_BOTTOM) {
@@ -823,7 +879,7 @@ scene("game", ({ numPlayers = 1, levelIdx = 0 }) => {
   // Game-over check — all players dead
   onUpdate(() => {
     if (players.length > 0 && players.every(p => p.hp <= 0)) {
-      wait(0.6, () => go("gameover", { numPlayers, levelIdx }));
+      wait(0.6, () => { Music.stop(); go("gameover", { numPlayers, levelIdx }); });
     }
   });
 

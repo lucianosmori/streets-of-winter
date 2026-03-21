@@ -294,7 +294,7 @@ const ENEMY_DEFS = {
     hp:180, speed:45, damage:12, attackRange:220, attackCooldown:2.0, isBoss:true,
     taunts:["You wanna piece of me?!", "I got friends!", "CATCH!"],
     isRaccoonThrower: true,
-    // TODO: sprite:"boss_raccoon_thrower"
+    sprite:"boss_raccoon_thrower", spriteH:190,
   },
   big_trans: {
     label:"BIG TRANS",   col:[100, 180, 220], w:40, h:72,
