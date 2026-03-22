@@ -1,6 +1,6 @@
 // =============================================================================
-// Ottawa Rage — Streets of Winter
-// game.js: Kaplay initialisation, scenes, wave/boss system, combat logic.
+// Calles de Alberdi — game.js
+// Kaplay initialisation, scenes, wave/boss system, combat logic.
 //
 // Depends on (loaded before this file):
 //   js/constants.js  — all tuning data & level definitions
@@ -47,196 +47,9 @@ kaplay({
 // Uncomment each block as you drop files into assets/.
 // =============================================================================
 
-// ── Hero spritesheets ─────────────────────────────────────────────────────────
-loadSprite("hero_taxpayer", "assets/hero_taxpayer.png", {
-  sliceX: 12, sliceY: 6,
-  anims: {
-    idle:    { from: 0,  to: 0,  loop: true,  speed: 1  },   // row 0, single frame
-    walk:    { from: 12, to: 23, loop: true,  speed: 10 },   // row 1, 12 frames
-    punch:   { from: 24, to: 27, loop: false, speed: 12 },   // row 2, cols 0-3
-    kick:    { from: 28, to: 31, loop: false, speed: 10 },   // row 2, cols 4-7
-    special: { from: 36, to: 47, loop: false, speed: 8  },   // row 3 (Audit Slam / ice burst)
-    hurt:    { from: 54, to: 59, loop: false, speed: 6  },   // row 4, cols 6-11
-  },
-});
-// loadSprite("hero_priya", "assets/hero_priya.png", { /* same layout */ });
-
-// ── Enemy spritesheets ────────────────────────────────────────────────────────
-loadSprite("enemy_grunt", "assets/grunt_art.png", {
-  sliceX: 8, sliceY: 4,
-  anims: {
-    walk:   { from: 0,  to: 7,  loop: true,  speed: 10 },  // row 0: walk cycle (all standing)
-    attack: { from: 8,  to: 15, loop: false, speed: 12 },  // row 1: attack (standing, arms extend)
-    hurt:   { from: 16, to: 20, loop: false, speed: 8  },  // row 2 cols 0-4: hurt (standing)
-    death:  { from: 21, to: 23, loop: false, speed: 6  },  // row 2 cols 5-7: collapse (lying)
-    idle:   { from: 24, to: 31, loop: true,  speed: 6  },  // row 3: idle/patrol (all standing)
-  },
-});
-loadSprite("enemy_agile", "assets/agile_art.png", {
-  sliceX: 8, sliceY: 4,
-  anims: {
-    walk:   { from: 0,  to: 7,  loop: true,  speed: 9  },   // row 0: skating approach
-    attack: { from: 8,  to: 15, loop: false, speed: 10 },   // row 1: slash attack
-    hurt:   { from: 16, to: 19, loop: false, speed: 8  },   // row 2 cols 0-3: flinch
-    death:  { from: 20, to: 23, loop: false, speed: 6  },   // row 2 cols 4-7: collapse
-    idle:   { from: 24, to: 31, loop: true,  speed: 6  },   // row 3: idle
-  },
-});
-loadSprite("enemy_heavy", "assets/heavy_art.png", {
-  sliceX: 8, sliceY: 4,
-  anims: {
-    walk:   { from: 0,  to: 7,  loop: true,  speed: 8  },   // row 0: walk cycle
-    attack: { from: 8,  to: 15, loop: false, speed: 10 },   // row 1: attack (arms extend)
-    hurt:   { from: 16, to: 20, loop: false, speed: 8  },   // row 2 cols 0-4: hurt (standing)
-    death:  { from: 21, to: 23, loop: false, speed: 6  },   // row 2 cols 5-7: collapse (lying)
-    idle:   { from: 24, to: 31, loop: true,  speed: 6  },   // row 3: idle/patrol
-  },
-});
-loadSprite("enemy_stripper", "assets/stripper_art.png", {
-  sliceX: 8, sliceY: 4,
-  anims: {
-    walk:   { from: 0,  to: 7,  loop: true,  speed: 8  },   // row 0: walk cycle
-    attack: { from: 8,  to: 15, loop: false, speed: 10 },   // row 1: whip/scarf attack
-    hurt:   { from: 16, to: 19, loop: false, speed: 8  },   // row 2 cols 0-3: flinch
-    death:  { from: 20, to: 23, loop: false, speed: 6  },   // row 2 cols 4-7: collapse
-    idle:   { from: 24, to: 31, loop: true,  speed: 6  },   // row 3: idle/posing
-  },
-});
-loadSprite("enemy_arab", "assets/enemy_arab.png", {
-  sliceX: 8, sliceY: 4,
-  anims: {
-    walk:   { from: 0,  to: 7,  loop: true,  speed: 7  },   // row 0: walk cycle
-    attack: { from: 8,  to: 15, loop: false, speed: 10 },   // row 1: attack combo
-    hurt:   { from: 16, to: 20, loop: false, speed: 8  },   // row 2 cols 0-4: flinch/stagger
-    death:  { from: 21, to: 23, loop: false, speed: 6  },   // row 2 cols 5-7: collapse
-    idle:   { from: 24, to: 31, loop: true,  speed: 6  },   // row 3: idle/patrol
-  },
-});
-// loadSprite("enemy_crackhead","assets/enemy_crackhead.png",{ /* same layout */ });
-// loadSprite("enemy_kicker",   "assets/enemy_kicker.png",   { /* same layout */ });
-
-// ── Boss spritesheets ─────────────────────────────────────────────────────────
-loadSprite("boss_earl", "assets/heavy_boss_art.png", {
-  sliceX: 8, sliceY: 4,
-  anims: {
-    walk:   { from: 0,  to: 7,  loop: true,  speed: 7  },  // row 0: heavy stride
-    attack: { from: 8,  to: 15, loop: false, speed: 10 },  // row 1: punch combo
-    hurt:   { from: 16, to: 19, loop: false, speed: 8  },  // row 2 cols 0-3: stagger (standing)
-    death:  { from: 20, to: 23, loop: false, speed: 5  },  // row 2 cols 4-7: collapse (lying)
-    idle:   { from: 24, to: 31, loop: true,  speed: 5  },  // row 3: idle/menacing
-  },
-});
-loadSprite("boss_duo", "assets/boss_duo_art.png", {
-  sliceX: 8, sliceY: 4,
-  anims: {
-    idle:   { from: 0,  to: 7,  loop: true,  speed: 6  },   // row 0: idle/taunt
-    walk:   { from: 8,  to: 15, loop: true,  speed: 7  },   // row 1: walk
-    attack: { from: 16, to: 23, loop: false, speed: 10 },   // row 2: attack combo
-    hurt:   { from: 24, to: 27, loop: false, speed: 8  },   // row 3 cols 0-3: hurt
-    death:  { from: 28, to: 31, loop: false, speed: 5  },   // row 3 cols 4-7: death
-  },
-});
-loadSprite("boss_big_trans", "assets/boss_big_trans.png", {
-  sliceX: 8, sliceY: 4,
-  anims: {
-    walk:   { from: 0,  to: 7,  loop: true,  speed: 6  },   // row 0: walk
-    attack: { from: 8,  to: 15, loop: false, speed: 10 },   // row 1: attack
-    hurt:   { from: 16, to: 20, loop: false, speed: 8  },   // row 2 cols 0-4: flinch
-    death:  { from: 21, to: 23, loop: false, speed: 5  },   // row 2 cols 5-7: collapse
-    idle:   { from: 24, to: 31, loop: true,  speed: 5  },   // row 3: idle/taunt
-  },
-});
-loadSprite("boss_raccoon_thrower", "assets/boss_raccoon_thrower.png", {
-  sliceX: 10, sliceY: 5,
-  anims: {
-    idle:   { from: 0,  to: 9,  loop: true,  speed: 6  },  // row 0: idle/taunt
-    walk:   { from: 10, to: 19, loop: true,  speed: 8  },  // row 1: walk
-    attack: { from: 20, to: 29, loop: false, speed: 10 },  // row 2: throw raccoon
-    hurt:   { from: 40, to: 44, loop: false, speed: 8  },  // row 4 cols 0-4: stagger
-    death:  { from: 45, to: 49, loop: false, speed: 6  },  // row 4 cols 5-9: collapse
-  },
-});
-// loadSprite("boss_chain",     "assets/boss_chain.png",     { sliceX:8, sliceY:5 });
-// loadSprite("boss_chef",      "assets/boss_chef.png",      { sliceX:8, sliceY:5 });
-// loadSprite("boss_overlord",  "assets/boss_overlord.png",  { sliceX:8, sliceY:5 });
-loadSprite("boss_carney", "assets/boss_final.png", {
-  sliceX: 8, sliceY: 4,
-  anims: {
-    walk:   { from: 0,  to: 7,  loop: true,  speed: 7  },  // row 0: walk
-    attack: { from: 8,  to: 15, loop: false, speed: 10 },  // row 1: attack
-    hurt:   { from: 16, to: 20, loop: false, speed: 8  },  // row 2: stagger
-    death:  { from: 21, to: 23, loop: false, speed: 5  },  // row 2: collapse
-    idle:   { from: 24, to: 31, loop: true,  speed: 5  },  // row 3: taunt
-  },
-});
-
-// ── NPC spritesheets ──────────────────────────────────────────────────────────
-loadSprite("npc_turban", "assets/npc_turban.png", {
-  sliceX: 4, sliceY: 1,
-  anims: {
-    walk: { from: 0, to: 3, loop: true, speed: 6 },
-  },
-});
-loadSprite("npc_lgbtq", "assets/npc_lgbtq.png", {
-  sliceX: 4, sliceY: 1,
-  anims: {
-    walk: { from: 0, to: 3, loop: true, speed: 6 },
-  },
-});
-loadSprite("npc_hijab", "assets/npc_hijab.png", {
-  sliceX: 4, sliceY: 1,
-  anims: {
-    walk: { from: 0, to: 3, loop: true, speed: 6 },
-  },
-});
-loadSprite("npc_african", "assets/npc_african.png", {
-  sliceX: 4, sliceY: 1,
-  anims: {
-    walk: { from: 0, to: 3, loop: true, speed: 6 },
-  },
-});
-loadSprite("npc_quebecois", "assets/npc_quebecois.png", {
-  sliceX: 4, sliceY: 1,
-  anims: {
-    walk: { from: 0, to: 3, loop: true, speed: 6 },
-  },
-});
-loadSprite("npc_ukrainian", "assets/npc_ukrainian.png", {
-  sliceX: 4, sliceY: 1,
-  anims: {
-    walk: { from: 0, to: 3, loop: true, speed: 6 },
-  },
-});
-loadSprite("npc_palestinian", "assets/npc_palestinian.png", {
-  sliceX: 4, sliceY: 1,
-  anims: {
-    walk: { from: 0, to: 3, loop: true, speed: 6 },
-  },
-});
-
-// ── Pet spritesheets ────────────────────────────────────────────────────────
-loadSprite("pet_raccoon", "assets/npc_raccoon.png", {
-  sliceX: 4, sliceY: 1,
-  anims: {
-    walk: { from: 0, to: 3, loop: true, speed: 8 },
-  },
-});
-
-// ── Pickup sprites ───────────────────────────────────────────────────────────
-loadSprite("pickup_donut",      "assets/pickup_donut.png");
-loadSprite("pickup_coffee",     "assets/pickup_coffee.png");
-loadSprite("pickup_samosa",     "assets/pickup_samosa.png");
-loadSprite("pickup_cart",       "assets/pickup_cart.png");
-loadSprite("pickup_bottle",     "assets/pickup_bottle.png");
-loadSprite("pickup_fruit_cart", "assets/pickup_fruit_cart.png");
-loadSprite("pickup_spice_cart", "assets/pickup_spice_cart.png");
-
-// ── Backgrounds ───────────────────────────────────────────────────────────────
-// loadSprite("bg_bankstreet",  "assets/bg_bankstreet.png");
-// loadSprite("bg_byward",      "assets/bg_byward.png");
-// loadSprite("bg_canal",       "assets/bg_canal.png");
-// loadSprite("bg_curry",       "assets/bg_curry.png");
-// loadSprite("bg_parliament",  "assets/bg_parliament.png");
+// ── Sprite loading stubs ──────────────────────────────────────────────────────
+// No sprites yet — all entities use colored rectangles as placeholders.
+// TODO: Add hero_gaucho, hero_cordobesa, enemy_*, boss_*, npc_* sprites
 
 // ── Music manager ─────────────────────────────────────────────────────────────
 const Music = (() => {
@@ -305,10 +118,10 @@ scene("title", () => {
   add([rect(VIEW_W, 40),  pos(0, VIEW_H - 40),  color(45, 30, 12),  fixed(), z(1)]);
 
   // Title
-  add([text("OTTAWA RAGE", { size: 44, align: "center" }),
+  add([text("CALLES DE ALBERDI", { size: 36, align: "center" }),
        pos(cx, 65), anchor("center"),
        color(255, 200, 50), fixed(), z(10)]);
-  add([text("Streets of Winter", { size: 16, align: "center" }),
+  add([text("Barrio Cordobés", { size: 16, align: "center" }),
        pos(cx, 116), anchor("center"),
        color(160, 200, 220), fixed(), z(10)]);
 
@@ -353,8 +166,8 @@ scene("title", () => {
   // Controls prompt (flashing)
   const isMobile = window.matchMedia("(pointer: coarse)").matches;
   const promptMsg = isMobile
-    ? "[ START ]  to begin"
-    : "[ ENTER ]  1 Player        [ TAB ]  2 Players";
+    ? "[ START ]  para jugar"
+    : "[ ENTER ]  1 Jugador        [ TAB ]  2 Jugadores";
   const prompt = add([
     text(promptMsg, { size: 11, align: "center", width: VIEW_W - 20 }),
     pos(cx, listStartY + LEVELS.length * rowH + 16), anchor("center"),
@@ -387,7 +200,7 @@ scene("title", () => {
   }
 
   // Copyright / flavour
-  add([text("\u00a9 Unofficial Ottawa Love Letter",
+  add([text("\u00a9 Calles de Alberdi — Córdoba, Argentina",
             { size: 7, align: "center" }),
        pos(cx, VIEW_H - 18), anchor("center"),
        color(70, 70, 80), fixed(), z(10)]);
@@ -444,29 +257,9 @@ scene("game", ({ numPlayers = 1, levelIdx = 0 }) => {
   let enemies     = [];   // active enemy game objects
   let npcs        = [];   // background NPC game objects
   let pickups     = [];   // pickup game objects
-  let projectiles = [];   // raccoon-thrower projectiles
   let waveIdx     = -1;   // current wave (incremented by advanceWave)
   let bossObjs    = [];   // boss game object(s) for current encounter
   let phase       = "wave"; // "wave" | "bossIntro" | "boss" | "levelClear"
-
-  // Expose projectile spawner so entities.js can call it for raccoon_thrower attacks
-  window.spawnRaccoonProjectile = function spawnRaccoonProjectile(fromX, fromY, target) {
-    const dir = target.pos.x < fromX ? -1 : 1;
-    const p = add([
-      sprite("pet_raccoon"),
-      anchor("center"),
-      scale(0.20),
-      rotate(0),
-      color(255, 255, 255),
-      pos(fromX + dir * 20, fromY - 25),
-      z(295),
-      { vx: dir * 320, vy: -80, gravity: 200, damage: 10 },
-    ]);
-    p.flipX = dir < 0;
-    p.play("walk");
-    projectiles.push(p);
-  };
-
 
   // ── Build the scene ─────────────────────────────────────────────────────────
   Music.play("level");
@@ -478,15 +271,6 @@ scene("game", ({ numPlayers = 1, levelIdx = 0 }) => {
   for (let i = 0; i < npcCount; i++) {
     const type = choose(lvl.npcTypes);
     npcs.push(spawnNPC(type, rand(50, SCREEN_W - 50), rand(GROUND_TOP + 28, GROUND_BOTTOM - 8)));
-  }
-
-  // Background pets
-  if (lvl.petTypes) {
-    const petCount = levelIdx === 1 ? 4 : 2;   // extra raccoons on ByWard
-    for (let i = 0; i < petCount; i++) {
-      const type = choose(lvl.petTypes);
-      npcs.push(spawnPet(type, rand(50, SCREEN_W - 50), rand(GROUND_TOP + 28, GROUND_BOTTOM - 8)));
-    }
   }
 
   // Initial pickups scattered around the level
@@ -504,36 +288,6 @@ scene("game", ({ numPlayers = 1, levelIdx = 0 }) => {
 
   // Kick off wave 1
   advanceWave();
-
-  // ── ByWard raccoon scatter event (near McDonald's) ───────────────────────
-  if (levelIdx === 1) {
-    let raccoonScatterDone = false;
-    const mcStore = lvl.stores.find(s => s.isMcDonalds);
-    if (mcStore) {
-      const scatterX = mcStore.x + mcStore.w / 2;
-      onUpdate(() => {
-        if (raccoonScatterDone) return;
-        for (const p of players) {
-          if (p.hp <= 0) continue;
-          if (Math.abs(p.pos.x - scatterX) < 50) {
-            raccoonScatterDone = true;
-            showBanner("RACCOON INCIDENT ZONE", 2);
-            for (let i = 0; i < 4; i++) {
-              const r = spawnPet("raccoon",
-                scatterX + rand(-15, 15),
-                rand(GROUND_TOP + 30, GROUND_BOTTOM - 10));
-              r.dir = choose([-1, 1]);
-              r.facing = r.dir;
-              r.walkTimer = 3;   // run in chosen direction for 3s
-              npcs.push(r);
-            }
-            break;
-          }
-        }
-      });
-    }
-  }
-
 
   // ── Wave / boss system ──────────────────────────────────────────────────────
 
@@ -664,7 +418,7 @@ scene("game", ({ numPlayers = 1, levelIdx = 0 }) => {
     if (p.heldWeapon) {
       p.heldWeapon.uses--;
       if (p.heldWeapon.uses <= 0) {
-        showSpeechBubble("Cancelame ESTA!👇", p);
+        showSpeechBubble("¡Se rompió!", p);
         p.heldWeapon = null;
       }
     }
@@ -721,7 +475,7 @@ scene("game", ({ numPlayers = 1, levelIdx = 0 }) => {
 
     // Chance to drop a health pickup
     if (!e.def.isBoss && Math.random() < 0.28) {
-      const drop = choose(["donut", "coffee", "samosa"]);
+      const drop = choose(["empanada", "mate", "choripan"]);
       pickups.push(spawnPickup(drop, e.pos.x, e.pos.y));
     }
 
@@ -836,39 +590,6 @@ scene("game", ({ numPlayers = 1, levelIdx = 0 }) => {
     }
   });
 
-  // Raccoon projectiles — move + collide with players
-  onUpdate(() => {
-    for (let i = projectiles.length - 1; i >= 0; i--) {
-      const p = projectiles[i];
-      p.pos.x += p.vx * dt();
-      p.pos.y += p.vy * dt();
-      p.vy    += p.gravity * dt();
-      p.angle += 400 * dt();  // spin in flight
-
-      // Destroy when off-screen or hits the ground
-      if (p.pos.x < -60 || p.pos.x > SCREEN_W + 60 || p.pos.y > GROUND_BOTTOM) {
-        destroy(p);
-        projectiles.splice(i, 1);
-        continue;
-      }
-
-      // Check against each living player
-      let hit = false;
-      for (const pl of players) {
-        if (pl.hp <= 0 || pl.hurtTimer > 0) continue;
-        if (Math.abs(p.pos.x - pl.pos.x) < 20 && Math.abs(p.pos.y - pl.pos.y) < 28) {
-          hitPlayer(pl, p.damage);
-          hit = true;
-          break;
-        }
-      }
-      if (hit) {
-        destroy(p);
-        projectiles.splice(i, 1);
-      }
-    }
-  });
-
   // Snow + HUD
   onUpdate(() => updateSnow());
   onDraw(() => {
@@ -928,8 +649,8 @@ scene("gameover", ({ numPlayers = 1, levelIdx = 0 }) => {
   add([rect(VIEW_W, VIEW_H), pos(0, 0), color(0, 0, 0), opacity(0.82), fixed(), z(998)]);
 
   const msg = isMobile
-    ? `GAME OVER\n\nFell on  ${lvl.name}\n\nTap START to retry`
-    : `GAME OVER\n\nFell on  ${lvl.name}\n\n[ ENTER ]  Try Again\n[ TAB ]  Title Screen`;
+    ? `FIN DEL JUEGO\n\nCaíste en  ${lvl.name}\n\nTocá START para reintentar`
+    : `FIN DEL JUEGO\n\nCaíste en  ${lvl.name}\n\n[ ENTER ]  Reintentar\n[ TAB ]  Menú Principal`;
   add([text(msg, { size: 21, align: "center", width: VIEW_W - 20 }),
        pos(cx, VIEW_H / 2), anchor("center"),
        color(255, 70, 70), fixed(), z(999)]);
@@ -955,18 +676,18 @@ scene("victory", ({ numPlayers = 1 }) => {
 
   add([rect(VIEW_W, VIEW_H), pos(0, 0), color(10, 20, 10), fixed(), z(0)]);
 
-  add([text("OTTAWA IS\nSAVED!", { size: 38, align: "center" }),
+  add([text("¡ALBERDI\nLIBERADO!", { size: 38, align: "center" }),
        pos(cx, 90), anchor("center"),
        color(100, 255, 100), fixed(), z(10)]);
 
-  add([text("You fought through\nevery neighbourhood.\nOttawa thanks you, eh.",
+  add([text("Peleaste por cada\ncalle del barrio.\n¡Alberdi te lo agradece, loco!",
             { size: 14, align: "center", width: VIEW_W - 20 }),
        pos(cx, 200), anchor("center"),
        color(180, 240, 180), fixed(), z(10)]);
 
   const replayMsg = isMobile
-    ? "Tap START to replay"
-    : "[ ENTER ]  Play Again\n[ TAB ]  Title Screen";
+    ? "Tocá START para jugar de nuevo"
+    : "[ ENTER ]  Jugar de Nuevo\n[ TAB ]  Menú Principal";
   add([text(replayMsg, { size: 12, align: "center", width: VIEW_W - 20 }),
        pos(cx, 290), anchor("center"),
        color(255, 245, 120), fixed(), z(10)]);

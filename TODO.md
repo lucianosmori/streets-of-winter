@@ -1,60 +1,50 @@
-# Ottawa Rage — Backlog
-
-Pick items off the top. One per session. Check off when done.
-
----
+# Calles de Alberdi — Backlog
 
 ## Sprites
 
-- [ ] Player 2 (Priya) sprite sheet
-- [ ] Enemy: agile/slider sprite
-- [ ] Enemy: stripper/whiplash sprite
-- [ ] Enemy: crackhead/addict sprite
-- [ ] Enemy: kicker sprite
-- [x] NPC: turban sprite
-- [x] NPC: quebecois sprite
-- [x] NPC: african sprite
-- [ ] NPC: lgbtq sprite
-- [ ] NPC: hijab sprite
-- [ ] NPC: ukrainian sprite
-- [ ] NPC: palestinian sprite
-- [ ] Boss: Big Earl sprite — regen (current one is broken)
-- [ ] Boss: The Duo (stripper_boss) sprite
-- [ ] Boss: Chain Daddy sprite
-- [ ] Boss: The Chef (drug_lord) sprite
-- [ ] Boss: The Overlord (syndicate_boss) sprite
+- [ ] Player 1 (Gaucho) sprite sheet
+- [ ] Player 2 (Cordobesa) sprite sheet
+- [ ] Enemy: punguista sprite
+- [ ] Enemy: patotero sprite
+- [ ] Enemy: naranjita sprite
+- [ ] Boss: El Comisario sprite
+- [ ] Boss: Barra Brava sprite
+- [ ] Boss: El Puntero sprite
+- [ ] Boss: El Intendente sprite
+- [ ] NPC: belgrano_fan sprite
+- [ ] NPC: feminist sprite
+- [ ] NPC: peronist sprite
+- [ ] NPC: trapito sprite
+- [ ] NPC: vecina sprite
+- [ ] Pickup sprites (empanada, mate, fernet, choripan)
 - [ ] Impact effects (punch/kick VFX)
-- [x] Pickup: donut sprite
-- [x] Pickup: coffee sprite
-- [x] Pickup: samosa sprite
-- [x] Pickup: cart sprite
-- [ ] Pickup: remaining items (bottle, fish, spice_cart, fruit_cart, flagpole, skate, statue)
 
 ## Audio
 
 - [ ] Sound effects: punch, kick, hurt, pickup, enemy_hit, enemy_die
-- [ ] Music: street theme loop
+- [ ] Music: street cumbia/cuarteto theme loop
 - [ ] Music: boss theme
 - [ ] Uncomment loadSound() stubs in game.js once assets exist
 
+## Level Design
+
+- [ ] Level 1 — Calle Colón: Comisaría Central background (Colón y Santa Fe)
+- [ ] Level 2 — Barrio Alberdi: Placeholder (cancha Belgrano area)
+- [ ] Level 3 — La Cañada: Placeholder
+- [ ] Level 4 — Centro: Placeholder (Catedral, Cabildo, Municipalidad)
+
 ## Features
 
-- [ ] Character select screen (P1/P2 character choice)
+- [ ] Character select screen
 - [ ] Difficulty modes (easy/normal/hard)
-- [ ] Score persistence / high score table
+- [ ] Score persistence / leaderboard (Supabase)
 - [ ] Combo system (hit counter, damage multiplier)
+- [ ] Multiplayer via QR code (Supabase)
 - [ ] Player 2 full integration testing
 
 ## Polish
 
-- [ ] Death animations for non-sprited enemies (currently flash + destroy)
+- [ ] Death animations for non-sprited enemies
 - [ ] Level transition animations
-- [ ] Boss intro cinematics (currently just text banners)
-- [x] Speech bubbles follow characters
-- [x] Speech bubble anti-overlap (stacking, proximity fade, suppression near player)
-
-## Brainstorm / Ideas
-
-_Drop new ideas here. Move to a section above when ready to work on them._
-
-- [ ] **Mobile portrait camera** — Instead of forcing landscape, use Kaplay's `camPos()` to follow the player in portrait mode. Crop to vertical slice centered on P1, smooth lerp follow, edge clamping. Concept plan in `.claude/plans/silly-toasting-meerkat.md`. Key: keep 800x400 world coords, only change viewport via camera. HUD needs `fixed()`, gamepad buttons need portrait layout check.
+- [ ] Boss intro cinematics
+- [ ] Responsive layout fix (desktop vs mobile)

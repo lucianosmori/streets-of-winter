@@ -81,7 +81,7 @@ test.describe('Game Constants', () => {
 
     expect(configs.isArray).toBe(true);
     expect(configs.length).toBe(2);
-    expect(configs.p1name).toBe('TAXPAYER');
-    expect(configs.p2name).toBe('PRIYA');
+    expect(configs.p1name).toBe('GAUCHO');
+    expect(configs.p2name).toBe('CORDOBESA');
   });
 });

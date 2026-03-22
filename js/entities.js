@@ -1,5 +1,5 @@
 // =============================================================================
-// Ottawa Rage — js/entities.js
+// Calles de Alberdi — js/entities.js
 //
 // Factory functions and update helpers for every entity type.
 // These functions are called from inside Kaplay scenes (game.js) and rely on
@@ -36,137 +36,7 @@ function drawLevelBackground(lvl) {
          z(-300)]);
   }
 
-  // ── Parliament Gate (Wellington Street special background) ────────────────
-  if (lvl.parliamentGate) {
-    const STONE  = [185, 165, 128];
-    const STONE_D  = dk(STONE, 28);
-    const STONE_DD = dk(STONE, 50);
-    const IRON     = [38,  36,  34];
-    const IRON_LT  = [62,  58,  52];
-    const COPPER   = [72, 108,  84];
-    const WINBLUE  = [110, 155, 200];
-
-    // ── Parliament buildings (distant background) ─────────────────────────
-    // Left flanking block
-    add([rect(145, 185), pos(120, GROUND_TOP - 185), color(...STONE_DD), z(-296)]);
-    add([rect(145,  10), pos(120, GROUND_TOP - 195), color(...COPPER),   z(-295)]);
-    // Right flanking block
-    add([rect(145, 185), pos(535, GROUND_TOP - 185), color(...STONE_DD), z(-296)]);
-    add([rect(145,  10), pos(535, GROUND_TOP - 195), color(...COPPER),   z(-295)]);
-    // Centre Block body
-    add([rect(245, 215), pos(278, GROUND_TOP - 215), color(...STONE_D),  z(-295)]);
-    add([rect(245,  10), pos(278, GROUND_TOP - 225), color(...COPPER),   z(-294)]);
-    // Gothic windows on Centre Block
-    for (let wy = GROUND_TOP - 205; wy < GROUND_TOP - 80; wy += 38) {
-      for (let wx = 293; wx < 510; wx += 30) {
-        add([rect(12, 20), pos(wx, wy),       color(...WINBLUE), opacity(0.75), z(-292)]);
-        add([rect( 8,  6), pos(wx + 2, wy - 6), color(...WINBLUE), opacity(0.5),  z(-292)]);
-      }
-    }
-    // Peace Tower
-    const ptX = 376, ptW = 48;
-    add([rect(ptW, 235), pos(ptX, GROUND_TOP - 235), color(...dk(STONE, 18)), z(-293)]);
-    add([rect(ptW,  32), pos(ptX, GROUND_TOP - 142), color(...lt(STONE, 28)), z(-291)]); // clock band
-    const ptSteps = [[44,9],[36,9],[28,9],[20,9],[14,7],[10,7],[6,7],[3,7]];
-    let psy = GROUND_TOP - 235;
-    for (const [sw, sh] of ptSteps) {
-      psy -= sh;
-      add([rect(sw, sh), pos(ptX + (ptW - sw) / 2, psy), color(...dk(STONE, 14)), z(-291)]);
-    }
-    add([rect(2, 8), pos(ptX + ptW / 2 - 1, psy - 8), color(...dk(STONE, 24)), z(-290)]);
-    // Canadian flag
-    add([rect(14, 9), pos(ptX + ptW - 1, GROUND_TOP - 244), color(210, 30, 30), z(-289)]);
-
-    // ── Stone perimeter wall ─────────────────────────────────────────────
-    add([rect(SCREEN_W,  4), pos(0, GROUND_TOP - 36), color(...lt(STONE, 24)), z(-272)]); // coping
-    add([rect(SCREEN_W, 32), pos(0, GROUND_TOP - 32), color(...STONE_D),       z(-271)]);
-
-    // ── Gothic stone pillars ─────────────────────────────────────────────
-    const pillars = [
-      { x:  40, w: 32, large: false },
-      { x: 168, w: 32, large: false },
-      { x: 290, w: 42, large: true  },
-      { x: 468, w: 42, large: true  },
-      { x: 596, w: 32, large: false },
-      { x: 728, w: 32, large: false },
-    ];
-    for (const p of pillars) {
-      const bodyH = p.large ? 208 : 182;
-      const bodyY = GROUND_TOP - bodyH;
-      add([rect(p.w, bodyH), pos(p.x, bodyY), color(...STONE), z(-267)]);
-      // Side shadows
-      add([rect(4, bodyH), pos(p.x,           bodyY), color(0,0,0), opacity(0.18), z(-266)]);
-      add([rect(4, bodyH), pos(p.x + p.w - 4, bodyY), color(0,0,0), opacity(0.10), z(-266)]);
-      // Mortar lines
-      for (let my = bodyY + 22; my < GROUND_TOP - 10; my += 20) {
-        add([rect(p.w, 1), pos(p.x, my), color(...dk(STONE, 28)), z(-265)]);
-      }
-      // Red diamond accents
-      add([rect(8, 8), pos(p.x + p.w / 2 - 4, bodyY +  40), color(148, 52, 42), z(-265)]);
-      add([rect(6, 6), pos(p.x + p.w / 2 - 3, bodyY + 100), color(148, 52, 42), z(-265)]);
-      // Gothic spire (stepped)
-      const steps = p.large
-        ? [[38,9],[30,9],[22,9],[16,8],[10,8],[6,7],[3,6]]
-        : [[28,8],[22,8],[16,8],[10,7],[6,7],[3,6]];
-      let sy = bodyY;
-      for (const [sw, sh] of steps) {
-        sy -= sh;
-        add([rect(sw, sh), pos(p.x + (p.w - sw) / 2, sy), color(...dk(STONE, 8)), z(-265)]);
-      }
-      add([rect(2, 6), pos(p.x + p.w / 2 - 1, sy - 6), color(...dk(STONE, 22)), z(-264)]);
-      // Globe lamp on large gate pillars
-      if (p.large) {
-        add([rect(12, 14), pos(p.x + p.w / 2 - 6, bodyY - 14), color(185, 180, 155), z(-263)]);
-        add([rect( 6,  6), pos(p.x + p.w / 2 - 3, bodyY - 20), color(245, 235, 180), opacity(0.7), z(-262)]);
-      }
-    }
-
-    // ── Iron fence sections (between smaller pillars) ─────────────────────
-    const fTop = GROUND_TOP - 132;
-    const fenceSecs = [
-      [0,                            pillars[0].x],
-      [pillars[0].x + pillars[0].w, pillars[1].x],
-      [pillars[1].x + pillars[1].w, pillars[2].x],
-      [pillars[3].x + pillars[3].w, pillars[4].x],
-      [pillars[4].x + pillars[4].w, pillars[5].x],
-      [pillars[5].x + pillars[5].w, SCREEN_W],
-    ];
-    for (const [fx1, fx2] of fenceSecs) {
-      const fw = fx2 - fx1;
-      add([rect(fw, 3), pos(fx1, fTop),           color(...IRON), z(-264)]); // top rail
-      add([rect(fw, 3), pos(fx1, fTop + 40),       color(...IRON), z(-264)]); // mid rail
-      add([rect(fw, 3), pos(fx1, GROUND_TOP - 36), color(...IRON), z(-264)]); // bottom rail
-      for (let bx = fx1 + 5; bx < fx2 - 3; bx += 10) {
-        add([rect(3, GROUND_TOP - 36 - fTop), pos(bx, fTop), color(...IRON), z(-264)]);
-        add([rect(3, 4), pos(bx, fTop -  4), color(...IRON), z(-263)]); // spear tip
-        add([rect(1, 4), pos(bx + 1, fTop - 8), color(...IRON), z(-263)]);
-      }
-    }
-
-    // ── Main iron gate (center, between large pillars) ────────────────────
-    const gx1  = pillars[2].x + pillars[2].w;
-    const gx2  = pillars[3].x;
-    const gTop = GROUND_TOP - 150;
-    const gH   = GROUND_TOP - 36 - gTop;
-    add([rect(gx2 - gx1, 4), pos(gx1, gTop),          color(...IRON), z(-266)]); // top rail
-    add([rect(gx2 - gx1, 4), pos(gx1, gTop + 36),     color(...IRON), z(-266)]); // mid rail
-    add([rect(gx2 - gx1, 4), pos(gx1, GROUND_TOP - 36), color(...IRON), z(-266)]); // base rail
-    let gi = 0;
-    for (let gx = gx1 + 5; gx < gx2 - 4; gx += 11, gi++) {
-      add([rect(4, gH), pos(gx, gTop), color(...IRON), z(-266)]);
-      add([rect(4, 5), pos(gx,     gTop - 5),  color(...IRON), z(-265)]); // spear tip
-      add([rect(2, 5), pos(gx + 1, gTop - 10), color(...IRON), z(-265)]);
-      if (gi % 2 === 0) { // rosette ornaments on alternating bars
-        add([rect(9, 9), pos(gx - 3, gTop + 18),     color(...IRON_LT), z(-268)]);
-        add([rect(5, 5), pos(gx - 1, gTop + 20),     color(...IRON),    z(-269)]);
-        add([rect(9, 9), pos(gx - 3, gTop + 70),     color(...IRON_LT), z(-268)]);
-        add([rect(5, 5), pos(gx - 1, gTop + 72),     color(...IRON),    z(-269)]);
-      }
-    }
-
-  }
-
-  if (!lvl.parliamentGate) {
+  {
   // ── Distant skyline silhouettes ───────────────────────────────────────────
   const sils = [{x:25,w:40,h:55},{x:140,w:30,h:40},{x:280,w:50,h:70},{x:450,w:35,h:48},
                 {x:580,w:45,h:62},{x:700,w:38,h:44},{x:760,w:42,h:58}];
@@ -324,132 +194,7 @@ function drawLevelBackground(lvl) {
     }
   }
 
-  // ── Special: McDonald's extras ─────────────────────────────────────────
-  for (const s of lvl.stores) {
-    if (!s.isMcDonalds) continue;
-    const wt = GROUND_TOP - s.h;
-    const gfFrac = 0.35;
-    const signH = 26;
-    const signY = wt + Math.floor(s.h * (1 - gfFrac)) - signH;
-    const awnY = signY + signH + 3;
-    const awnH = 9;
-    const gfTop = awnY + awnH + 3;
-
-    // Golden arches glow behind building
-    add([rect(s.w + 12, s.h + 8), pos(s.x - 6, wt - 4),
-         color(255, 190, 30), opacity(0.08), z(-291)]);
-
-    // Large golden "M" on sign (over the regular sign text)
-    add([text("M", { size: 20 }),
-         pos(s.x + Math.floor(s.w / 2) - 7, signY + 2),
-         color(255, 188, 0), z(-263)]);
-
-    // Board up alternating upper-floor windows
-    const winW = 16, winH = 18, winGapX = 8;
-    const winAreaTop = wt + 10;
-    const numCols = Math.max(1, Math.floor((s.w - 22 + winGapX) / (winW + winGapX)));
-    const totalWinW = numCols * winW + (numCols - 1) * winGapX;
-    const winOffX = s.x + Math.floor((s.w - totalWinW) / 2);
-    for (let c = 0; c < numCols; c += 2) {
-      const wx = winOffX + c * (winW + winGapX);
-      // Wood plank over window
-      add([rect(winW + 2, winH + 2), pos(wx - 1, winAreaTop - 1),
-           color(110, 75, 40), z(-272)]);
-      // Plank grain lines
-      add([rect(winW, 2), pos(wx, winAreaTop + 6),
-           color(85, 55, 30), z(-271)]);
-      add([rect(winW, 2), pos(wx, winAreaTop + 12),
-           color(85, 55, 30), z(-271)]);
-    }
-
-    // "RIDEAU — CLOSED" sign on ground floor
-    add([rect(s.w - 12, 14), pos(s.x + 6, gfTop + 2),
-         color(160, 18, 18), z(-251)]);
-    add([text("RIDEAU — CLOSED", { size: 6 }),
-         pos(s.x + 12, gfTop + 5), color(255, 240, 200), z(-250)]);
-
-    // Overturned garbage bags on sidewalk near entrance
-    const garbY = GROUND_TOP + 6;
-    add([rect(14, 10), pos(s.x + Math.floor(s.w / 2) - 22, garbY),
-         color(35, 38, 30), z(-244)]);
-    add([rect(18, 8), pos(s.x + Math.floor(s.w / 2) + 6, garbY + 3),
-         color(28, 30, 24), z(-244)]);
-    // Scattered trash bits
-    const trashCols = [[160,140,80],[120,100,60],[180,160,100],[140,120,70]];
-    for (let g = 0; g < 4; g++) {
-      add([rect(3, 3),
-           pos(s.x + Math.floor(s.w / 2) - 28 + g * 14, garbY + 14 + (g % 2) * 4),
-           color(...trashCols[g]), z(-243)]);
-    }
-
-    // Warm amber glow from inside (through ground floor windows)
-    const glowH = GROUND_TOP - gfTop - 2;
-    if (glowH > 4) {
-      add([rect(s.w - 8, glowH), pos(s.x + 4, gfTop + 1),
-           color(255, 200, 80), opacity(0.15), z(-256)]);
-    }
-  }
-  } // end if (!lvl.parliamentGate)
-
-  // ── Parliament Hill (Level 4 — open plaza, no fence, Centennial Flame) ─────
-  if (lvl.parliamentHill) {
-    const STONE    = [185, 165, 128];
-    const STONE_D  = dk(STONE, 28);
-    const STONE_DD = dk(STONE, 50);
-    const COPPER   = [72, 108,  84];
-    const WINBLUE  = [110, 155, 200];
-
-    // ── Parliament buildings (same as Wellington gate) ────────────────────
-    add([rect(145, 185), pos(120, GROUND_TOP - 185), color(...STONE_DD), z(-296)]);
-    add([rect(145,  10), pos(120, GROUND_TOP - 195), color(...COPPER),   z(-295)]);
-    add([rect(145, 185), pos(535, GROUND_TOP - 185), color(...STONE_DD), z(-296)]);
-    add([rect(145,  10), pos(535, GROUND_TOP - 195), color(...COPPER),   z(-295)]);
-    add([rect(245, 215), pos(278, GROUND_TOP - 215), color(...STONE_D),  z(-295)]);
-    add([rect(245,  10), pos(278, GROUND_TOP - 225), color(...COPPER),   z(-294)]);
-    for (let wy = GROUND_TOP - 205; wy < GROUND_TOP - 80; wy += 38) {
-      for (let wx = 293; wx < 510; wx += 30) {
-        add([rect(12, 20), pos(wx, wy),         color(...WINBLUE), opacity(0.75), z(-292)]);
-        add([rect( 8,  6), pos(wx + 2, wy - 6), color(...WINBLUE), opacity(0.5),  z(-292)]);
-      }
-    }
-    // Peace Tower
-    const ptX = 376, ptW = 48;
-    add([rect(ptW, 235), pos(ptX, GROUND_TOP - 235), color(...dk(STONE, 18)), z(-293)]);
-    add([rect(ptW,  32), pos(ptX, GROUND_TOP - 142), color(...lt(STONE, 28)), z(-291)]);
-    const ptSteps = [[44,9],[36,9],[28,9],[20,9],[14,7],[10,7],[6,7],[3,7]];
-    let psy = GROUND_TOP - 235;
-    for (const [sw, sh] of ptSteps) {
-      psy -= sh;
-      add([rect(sw, sh), pos(ptX + (ptW - sw) / 2, psy), color(...dk(STONE, 14)), z(-291)]);
-    }
-    add([rect(2, 8), pos(ptX + ptW / 2 - 1, psy - 8), color(...dk(STONE, 24)), z(-290)]);
-    add([rect(14, 9), pos(ptX + ptW - 1, GROUND_TOP - 244), color(210, 30, 30), z(-289)]);
-
-    // Open lawn (green strip in front of Parliament, above sidewalk)
-    add([rect(SCREEN_W, 40), pos(0, GROUND_TOP - 40), color(55, 95, 55), z(-270)]);
-    // Snow patches on lawn
-    for (let i = 0; i < 6; i++) {
-      add([rect(30 + i * 12, 5), pos(40 + i * 120, GROUND_TOP - 32),
-           color(225, 230, 245), opacity(0.35), z(-269)]);
-    }
-
-    // ── Centennial Flame ──────────────────────────────────────────────────
-    const flX = 400, flY = GROUND_TOP - 4;
-    // Outer stone basin rim
-    add([rect(52,  8), pos(flX - 26, flY - 8),  color(...STONE_D),      z(-242)]);
-    add([rect(60, 18), pos(flX - 30, flY - 18), color(...dk(STONE, 10)), z(-243)]);
-    // Inner basin (water/dark)
-    add([rect(44, 12), pos(flX - 22, flY - 16), color(35, 55, 75),  z(-241)]);
-    // Stone plinth in center
-    add([rect(14, 20), pos(flX - 7, flY - 32),  color(...STONE_D),  z(-241)]);
-    // Flame (layered for depth: outer orange → inner yellow → white core)
-    add([rect(14, 22), pos(flX - 7,  flY - 54), color(200,  80,  10), opacity(0.9), z(-240)]);
-    add([rect(10, 18), pos(flX - 5,  flY - 52), color(240, 140,  20), opacity(0.9), z(-239)]);
-    add([rect( 6, 14), pos(flX - 3,  flY - 50), color(255, 210,  60), opacity(0.95), z(-238)]);
-    add([rect( 3,  8), pos(flX - 1,  flY - 46), color(255, 245, 200), opacity(0.8), z(-237)]);
-    // Warm glow on ground around flame
-    add([rect(40, 6), pos(flX - 20, flY - 8), color(255, 160, 40), opacity(0.12), z(-244)]);
-  }
+  } // end storefront block
 
   // ── Sidewalk ──────────────────────────────────────────────────────────────
   add([rect(SCREEN_W, GROUND_BOTTOM - GROUND_TOP), pos(0, GROUND_TOP),
@@ -694,7 +439,7 @@ function spawnFloatText(msg, x, y, col) {
 
 /**
  * Spawn a player character.
- * @param {number} idx — 0 = P1 (Luciano), 1 = P2 (Priya)
+ * @param {number} idx — 0 = P1 (Gaucho), 1 = P2 (Cordobesa)
  * @returns {KAPLAYObj} player game object
  */
 function spawnPlayer(idx) {
@@ -867,20 +612,10 @@ function updateEnemy(e, target, onAttack) {
     if (e.attackCooldown <= 0) {
       e.attackCooldown = e.def.attackCooldown;
 
-      if (e.def.isRaccoonThrower) {
-        // Throw a raccoon projectile instead of dealing melee damage
-        if (typeof window.spawnRaccoonProjectile === "function") {
-          window.spawnRaccoonProjectile(e.pos.x, e.pos.y, target);
-        }
-        // Small toss flash
-        add([rect(10, 10), pos(e.pos.x + e.facing * 20, e.pos.y - 30),
-             anchor("center"), color(100, 90, 70), opacity(1), z(e.pos.y + 5), lifespan(0.15)]);
-      } else {
-        onAttack(e.def.damage);
-        // Tiny red flash on attack
-        add([rect(14, 14), pos(e.pos.x + e.facing * 14, e.pos.y - 28),
-             anchor("center"), color(255, 60, 60), opacity(1), z(e.pos.y + 5), lifespan(0.1)]);
-      }
+      onAttack(e.def.damage);
+      // Tiny red flash on attack
+      add([rect(14, 14), pos(e.pos.x + e.facing * 14, e.pos.y - 28),
+           anchor("center"), color(255, 60, 60), opacity(1), z(e.pos.y + 5), lifespan(0.1)]);
 
       if (e.def.sprite) {
         e.play("attack");

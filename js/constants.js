@@ -1,5 +1,5 @@
 // =============================================================================
-// Ottawa Rage — js/constants.js
+// Calles de Alberdi — js/constants.js
 // All tuning values, level definitions, and entity stat tables.
 // Edit numbers here; never scatter magic values through game logic.
 // =============================================================================
@@ -9,7 +9,6 @@ const SCREEN_W = 800;
 const SCREEN_H = 400;
 
 // Belt-scroll ground band.  Characters are confined to this vertical strip.
-// Smaller y = further back in perspective; larger y = closer to camera.
 const GROUND_TOP    = 260;
 const GROUND_BOTTOM = 365;
 
@@ -30,22 +29,28 @@ const ATTACKS = {
   kick:    { range: 90,  width: 42, damage: 22, fxColor: [255, 130, 40]  },
 };
 
+// ── Scoring ─────────────────────────────────────────────────────────────────
+const SCORE_ENEMY_KILL = 100;
+const SCORE_BOSS_KILL  = 500;
+const SCORE_LEVEL_CLEAR = 1000;
+const SCORE_COMBO_MULTIPLIER = 1.5;  // applied after 3+ hits in 2 seconds
+const COMBO_WINDOW     = 2.0;       // seconds to chain hits for combo
+
 // ── Player character roster ───────────────────────────────────────────────────
-// TODO: Add a character-select screen and expand this array with more heroes.
 const PLAYER_CONFIGS = [
   {
-    name:    "TAXPAYER",
-    col:     [255, 255, 255],   // white = neutral sprite tint
+    name:    "GAUCHO",
+    col:     [200, 180, 140],   // earthy tan
     hurtCol: [255, 80,  80 ],
-    sprite:  "hero_taxpayer",
+    // TODO: sprite: "hero_gaucho"
     keys: { up:"w", down:"s", left:"a", right:"d", punch:"z", kick:"x", special:"q" },
     startX: 120,
   },
   {
-    name:    "PRIYA",
-    col:     [80,  220, 120],
+    name:    "CORDOBESA",
+    col:     [180, 100, 160],
     hurtCol: [255, 200, 60 ],
-    // TODO: sprite: "hero_priya"
+    // TODO: sprite: "hero_cordobesa"  (Player 2 — future)
     keys: { up:"i", down:"k", left:"j", right:"l", punch:"u", kick:"o", special:"p" },
     startX: 175,
   },
@@ -56,317 +61,221 @@ const PLAYER_CONFIGS = [
 //   stores     — placeholder storefronts rendered as coloured rects + sign text
 //   npcTypes   — pool of NPC archetypes to spawn in background
 //   waves      — array of wave definitions; each wave = array of {type, count}
-//   boss       — { type, name, count? }  (count defaults to 1)
-//   pickups    — types available in this level (health drops + weapon pickups)
+//   boss       — { type, name, count? }
+//   pickups    — types available in this level
 //   bossIntro  — banner text when the boss spawns
-//   skyCol     — [r,g,b] sky/upper-half colour
+//   skyCol     — [r,g,b] sky colour
 //   groundCol  — [r,g,b] sidewalk surface colour
 const LEVELS = [
-  // ── Level 1 ────────────────────────────────────────────────────────────────
+  // ── Level 1 — Calle Colón ────────────────────────────────────────────────
   {
-    id: 1, name: "Bank Street", subtitle: "The Strip",
-    skyCol: [60, 65, 80], groundCol: [200, 195, 185],
+    id: 1, name: "Calle Colón", subtitle: "La Comisaría",
+    skyCol: [85, 130, 200], groundCol: [195, 185, 170],
+    policeStation: true,  // special background: Comisaría Central at Colón y Santa Fe
     stores: [
-      { label: "TIM HORTONS", x: 0, w: 156, h: 195,
-        col: [100, 28, 22], signCol: [195, 25, 25],
-        signTextCol: [255, 255, 255], awningCol: [130, 20, 15] },
-      { label: "DOLLARAMA", x: 164, w: 140, h: 170,
-        col: [25, 95, 25], signCol: [0, 148, 0],
-        signTextCol: [255, 230, 0], awningCol: [0, 100, 0] },
-      { label: "CURRY PALACE", x: 312, w: 168, h: 182,
-        col: [160, 110, 30], signCol: [180, 30, 15],
-        signTextCol: [255, 220, 80], awningCol: [140, 95, 25] },
-      { label: "DEP", x: 488, w: 132, h: 155,
-        col: [65, 65, 130], signCol: [40, 50, 140],
-        signTextCol: [255, 255, 255], awningCol: [50, 50, 100] },
-      { label: "SMOKE SHOP", x: 628, w: 172, h: 188,
-        col: [75, 50, 35], signCol: [55, 38, 22],
-        signTextCol: [255, 170, 50], awningCol: [50, 35, 20] },
+      { label: "KIOSCO", x: 0, w: 140, h: 175,
+        col: [120, 90, 50], signCol: [180, 140, 60],
+        signTextCol: [255, 255, 255], awningCol: [100, 75, 35] },
+      { label: "PANADERÍA", x: 148, w: 155, h: 185,
+        col: [170, 130, 70], signCol: [200, 160, 80],
+        signTextCol: [60, 30, 10], awningCol: [140, 105, 50] },
+      { label: "COMISARÍA CENTRAL", x: 311, w: 210, h: 210,
+        col: [160, 155, 145], signCol: [50, 60, 100],
+        signTextCol: [255, 255, 255], awningCol: [80, 85, 100],
+        isPoliceStation: true },
+      { label: "FERRETERÍA", x: 529, w: 135, h: 168,
+        col: [90, 70, 55], signCol: [60, 45, 30],
+        signTextCol: [255, 220, 140], awningCol: [70, 50, 35] },
+      { label: "ALMACÉN", x: 672, w: 128, h: 155,
+        col: [100, 120, 80], signCol: [70, 90, 50],
+        signTextCol: [255, 255, 230], awningCol: [60, 80, 40] },
     ],
-    npcTypes: ["turban", "quebecois", "hijab"],
+    npcTypes: ["belgrano_fan", "feminist", "peronist", "trapito"],
     waves: [
-      [{ type:"grunt",  count:3 }],
-      [{ type:"grunt",  count:2 }, { type:"heavy",  count:1 }],
-      [{ type:"grunt",  count:3 }, { type:"heavy",  count:1 }],
+      [{ type:"punguista",  count:3 }],
+      [{ type:"punguista",  count:2 }, { type:"patotero",  count:1 }],
+      [{ type:"punguista",  count:2 }, { type:"patotero",  count:1 }, { type:"naranjita", count:1 }],
     ],
-    boss:      { type:"heavy_boss",    name:"Big Earl" },
-    pickups:   ["donut", "cart", "coffee"],
-    bossIntro: "BIG EARL blocks the Tim Hortons exit!",
+    boss:      { type:"comisario",    name:"El Comisario" },
+    pickups:   ["empanada", "mate", "fernet"],
+    bossIntro: "¡EL COMISARIO bloquea la salida de la Comisaría!",
   },
 
-  // ── Level 2 ────────────────────────────────────────────────────────────────
+  // ── Level 2 — Placeholder ────────────────────────────────────────────────
   {
-    id: 2, name: "ByWard Market", subtitle: "The Market",
-    skyCol: [30, 32, 50], groundCol: [170, 165, 158],
+    id: 2, name: "Barrio Alberdi", subtitle: "El Barrio",
+    skyCol: [70, 100, 160], groundCol: [185, 178, 165],
     stores: [
-      { label: "BYWARD MUFFIN", x: 0, w: 152, h: 175,
-        col: [130, 80, 35], signCol: [160, 100, 35],
-        signTextCol: [255, 240, 200], awningCol: [110, 65, 25] },
-      { label: "BAREFAX", x: 160, w: 162, h: 195,
-        col: [90, 18, 90], signCol: [150, 20, 130],
-        signTextCol: [255, 100, 220], awningCol: [100, 15, 85] },
-      { label: "McDONALD'S", x: 330, w: 132, h: 170,
-        col: [110, 25, 22], signCol: [218, 170, 0],
-        signTextCol: [255, 50, 50], awningCol: [100, 18, 12],
-        isMcDonalds: true },
-      { label: "MARKET STALL", x: 470, w: 162, h: 140,
-        col: [140, 105, 25], signCol: [160, 120, 20],
-        signTextCol: [255, 240, 180], awningCol: [120, 85, 15] },
-      { label: "CHEESE PLACE", x: 640, w: 160, h: 168,
-        col: [170, 150, 45], signCol: [180, 160, 30],
-        signTextCol: [255, 255, 255], awningCol: [145, 130, 25] },
+      { label: "ALMACÉN DON PEPE", x: 0, w: 160, h: 180,
+        col: [130, 100, 60], signCol: [160, 120, 40],
+        signTextCol: [255, 255, 255], awningCol: [110, 80, 35] },
+      { label: "CARNICERÍA", x: 168, w: 148, h: 170,
+        col: [160, 50, 40], signCol: [180, 30, 20],
+        signTextCol: [255, 255, 255], awningCol: [130, 35, 25] },
+      { label: "CANCHA BELGRANO", x: 324, w: 200, h: 195,
+        col: [50, 120, 180], signCol: [30, 90, 160],
+        signTextCol: [255, 255, 255], awningCol: [40, 100, 150] },
+      { label: "VERDULERÍA", x: 532, w: 130, h: 155,
+        col: [60, 130, 50], signCol: [40, 100, 30],
+        signTextCol: [255, 255, 200], awningCol: [45, 95, 30] },
+      { label: "BAR LOS AMIGOS", x: 670, w: 130, h: 165,
+        col: [100, 60, 40], signCol: [80, 45, 25],
+        signTextCol: [255, 200, 100], awningCol: [70, 40, 20] },
     ],
-    npcTypes: ["lgbtq", "ukrainian", "turban"],
-    petTypes: ["raccoon"],
+    npcTypes: ["belgrano_fan", "peronist", "vecina"],
     waves: [
-      [{ type:"grunt",    count:2 }, { type:"stripper", count:1 }],
-      [{ type:"agile",    count:2 }, { type:"stripper", count:2 }],
-      [{ type:"stripper", count:2 }, { type:"heavy",    count:1 }, { type:"agile", count:2 }],
+      [{ type:"punguista",  count:2 }, { type:"patotero", count:1 }],
+      [{ type:"naranjita",  count:2 }, { type:"patotero", count:2 }],
+      [{ type:"punguista",  count:2 }, { type:"patotero", count:2 }, { type:"naranjita", count:1 }],
     ],
-    boss: {
-      types: [
-        { type:"stripper_boss",   name:"Roxanne"    },
-        { type:"raccoon_thrower", name:"Trash King" },
-      ],
-      name: "The Duo",
-    },
-    pickups:   ["bottle", "fruit_cart", "donut"],
-    bossIntro: "THE DUO guard the Barefax door — one packing heat, one packing RACCOONS!",
+    boss:      { type:"barra_brava",   name:"El Barra Brava" },
+    pickups:   ["empanada", "mate", "choripan"],
+    bossIntro: "¡EL BARRA BRAVA baja de la tribuna!",
   },
 
-  // ── Level 3 ────────────────────────────────────────────────────────────────
+  // ── Level 3 — Placeholder ────────────────────────────────────────────────
   {
-    id: 3, name: "Wellington Street", subtitle: "The Parade",
-    skyCol: [75, 140, 200], groundCol: [195, 188, 175],
-    parliamentGate: true,
-    stores: [],
-    npcTypes: ["hijab", "lgbtq", "turban"],
-    waves: [
-      [{ type:"arab",     count:3 }, { type:"grunt",    count:1 }],
-      [{ type:"stripper", count:2 }, { type:"agile",    count:2 }],
-      [{ type:"arab",     count:2 }, { type:"stripper", count:2 }, { type:"agile", count:1 }],
+    id: 3, name: "La Cañada", subtitle: "El Paseo",
+    skyCol: [95, 145, 210], groundCol: [200, 195, 180],
+    stores: [
+      { label: "HELADERÍA", x: 0, w: 150, h: 170,
+        col: [200, 180, 220], signCol: [180, 140, 200],
+        signTextCol: [255, 255, 255], awningCol: [160, 120, 180] },
+      { label: "CERVECERÍA", x: 158, w: 160, h: 185,
+        col: [150, 110, 40], signCol: [170, 130, 30],
+        signTextCol: [255, 240, 180], awningCol: [120, 90, 25] },
+      { label: "PARQUE", x: 326, w: 180, h: 140,
+        col: [60, 110, 55], signCol: [45, 85, 40],
+        signTextCol: [255, 255, 240], awningCol: [50, 90, 45] },
+      { label: "LIBRERÍA", x: 514, w: 140, h: 160,
+        col: [100, 80, 65], signCol: [80, 60, 45],
+        signTextCol: [255, 230, 200], awningCol: [70, 50, 35] },
+      { label: "FARMACIA", x: 662, w: 138, h: 165,
+        col: [40, 130, 70], signCol: [30, 110, 50],
+        signTextCol: [255, 255, 255], awningCol: [25, 100, 45] },
     ],
-    boss:      { type:"big_trans", name:"Big Trans" },
-    pickups:   ["donut", "bottle", "coffee"],
-    bossIntro: "BIG TRANS steps out of the Pride float!",
+    npcTypes: ["feminist", "vecina", "peronist"],
+    waves: [
+      [{ type:"patotero",  count:3 }],
+      [{ type:"patotero",  count:2 }, { type:"naranjita", count:2 }],
+      [{ type:"punguista", count:2 }, { type:"patotero",  count:2 }, { type:"naranjita", count:2 }],
+    ],
+    boss:      { type:"puntero",   name:"El Puntero" },
+    pickups:   ["empanada", "choripan", "fernet"],
+    bossIntro: "¡EL PUNTERO corta el paso en La Cañada!",
   },
 
-  // ── Level 4 ────────────────────────────────────────────────────────────────
+  // ── Level 4 — Placeholder ────────────────────────────────────────────────
   {
-    id: 4, name: "Parliament Hill", subtitle: "The Finale",
-    skyCol: [55, 90, 150], groundCol: [215, 220, 215],
-    parliamentHill: true,
-    stores: [],
-    npcTypes: ["palestinian", "turban", "hijab", "quebecois"],
-    waves: [
-      [{ type:"heavy",    count:2 }, { type:"grunt",    count:2 }],
-      [{ type:"heavy",    count:2 }, { type:"stripper", count:2 }, { type:"grunt",  count:2 }],
-      [{ type:"heavy",    count:3 }, { type:"arab",     count:4 }, { type:"stripper", count:2 }],
-    ],
-    boss:      { type:"syndicate_boss", name:"The Prime Minister" },
-    pickups:   ["samosa", "cart", "coffee"],
-    bossIntro: "THE PRIME MINISTER blocks the door!",
-  },
-
-  /* ── DISABLED LEVELS (preserved for future reactivation) ─────────────────
-  {
-    id: 3, name: "Rideau Canal", subtitle: "The Canal",
-    skyCol: [70, 80, 100], groundCol: [210, 220, 230],
+    id: 4, name: "Centro", subtitle: "La Final",
+    skyCol: [55, 80, 140], groundCol: [210, 205, 195],
     stores: [
-      { label: "SKATE SHACK", x: 0, w: 148, h: 155, col: [70, 70, 110], signCol: [55, 65, 120], signTextCol: [255, 255, 255], awningCol: [50, 55, 90] },
-      { label: "HOT CHOC",    x: 156, w: 142, h: 145, col: [110, 60, 25], signCol: [100, 55, 20], signTextCol: [255, 230, 180], awningCol: [85, 45, 15] },
-      { label: "PARLIAMENT >>", x: 306, w: 198, h: 130, col: [45, 72, 45], signCol: [40, 65, 40], signTextCol: [220, 200, 140], awningCol: [35, 55, 35] },
-      { label: "CANAL TRAIL", x: 512, w: 148, h: 138, col: [60, 80, 100], signCol: [50, 70, 95], signTextCol: [255, 255, 255], awningCol: [42, 62, 82] },
-      { label: "FISH HUT",    x: 668, w: 132, h: 145, col: [82, 55, 35],  signCol: [75, 48, 28],  signTextCol: [255, 240, 200], awningCol: [62, 40, 22] },
+      { label: "CATEDRAL", x: 0, w: 180, h: 210,
+        col: [170, 160, 140], signCol: [140, 130, 110],
+        signTextCol: [255, 255, 255], awningCol: [120, 110, 95] },
+      { label: "CABILDO", x: 188, w: 200, h: 200,
+        col: [180, 170, 150], signCol: [150, 140, 120],
+        signTextCol: [255, 240, 200], awningCol: [130, 120, 100] },
+      { label: "GALERÍA", x: 396, w: 160, h: 180,
+        col: [120, 100, 80], signCol: [100, 80, 60],
+        signTextCol: [255, 255, 240], awningCol: [85, 65, 45] },
+      { label: "MUNICIPALIDAD", x: 564, w: 236, h: 215,
+        col: [150, 145, 135], signCol: [60, 70, 100],
+        signTextCol: [255, 255, 255], awningCol: [80, 85, 105] },
     ],
-    npcTypes: ["hijab", "quebecois", "african"],
+    npcTypes: ["belgrano_fan", "feminist", "peronist", "vecina"],
     waves: [
-      [{ type:"agile", count:3 }],
-      [{ type:"agile", count:2 }, { type:"crackhead", count:2 }],
-      [{ type:"kicker", count:2 }, { type:"crackhead", count:2 }, { type:"agile", count:1 }],
+      [{ type:"patotero",  count:3 }, { type:"punguista", count:2 }],
+      [{ type:"patotero",  count:2 }, { type:"naranjita",  count:2 }, { type:"punguista", count:2 }],
+      [{ type:"patotero",  count:3 }, { type:"naranjita",  count:3 }, { type:"punguista", count:2 }],
     ],
-    boss: { type:"heavy_chain", name:"Chain Daddy" },
-    pickups: ["skate", "fish", "coffee"],
-    bossIntro: "CHAIN DADDY descends from the barge!",
+    boss:      { type:"intendente",   name:"El Intendente" },
+    pickups:   ["empanada", "mate", "fernet", "choripan"],
+    bossIntro: "¡EL INTENDENTE sale del Palacio Municipal!",
   },
-  {
-    id: 4, name: "Curry Street", subtitle: "The Strip",
-    skyCol: [50, 45, 60], groundCol: [185, 175, 160],
-    stores: [
-      { label: "DESI KITCHEN",  x: 0,   w: 156, h: 190, col: [170, 120, 20], signCol: [180, 30, 15],  signTextCol: [255, 230, 80],  awningCol: [145, 100, 18] },
-      { label: "SPICE WORLD",   x: 164, w: 146, h: 175, col: [185, 65, 15],  signCol: [200, 60, 10],  signTextCol: [255, 240, 120], awningCol: [155, 50, 10]  },
-      { label: "BIRYANI HOUSE", x: 318, w: 166, h: 192, col: [155, 115, 18], signCol: [160, 28, 10],  signTextCol: [255, 220, 80],  awningCol: [130, 95, 15]  },
-      { label: "HALAL MEATS",   x: 492, w: 136, h: 162, col: [135, 35, 35],  signCol: [140, 25, 25],  signTextCol: [255, 255, 255], awningCol: [110, 28, 25]  },
-      { label: "SWEET SHOP",    x: 636, w: 164, h: 175, col: [175, 135, 45], signCol: [180, 140, 30], signTextCol: [255, 255, 255], awningCol: [150, 115, 22] },
-    ],
-    npcTypes: ["turban", "ukrainian", "lgbtq"],
-    waves: [
-      [{ type:"crackhead", count:3 }, { type:"grunt",  count:1 }],
-      [{ type:"crackhead", count:3 }, { type:"kicker", count:2 }],
-      [{ type:"crackhead", count:2 }, { type:"grunt",  count:2 }, { type:"kicker", count:2 }],
-    ],
-    boss: { type:"drug_lord", name:"The Chef" },
-    pickups: ["samosa", "spice_cart", "coffee"],
-    bossIntro: "THE CHEF steps off the food truck!",
-  },
-  ── END DISABLED LEVELS ─────────────────────────────────────────────────── */
 ];
 
 // ── Enemy stat table ──────────────────────────────────────────────────────────
-// TODO: Add "sprite" key to each entry once spritesheet is in assets/.
-//       Remove the matching rect/color in spawnEnemy() and add sprite() component.
 const ENEMY_DEFS = {
-  grunt: {
-    label:"GRUNT",   col:[160, 80, 80],  w:26, h:46,
-    hp:50,  speed:58,  damage:8,  attackRange:38, attackCooldown:1.4,
-    taunts:["Get lost, eh!", "Stay from away!", "Puck off!"],
-    sprite:"enemy_grunt",
+  punguista: {
+    label:"PUNGUISTA",   col:[160, 100, 80],  w:26, h:46,
+    hp:45,  speed:62,  damage:8,  attackRange:38, attackCooldown:1.3,
+    taunts:["¡Dame la billetera!", "¡Afanamos tranqui!", "¡Rajá de acá!"],
+    // TODO: sprite:"enemy_punguista"
   },
-  agile: {
-    label:"SLIDER",  col:[120, 80, 140], w:24, h:44,
-    hp:35,  speed:90,  damage:6,  attackRange:45, attackCooldown:0.9,
-    taunts:["Too slow, bud!", "Catch this deke!", "Shinny's over!"],
-    sprite:"enemy_agile",
+  patotero: {
+    label:"PATOTERO",   col:[140, 70, 50],  w:30, h:48,
+    hp:70,  speed:45,  damage:14, attackRange:42, attackCooldown:1.6,
+    taunts:["¡Te vamo' a fajar!", "¡Vení pa'ca!", "¡Sacá chapa!"],
+    // TODO: sprite:"enemy_patotero"
   },
-  heavy: {
-    label:"HEAVY",   col:[140, 60, 40],  w:34, h:50,
-    hp:90,  speed:40,  damage:14, attackRange:42, attackCooldown:1.8,
-    taunts:["Crush time, eh!", "Burly smash!", "Take the body!"],
-    sprite:"enemy_heavy",
+  naranjita: {
+    label:"NARANJITA",  col:[255, 160, 50], w:24, h:44,
+    hp:35,  speed:70,  damage:6,  attackRange:36, attackCooldown:1.0,
+    taunts:["¡Te cuido el auto, loco!", "¡Son cien pe' nomá!", "¡Dame la moneda!"],
+    // TODO: sprite:"enemy_naranjita"
   },
-  stripper: {
-    label:"WHIPLASH", col:[220, 100, 160], w:22, h:46,
-    hp:45,  speed:80,  damage:10, attackRange:62, attackCooldown:1.1,
-    taunts:["Back off!", "Dance with me!", "Whip it!"],
-    sprite:"enemy_stripper",
-  },
-  crackhead: {
-    label:"ADDICT",  col:[110, 100, 75], w:22, h:42,
-    hp:30,  speed:72,  damage:7,  attackRange:40, attackCooldown:0.8,
-    taunts:["Gimme that!", "Heh heh, mine!", "Burn ya!"],
-    // TODO: sprite:"enemy_crackhead"
-  },
-  kicker: {
-    label:"KICKER",  col:[80, 120, 160], w:24, h:46,
-    hp:55,  speed:65,  damage:12, attackRange:52, attackCooldown:1.0,
-    taunts:["Kick your ass!", "Feel the burn!", "Block this!"],
-    // TODO: sprite:"enemy_kicker"
-  },
-  arab: {
-    label:"PROTESTER", col:[180, 140, 80], w:24, h:44,
-    hp:40,  speed:65,  damage:9,  attackRange:42, attackCooldown:1.4,
-    taunts:["Free Palestine!", "Allahu Akbar!", "Intifada!"],
-    sprite:"enemy_arab",
-  },
+
   // ── Boss variants ──────────────────────────────────────────────────────────
-  heavy_boss: {
-    label:"BIG EARL",    col:[120, 40, 20],  w:40, h:72,
-    hp:200, speed:35, damage:16, attackRange:52, attackCooldown:2.0, isBoss:true,
-    taunts:["Bank Street's mine!", "You're done in Ottawa!"],
-    sprite:"boss_earl",
+  comisario: {
+    label:"EL COMISARIO", col:[40, 50, 80], w:38, h:62,
+    hp:220, speed:35, damage:18, attackRange:50, attackCooldown:1.8, isBoss:true,
+    taunts:["¡Acá mando yo!", "¡A la comisaría vas a ir!", "¡Respetá la autoridad!"],
+    // TODO: sprite:"boss_comisario"
   },
-  stripper_boss: {
-    label:"THE DUO",     col:[200, 50, 140], w:30, h:52,
-    hp:180, speed:75, damage:14, attackRange:70, attackCooldown:1.2, isBoss:true,
-    taunts:["You can't handle us!", "Two's company!"],
-    sprite:"boss_duo",
+  barra_brava: {
+    label:"BARRA BRAVA", col:[50, 120, 180], w:36, h:58,
+    hp:200, speed:50, damage:16, attackRange:48, attackCooldown:1.4, isBoss:true,
+    taunts:["¡Belgrano no pierde!", "¡Aguante la B!", "¡Te rompo todo!"],
+    // TODO: sprite:"boss_barra_brava"
   },
-  heavy_chain: {
-    label:"CHAIN DADDY", col:[80, 80, 40],   w:42, h:54,
-    hp:220, speed:38, damage:18, attackRange:68, attackCooldown:1.8, isBoss:true,
-    taunts:["Chain check, buddy!", "Nobody passes the barge!"],
-    // TODO: sprite:"boss_chain"
+  puntero: {
+    label:"EL PUNTERO", col:[120, 80, 40], w:34, h:54,
+    hp:240, speed:40, damage:15, attackRange:52, attackCooldown:1.6, isBoss:true,
+    taunts:["¡Yo te consigo laburo!", "¡Votame o rajá!", "¡La calle es mía!"],
+    // TODO: sprite:"boss_puntero"
   },
-  drug_lord: {
-    label:"THE CHEF",    col:[160, 120, 20], w:36, h:52,
-    hp:240, speed:45, damage:15, attackRange:56, attackCooldown:1.6, isBoss:true,
-    taunts:["This is my street!", "You mess with the chef?"],
-    // TODO: sprite:"boss_chef"
-  },
-  syndicate_boss: {
-    label:"PRIME MINISTER", col:[20, 30, 80], w:44, h:60,
-    hp:300, speed:30, damage:20, attackRange:62, attackCooldown:2.2, isBoss:true,
-    taunts:["They call me daddy!", "Ottawa belongs to me!", "The Hill is MINE!"],
-    sprite:"boss_carney",
-  },
-  raccoon_thrower: {
-    label:"TRASH KING",  col:[90, 80, 65],   w:32, h:52,
-    hp:180, speed:45, damage:12, attackRange:220, attackCooldown:2.0, isBoss:true,
-    taunts:["You wanna piece of me?!", "I got friends!", "CATCH!"],
-    isRaccoonThrower: true,
-    sprite:"boss_raccoon_thrower", spriteH:190,
-  },
-  big_trans: {
-    label:"BIG TRANS",   col:[100, 180, 220], w:40, h:72,
-    hp:260, speed:38, damage:18, attackRange:58, attackCooldown:1.1, isBoss:true,
-    taunts:["You can't cancel me!", "PRIDE AND POWER!", "Yaaas slay!"],
-    sprite:"boss_big_trans",
+  intendente: {
+    label:"EL INTENDENTE", col:[30, 30, 60], w:42, h:64,
+    hp:300, speed:30, damage:20, attackRange:56, attackCooldown:2.0, isBoss:true,
+    taunts:["¡Córdoba es mía!", "¡No me van a voltear!", "¡Soy intocable!"],
+    // TODO: sprite:"boss_intendente"
   },
 };
 
 // ── NPC archetypes ────────────────────────────────────────────────────────────
-// NPCs are always passive.  They wander, react to fights, flee from enemies.
-// TODO: Add "sprite" key once NPC spritesheets exist in assets/.
 const NPC_DEFS = {
-  turban: {
-    col:[210, 170, 110], accentCol:[255, 120, 0],   w:22, h:44, speed:25,
-    phrases:["Arre yaar!", "Bas karo!", "Chai piyoge?"],
-    sprite: "npc_turban",
+  belgrano_fan: {
+    col:[50, 140, 200], accentCol:[255, 255, 255], w:22, h:44, speed:28,
+    phrases:["¡Vamos Belgrano!", "¡Pirata hasta la muerte!", "¡Aguante la B!"],
+    // TODO: sprite: "npc_belgrano_fan"
   },
-  lgbtq: {
-    col:[255, 140, 200], accentCol:[255, 80, 200],  w:22, h:44, speed:30,
-    phrases:["Love wins!", "Stay fabulous!", "You go girl!"],
-    sprite: "npc_lgbtq",
+  feminist: {
+    col:[140, 50, 140], accentCol:[200, 80, 200], w:22, h:44, speed:25,
+    phrases:["¡Ni una menos!", "¡Vivas nos queremos!", "¡El patriarcado se va a caer!"],
+    // TODO: sprite: "npc_feminist"
   },
-  hijab: {
-    col:[100, 120, 200], accentCol:[60, 80, 160],   w:22, h:44, speed:20,
-    phrases:["Astaghfirullah!", "SubhanAllah!", "Peace be upon you."],
-    sprite:"npc_hijab",
+  peronist: {
+    col:[100, 140, 200], accentCol:[255, 255, 255], w:24, h:44, speed:22,
+    phrases:["¡Perón vuelve!", "¡Viva el General!", "¡La patria es el otro!"],
+    // TODO: sprite: "npc_peronist"
   },
-  african: {
-    col:[160, 100, 50],  accentCol:[220, 160, 40],  w:22, h:44, speed:28,
-    phrases:["Habari!", "Selam!", "Insha'Allah!"],
-    sprite: "npc_african",
+  trapito: {
+    col:[200, 140, 60], accentCol:[255, 180, 80], w:22, h:44, speed:30,
+    phrases:["¡Te lo cuido, jefe!", "¡Son doscientos!", "¡Dale, una monedita!"],
+    // TODO: sprite: "npc_trapito"
   },
-  quebecois: {
-    col:[220, 180, 140], accentCol:[200, 60, 60],   w:24, h:44, speed:22,
-    phrases:["Tabarnak!", "Câlisse!", "Go Sens go!"],
-    sprite: "npc_quebecois",
-  },
-  ukrainian: {
-    col:[255, 220, 180], accentCol:[30, 120, 220],  w:22, h:44, speed:25,
-    phrases:["Slava Ukraini!", "Davai!", "Nemozhlyvo!"],
-    sprite: "npc_ukrainian",
-  },
-  palestinian: {
-    col:[210, 190, 160], accentCol:[20, 120, 40],   w:22, h:44, speed:30,
-    phrases:["Free Palestine!", "Intifada!", "Ya free!"],
-    sprite:"npc_palestinian",
-  },
-  // ── Pets (isPet: true) ────────────────────────────────────────────────
-  raccoon: {
-    col:[100, 90, 75], accentCol:[60, 55, 45], w:14, h:16, speed:40,
-    isPet: true,
-    phrases:[],
-    sprite: "pet_raccoon",
-    spriteH: 512,
+  vecina: {
+    col:[180, 160, 140], accentCol:[220, 200, 180], w:22, h:44, speed:20,
+    phrases:["¡Qué quilombo!", "¡Llamo a la policía!", "¡Estos pibes de ahora!"],
+    // TODO: sprite: "npc_vecina"
   },
 };
 
 // ── Pickup table ──────────────────────────────────────────────────────────────
-// heal > 0  → restores HP on contact
-// isWeapon  → player holds it; attacks use weapon damage/uses until it breaks
-// TODO: Add sprite keys once pickup sprites exist in assets/.
 const PICKUP_DEFS = {
-  donut:      { col:[220,170,100], label:"DONUT",   heal:20, isWeapon:false,                   w:18, h:14, sprite:"pickup_donut" },
-  samosa:     { col:[200,150, 50], label:"SAMOSA",  heal:25, isWeapon:false,                   w:16, h:16, sprite:"pickup_samosa" },
-  coffee:     { col:[100, 60, 30], label:"COFFEE",  heal:15, isWeapon:false,                   w:14, h:20, sprite:"pickup_coffee" },
-  fish:       { col:[150,200,220], label:"FISH",    heal:10, isWeapon:false,                   w:28, h:14 },
-  bottle:     { col:[100,160, 80], label:"BOTTLE",  heal: 0, isWeapon:true,  damage:18, uses:3, w:10, h:24, sprite:"pickup_bottle" },
-  cart:       { col:[160,160,160], label:"CART",    heal: 0, isWeapon:true,  damage:30, uses:2, w:40, h:28, sprite:"pickup_cart" },
-  spice_cart: { col:[200,100, 20], label:"SPICE",   heal: 0, isWeapon:true,  damage:22, uses:3, w:36, h:28, sprite:"pickup_spice_cart" },
-  fruit_cart: { col:[220,140, 60], label:"FRUITS",  heal: 0, isWeapon:true,  damage:25, uses:2, w:40, h:28, sprite:"pickup_fruit_cart" },
-  flagpole:   { col:[200, 50, 50], label:"FLAG",    heal: 0, isWeapon:true,  damage:28, uses:4, w: 8, h:55 },
-  skate:      { col:[180,200,220], label:"SKATE",   heal: 0, isWeapon:true,  damage:20, uses:2, w:30, h:12 },
-  statue:     { col:[160,140,100], label:"STATUE",  heal: 0, isWeapon:true,  damage:40, uses:1, w:20, h:50 },
+  empanada:   { col:[220, 170, 80],  label:"EMPANADA", heal:20, isWeapon:false, w:18, h:14 },
+  mate:       { col:[80, 140, 60],   label:"MATE",     heal:15, isWeapon:false, w:16, h:20 },
+  fernet:     { col:[50, 30, 20],    label:"FERNET",   heal:0,  isWeapon:true,  damage:22, uses:3, w:12, h:24 },
+  choripan:   { col:[160, 100, 50],  label:"CHORIPÁN", heal:25, isWeapon:false, w:24, h:12 },
 };

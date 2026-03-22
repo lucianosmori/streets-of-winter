@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Ottawa Rage — Streets of Winter</title>
+  <title>Calles de Alberdi</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body {
@@ -11,7 +11,7 @@
       width: 100%; height: 100%;
       overflow: hidden;
       touch-action: none;
-      position: fixed;           /* prevent iOS bounce/scroll */
+      position: fixed;
       inset: 0;
     }
     canvas {
@@ -22,10 +22,10 @@
 
     /* ── Virtual gamepad — overlays the canvas ──────────────────────────────── */
     #gamepad {
-      display: none;          /* shown only on touch devices via JS */
+      display: none;
       position: fixed;
       inset: 0;
-      pointer-events: none;   /* children re-enable as needed */
+      pointer-events: none;
       z-index: 1000;
       user-select: none;
       -webkit-user-select: none;
@@ -50,25 +50,24 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 20px;
-      color: rgba(255,255,255,0.55);
-      pointer-events: all;
-      touch-action: none;
-      cursor: pointer;
+      font-size: 22px;
+      color: rgba(255,255,255,0.5);
+      pointer-events: auto;
+      -webkit-tap-highlight-color: transparent;
     }
-    .dpad-btn:active { background: rgba(255,255,255,0.25); }
-    #btn-up    { left: 47px; top: 0;    }
-    #btn-down  { left: 47px; bottom: 0; }
-    #btn-left  { left: 0;    top: 47px; }
-    #btn-right { right: 0;   top: 47px; }
+    .dpad-btn:active, .dpad-btn.active { background: rgba(255,255,255,0.28); }
+    #btn-up    { top: 0;    left: 47px; }
+    #btn-down  { bottom: 0; left: 47px; }
+    #btn-left  { top: 47px; left: 0;    }
+    #btn-right { top: 47px; right: 0;   }
 
     /* Action buttons — bottom-right */
     #actions {
       position: absolute;
       right: 12px;
       bottom: 28px;
-      width: 155px;
-      height: 110px;
+      width: 160px;
+      height: 120px;
       pointer-events: none;
     }
     .action-btn {
@@ -76,114 +75,134 @@
       width: 56px;
       height: 56px;
       border-radius: 50%;
-      border: 2px solid rgba(255,255,255,0.28);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-family: monospace;
       font-size: 11px;
       font-weight: bold;
-      color: rgba(255,255,255,0.85);
-      pointer-events: all;
-      touch-action: none;
-      cursor: pointer;
+      color: #fff;
+      pointer-events: auto;
+      -webkit-tap-highlight-color: transparent;
     }
-    .action-btn:active { filter: brightness(1.5); }
-    #btn-punch   { background: rgba(255,200,0,0.18);  left: 0;    bottom: 0; }
-    #btn-kick    { background: rgba(255,100,30,0.18); right: 0;   bottom: 0; }
-    #btn-special { background: rgba(80,160,255,0.18); left: 50px; top: 0;    }
+    .action-btn:active, .action-btn.active { filter: brightness(1.5); }
+    #btn-punch   { background: rgba(255,200,60,0.35); border: 2px solid rgba(255,200,60,0.6);
+                   bottom: 32px; left: 0; }
+    #btn-kick    { background: rgba(255,100,40,0.35); border: 2px solid rgba(255,100,40,0.6);
+                   bottom: 32px; right: 0; }
+    #btn-special { background: rgba(200,80,255,0.35); border: 2px solid rgba(200,80,255,0.6);
+                   top: 0; left: 52px; font-size: 16px; }
 
-    /* Menu pills — positioned above their respective button clusters */
-    .menu-btn {
+    /* START / BACK pills */
+    .pill-btn {
       position: absolute;
-      padding: 6px 16px;
+      padding: 6px 18px;
       border-radius: 14px;
-      border: 1.5px solid rgba(255,255,255,0.25);
-      display: flex;
+      font-size: 11px;
+      font-weight: bold;
+      color: #fff;
+      pointer-events: auto;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .pill-btn:active { filter: brightness(1.5); }
+    #btn-start { background: rgba(80,200,80,0.35); border: 2px solid rgba(80,200,80,0.6);
+                 right: 12px; top: 12px; }
+    #btn-back  { background: rgba(160,160,160,0.25); border: 2px solid rgba(160,160,160,0.5);
+                 left: 12px; top: 12px; }
+
+    /* QR Code overlay */
+    #qr-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      z-index: 2000;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
+      color: #fff;
       font-family: monospace;
-      font-size: 10px;
-      font-weight: bold;
-      color: rgba(255,255,255,0.65);
-      pointer-events: all;
-      touch-action: none;
-      cursor: pointer;
-      background: rgba(0,0,0,0.35);
     }
-    .menu-btn:active { filter: brightness(1.5); background: rgba(80,255,120,0.25); }
-    /* START — right side, above action buttons */
-    #btn-start { right: 18px; bottom: 155px; }
-    /* BACK — left side, above d-pad */
-    #btn-back  { left: 18px;  bottom: 185px; }
+    #qr-overlay.visible { display: flex; }
+    #qr-overlay canvas { border: 8px solid #fff; border-radius: 8px; margin: 16px; }
+    #qr-overlay .qr-title { font-size: 18px; margin-bottom: 8px; }
+    #qr-overlay .qr-url { font-size: 11px; color: #aaa; word-break: break-all; max-width: 80%; text-align: center; }
+    #qr-overlay .qr-close { margin-top: 16px; padding: 8px 24px; background: rgba(255,80,80,0.5); border: 2px solid rgba(255,80,80,0.8); border-radius: 8px; cursor: pointer; color: #fff; font-size: 14px; }
   </style>
 </head>
 <body>
 
-  <!-- Virtual gamepad (visible on touch devices only) — overlays the canvas -->
-  <div id="gamepad">
-    <div id="dpad">
-      <div class="dpad-btn" id="btn-up"    data-key="w">▲</div>
-      <div class="dpad-btn" id="btn-down"  data-key="s">▼</div>
-      <div class="dpad-btn" id="btn-left"  data-key="a">◀</div>
-      <div class="dpad-btn" id="btn-right" data-key="d">▶</div>
-    </div>
-    <div id="actions">
-      <div class="action-btn" id="btn-punch"   data-key="z">PUNCH</div>
-      <div class="action-btn" id="btn-kick"    data-key="x">KICK</div>
-      <div class="action-btn" id="btn-special" data-key="q">★ SPEC</div>
-    </div>
-    <div class="menu-btn" id="btn-start" data-key="Enter">START</div>
-    <div class="menu-btn" id="btn-back"  data-key="Tab">BACK</div>
+  <!-- QR Code overlay for multiplayer -->
+  <div id="qr-overlay">
+    <div class="qr-title">Escaneá para unirte</div>
+    <canvas id="qr-canvas" width="200" height="200"></canvas>
+    <div class="qr-url" id="qr-url-text"></div>
+    <div class="qr-close" id="qr-close">CERRAR</div>
   </div>
 
-  <!-- Kaplay.js -->
+  <!-- Virtual gamepad (touch devices only — shown by JS) -->
+  <div id="gamepad">
+    <div class="pill-btn" id="btn-start">START</div>
+    <div class="pill-btn" id="btn-back">BACK</div>
+
+    <div id="dpad">
+      <div class="dpad-btn" id="btn-up">▲</div>
+      <div class="dpad-btn" id="btn-down">▼</div>
+      <div class="dpad-btn" id="btn-left">◀</div>
+      <div class="dpad-btn" id="btn-right">▶</div>
+    </div>
+
+    <div id="actions">
+      <div class="action-btn" id="btn-punch">PUÑO</div>
+      <div class="action-btn" id="btn-kick">PATADA</div>
+      <div class="action-btn" id="btn-special">★</div>
+    </div>
+  </div>
+
+  <!-- Engine -->
   <script src="https://unpkg.com/kaplay@3001/dist/kaplay.js"></script>
 
-  <!-- Load order matters: constants → entities → game -->
+  <!-- Supabase client (for leaderboard + multiplayer) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
+  <!-- QR Code generator (lightweight, no deps) -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+
+  <!-- Game code (load order matters) -->
   <script src="js/constants.js"></script>
   <script src="js/entities.js"></script>
+  <script src="js/multiplayer.js"></script>
   <script src="game.js"></script>
 
+  <!-- Mobile gamepad wiring -->
   <script>
-    // ── Show gamepad only on real touch devices ───────────────────────────────
-    if (window.matchMedia("(pointer: coarse)").matches) {
-      document.getElementById("gamepad").style.display = "block";
+  (function() {
+    if (!window.matchMedia("(pointer: coarse)").matches) return;
+    document.getElementById("gamepad").style.display = "block";
+
+    const canvas = document.querySelector("canvas");
+    const fire = (key, type) => {
+      canvas.dispatchEvent(new KeyboardEvent(type, { key, bubbles: true }));
+    };
+
+    const MAP = {
+      "btn-up":      "w",
+      "btn-down":    "s",
+      "btn-left":    "a",
+      "btn-right":   "d",
+      "btn-punch":   "z",
+      "btn-kick":    "x",
+      "btn-special": "q",
+      "btn-start":   "Enter",
+      "btn-back":    "Tab",
+    };
+
+    for (const [id, key] of Object.entries(MAP)) {
+      const el = document.getElementById(id);
+      el.addEventListener("touchstart", (e) => { e.preventDefault(); el.classList.add("active"); fire(key, "keydown"); }, { passive: false });
+      el.addEventListener("touchend",   (e) => { e.preventDefault(); el.classList.remove("active"); fire(key, "keyup"); }, { passive: false });
+      el.addEventListener("touchcancel",(e) => { el.classList.remove("active"); fire(key, "keyup"); });
     }
-
-    // ── Virtual button → synthetic KeyboardEvent ─────────────────────────────
-    // Kaplay listens for keyboard events on the <canvas>, not on window.
-    // We must dispatch on the canvas so onKeyPress / isKeyDown pick them up.
-    const _gameCanvas = document.querySelector("canvas");
-
-    function fireKey(key, type) {
-      const singleChar = key.length === 1;
-      _gameCanvas.dispatchEvent(new KeyboardEvent(type, {
-        key,
-        code: singleChar ? "Key" + key.toUpperCase() : key,
-        bubbles: true, cancelable: true,
-      }));
-    }
-
-    document.querySelectorAll("[data-key]").forEach(btn => {
-      const key = btn.dataset.key;
-
-      btn.addEventListener("touchstart", e => {
-        e.preventDefault();
-        _gameCanvas.focus();          // keep canvas focused so Kaplay tracks keys
-        fireKey(key, "keydown");
-        fireKey(key, "keypress");
-      }, { passive: false });
-
-      btn.addEventListener("touchend", e => {
-        e.preventDefault();
-        fireKey(key, "keyup");
-      }, { passive: false });
-
-      // Mouse fallback for desktop testing
-      btn.addEventListener("mousedown", () => { _gameCanvas.focus(); fireKey(key, "keydown"); fireKey(key, "keypress"); });
-      btn.addEventListener("mouseup",   () => fireKey(key, "keyup"));
-    });
+  })();
   </script>
 </body>
 </html>

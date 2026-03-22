@@ -1,14 +1,14 @@
 const { test, expect } = require('@playwright/test');
 
 /**
- * Smoke tests for Streets of Winter.
+ * Smoke tests for Calles de Alberdi.
  * Verify page loads, canvas renders, and basic structure is intact.
  */
 
 test.describe('Page Load & Canvas', () => {
   test('page title is correct', async ({ page }) => {
     await page.goto('/');
-    await expect(page).toHaveTitle('Ottawa Rage — Streets of Winter');
+    await expect(page).toHaveTitle('Calles de Alberdi');
   });
 
   test('canvas element exists', async ({ page }) => {
@@ -31,15 +31,6 @@ test.describe('Page Load & Canvas', () => {
     await page.waitForLoadState('networkidle');
 
     expect(jsErrors).toHaveLength(0);
-  });
-
-  test('landscape viewport hides rotate overlay', async ({ page }) => {
-    await page.goto('/');
-
-    const overlay = page.locator('#rotate-overlay');
-    const display = await overlay.evaluate((el) => window.getComputedStyle(el).display);
-
-    expect(display).toBe('none');
   });
 
   test('canvas is not blank (has pixel data)', async ({ page }) => {
