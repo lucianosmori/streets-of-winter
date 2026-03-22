@@ -199,6 +199,23 @@ scene("title", () => {
          color(130, 180, 220), fixed(), z(10)]);
   }
 
+  // ── Leaderboard on title ──────────────────────────────────────────────────
+  const lbY = isMobile
+    ? listStartY + LEVELS.length * rowH + 52
+    : listStartY + LEVELS.length * rowH + 78;
+  const lbText = add([
+    text("", { size: 9, align: "center", width: VIEW_W - 20 }),
+    pos(cx, lbY), anchor("center"),
+    color(140, 180, 140), fixed(), z(10),
+  ]);
+  fetchLeaderboard(5).then(entries => {
+    if (entries.length === 0) return;
+    const lines = entries.map((e, i) =>
+      `${i + 1}. ${e.player} — ${e.score}`
+    );
+    lbText.text = "TOP SCORES\n" + lines.join("\n");
+  });
+
   // Copyright / flavour
   add([text("\u00a9 Calles de Alberdi — Córdoba, Argentina",
             { size: 7, align: "center" }),
@@ -248,7 +265,7 @@ scene("title", () => {
 // SCENE — MAIN GAME
 // =============================================================================
 
-scene("game", ({ numPlayers = 1, levelIdx = 0 }) => {
+scene("game", ({ numPlayers = 1, levelIdx = 0, score: carriedScore = 0 }) => {
 
   const lvl = LEVELS[levelIdx];
 
@@ -260,6 +277,11 @@ scene("game", ({ numPlayers = 1, levelIdx = 0 }) => {
   let waveIdx     = -1;   // current wave (incremented by advanceWave)
   let bossObjs    = [];   // boss game object(s) for current encounter
   let phase       = "wave"; // "wave" | "bossIntro" | "boss" | "levelClear"
+
+  // ── Score & combo tracking ────────────────────────────────────────────────
+  let score       = carriedScore;
+  let comboCount  = 0;    // consecutive hits within COMBO_WINDOW
+  let comboTimer  = 0;    // seconds remaining in current combo window
 
   // ── Build the scene ─────────────────────────────────────────────────────────
   Music.play("level");
@@ -349,16 +371,17 @@ scene("game", ({ numPlayers = 1, levelIdx = 0 }) => {
 
     } else if (phase === "boss") {
       phase = "levelClear";
-      showBanner(`${lvl.name.toUpperCase()}  CLEAR!`, 3);
+      score += SCORE_LEVEL_CLEAR;
+      showBanner(`${lvl.name.toUpperCase()}  CLEAR!  +${SCORE_LEVEL_CLEAR}`, 3);
 
       wait(4, () => {
         const next = levelIdx + 1;
         if (next < LEVELS.length) {
           Music.stop();
-          go("game", { numPlayers, levelIdx: next });
+          go("game", { numPlayers, levelIdx: next, score });
         } else {
           Music.stop();
-          go("victory", { numPlayers });
+          go("victory", { numPlayers, score });
         }
       });
     }
@@ -460,6 +483,10 @@ scene("game", ({ numPlayers = 1, levelIdx = 0 }) => {
       e.pos.x  = clamp(e.pos.x, 20, SCREEN_W - 20);
     }
 
+    // Combo tracking
+    comboCount++;
+    comboTimer = COMBO_WINDOW;
+
     spawnFloatText(`-${damage}`, e.pos.x, e.pos.y - 50, [255, 220, 50]);
 
     if (e.hp <= 0) killEnemy(e);
@@ -469,8 +496,11 @@ scene("game", ({ numPlayers = 1, levelIdx = 0 }) => {
     if (e.state === "dead") return;  // guard against double-kill in same frame
     e.state = "dead";
 
-    // Score popup
-    const pts = e.def.isBoss ? 500 : 100;
+    // Score — apply combo multiplier when combo >= 3
+    const basePts = e.def.isBoss ? SCORE_BOSS_KILL : SCORE_ENEMY_KILL;
+    const multiplier = comboCount >= 3 ? SCORE_COMBO_MULTIPLIER : 1;
+    const pts = Math.round(basePts * multiplier);
+    score += pts;
     spawnFloatText(`+${pts}`, e.pos.x, e.pos.y - 68, [255, 255, 70]);
 
     // Chance to drop a health pickup
@@ -523,6 +553,14 @@ scene("game", ({ numPlayers = 1, levelIdx = 0 }) => {
   onKeyPress("x", () => { if (isKeyDown("tab")) debugSkipLevel(); });  // BACK+KICK
 
   // ── Main update loops ───────────────────────────────────────────────────────
+
+  // Combo timer decay
+  onUpdate(() => {
+    if (comboTimer > 0) {
+      comboTimer -= dt();
+      if (comboTimer <= 0) { comboCount = 0; comboTimer = 0; }
+    }
+  });
 
   // Player movement (attack/hurt timers are ticked inside updatePlayerMovement)
   onUpdate(() => {
@@ -594,13 +632,13 @@ scene("game", ({ numPlayers = 1, levelIdx = 0 }) => {
   onUpdate(() => updateSnow());
   onDraw(() => {
     drawSnow();
-    drawHUD(players, waveIdx, lvl, enemies, bossObjs, phase);
+    drawHUD(players, waveIdx, lvl, enemies, bossObjs, phase, score, comboCount);
   });
 
   // Game-over check — all players dead
   onUpdate(() => {
     if (players.length > 0 && players.every(p => p.hp <= 0)) {
-      wait(0.6, () => { Music.stop(); go("gameover", { numPlayers, levelIdx }); });
+      wait(0.6, () => { Music.stop(); go("gameover", { numPlayers, levelIdx, score }); });
     }
   });
 
@@ -638,19 +676,22 @@ scene("game", ({ numPlayers = 1, levelIdx = 0 }) => {
 // SCENE — GAME OVER
 // =============================================================================
 
-scene("gameover", ({ numPlayers = 1, levelIdx = 0 }) => {
+scene("gameover", ({ numPlayers = 1, levelIdx = 0, score = 0 }) => {
   setCamScale(1); setCamPos(VIEW_W / 2, VIEW_H / 2);
 
   const lvl = LEVELS[levelIdx];
   const cx = VIEW_W / 2;
   const isMobile = window.matchMedia("(pointer: coarse)").matches;
 
+  // Submit score to leaderboard
+  submitScore("GAUCHO", score, levelIdx + 1);
+
   // Dark overlay
   add([rect(VIEW_W, VIEW_H), pos(0, 0), color(0, 0, 0), opacity(0.82), fixed(), z(998)]);
 
   const msg = isMobile
-    ? `FIN DEL JUEGO\n\nCaíste en  ${lvl.name}\n\nTocá START para reintentar`
-    : `FIN DEL JUEGO\n\nCaíste en  ${lvl.name}\n\n[ ENTER ]  Reintentar\n[ TAB ]  Menú Principal`;
+    ? `FIN DEL JUEGO\n\nCaíste en  ${lvl.name}\nPuntaje: ${score}\n\nTocá START para reintentar`
+    : `FIN DEL JUEGO\n\nCaíste en  ${lvl.name}\nPuntaje: ${score}\n\n[ ENTER ]  Reintentar\n[ TAB ]  Menú Principal`;
   add([text(msg, { size: 21, align: "center", width: VIEW_W - 20 }),
        pos(cx, VIEW_H / 2), anchor("center"),
        color(255, 70, 70), fixed(), z(999)]);
@@ -668,28 +709,52 @@ scene("gameover", ({ numPlayers = 1, levelIdx = 0 }) => {
 // SCENE — VICTORY
 // =============================================================================
 
-scene("victory", ({ numPlayers = 1 }) => {
+scene("victory", ({ numPlayers = 1, score = 0 }) => {
   setCamScale(1); setCamPos(VIEW_W / 2, VIEW_H / 2);
 
   const cx = VIEW_W / 2;
   const isMobile = window.matchMedia("(pointer: coarse)").matches;
 
+  // Submit score to leaderboard
+  submitScore("GAUCHO", score, LEVELS.length);
+
   add([rect(VIEW_W, VIEW_H), pos(0, 0), color(10, 20, 10), fixed(), z(0)]);
 
   add([text("¡ALBERDI\nLIBERADO!", { size: 38, align: "center" }),
-       pos(cx, 90), anchor("center"),
+       pos(cx, 70), anchor("center"),
        color(100, 255, 100), fixed(), z(10)]);
+
+  add([text(`Puntaje Final: ${score}`, { size: 18, align: "center" }),
+       pos(cx, 130), anchor("center"),
+       color(255, 215, 60), fixed(), z(10)]);
 
   add([text("Peleaste por cada\ncalle del barrio.\n¡Alberdi te lo agradece, loco!",
             { size: 14, align: "center", width: VIEW_W - 20 }),
-       pos(cx, 200), anchor("center"),
+       pos(cx, 190), anchor("center"),
        color(180, 240, 180), fixed(), z(10)]);
+
+  // Fetch and display leaderboard
+  const lbLabel = add([
+    text("Cargando ranking...", { size: 10, align: "center", width: VIEW_W - 20 }),
+    pos(cx, 240), anchor("center"),
+    color(160, 200, 160), fixed(), z(10),
+  ]);
+  fetchLeaderboard(5).then(entries => {
+    if (entries.length === 0) {
+      lbLabel.text = "";
+      return;
+    }
+    const lines = entries.map((e, i) =>
+      `${i + 1}. ${e.player} — ${e.score} (Nivel ${e.level})`
+    );
+    lbLabel.text = "RANKING\n" + lines.join("\n");
+  });
 
   const replayMsg = isMobile
     ? "Tocá START para jugar de nuevo"
     : "[ ENTER ]  Jugar de Nuevo\n[ TAB ]  Menú Principal";
   add([text(replayMsg, { size: 12, align: "center", width: VIEW_W - 20 }),
-       pos(cx, 290), anchor("center"),
+       pos(cx, 320), anchor("center"),
        color(255, 245, 120), fixed(), z(10)]);
 
   // Celebratory heavy snow

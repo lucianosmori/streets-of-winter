@@ -812,7 +812,9 @@ function spawnPickup(type, x, y) {
  * @param {KAPLAYObj[]} bossObjs — boss objects (may be empty)
  * @param {string}      phase    — "wave" | "bossIntro" | "boss" | "levelClear"
  */
-function drawHUD(players, waveIdx, lvl, enemies, bossObjs, phase) {
+function drawHUD(players, waveIdx, lvl, enemies, bossObjs, phase, score, comboCount) {
+  score = score || 0;
+  comboCount = comboCount || 0;
   // VIEW_W / VIEW_H are the viewport dimensions (may differ from SCREEN_W in portrait)
   const vw = typeof VIEW_W !== "undefined" ? VIEW_W : SCREEN_W;
   const vh = typeof VIEW_H !== "undefined" ? VIEW_H : SCREEN_H;
@@ -863,9 +865,19 @@ function drawHUD(players, waveIdx, lvl, enemies, bossObjs, phase) {
                pos: vec2(vw / 2 - 18, 5), size: 13, color: rgb(255, 50, 50) });
   }
 
-  // ── Enemy count (top-right) ──────────────────────────────────────────────
+  // ── Score (top-right) ───────────────────────────────────────────────────
+  drawText({ text: `${score}`, pos: vec2(vw - 8, 5),
+             size: 11, color: rgb(255, 215, 60), align: "right" });
+
+  // ── Combo indicator (below score) ─────────────────────────────────────
+  if (comboCount >= 3) {
+    drawText({ text: `COMBO ×${comboCount}`, pos: vec2(vw - 8, 19),
+               size: 9, color: rgb(255, 140, 40), align: "right" });
+  }
+
+  // ── Enemy count (top-right, shifted down) ──────────────────────────────
   const alive = enemies.filter(e => e.state !== "dead").length;
-  drawText({ text: `×${alive}`, pos: vec2(vw - 30, 5),
+  drawText({ text: `×${alive}`, pos: vec2(vw - 30, comboCount >= 3 ? 32 : 19),
              size: 11, color: rgb(215, 85, 85) });
 
   // ── Boss HP bar (bottom of screen) ──────────────────────────────────────
